@@ -9,12 +9,15 @@ import {
 } from "@ui/components/card";
 
 import { AbilityDemo } from "@/app/(admin)/_components/ability-demo";
+import { FormBuilderDemo } from "@/app/(admin)/_components/form-builder-demo";
 import { StateMachineDemo } from "@/app/(admin)/_components/state-machine-demo";
+import { getApplicationFormSchema } from "@/lib/api";
 import { getTenantBranding, getTenantCode } from "@/lib/tenants/branding";
 
 export default async function AdminHomePage() {
   const code = await getTenantCode();
   const branding = await getTenantBranding(code);
+  const formSchema = await getApplicationFormSchema(code ?? "");
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:py-10">
@@ -70,6 +73,13 @@ export default async function AdminHomePage() {
           Smoke test ability layer (task 9)
         </h2>
         <AbilityDemo />
+      </div>
+
+      <div className="mt-10">
+        <h2 className="mb-4 text-lg font-semibold">
+          Smoke test FormBuilder (task 10)
+        </h2>
+        <FormBuilderDemo schema={formSchema} />
       </div>
     </div>
   );

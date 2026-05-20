@@ -10,3 +10,5 @@ export {
   type VerifyEmailOtpInput,
   type VerifyEmailOtpResult,
 } from "./admission";
+
+export { getApplicationFormSchema } from "./forms";
