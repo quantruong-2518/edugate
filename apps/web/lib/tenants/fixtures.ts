@@ -68,6 +68,23 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
       },
     }),
   },
+  "nguyen-huy-tuong": {
+    code: "nguyen-huy-tuong",
+    name: "Trường THCS Nguyễn Huy Tưởng — Đông Anh",
+    shortName: "NHT",
+    logoUrl: null,
+    theme: tenantTheme({
+      // Tailwind emerald-600 / emerald-400 in oklch — fresh green.
+      light: {
+        primary: "oklch(0.596 0.145 163.225)",
+        primaryForeground: "oklch(0.985 0 0)",
+      },
+      dark: {
+        primary: "oklch(0.765 0.177 163.223)",
+        primaryForeground: "oklch(0.205 0 0)",
+      },
+    }),
+  },
 };
 
 export const DEFAULT_BRANDING: TenantBranding = {

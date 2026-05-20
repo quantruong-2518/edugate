@@ -198,9 +198,137 @@ const TDN_CONFIG: LandingConfig = {
   ],
 };
 
+const NHT_CONFIG: LandingConfig = {
+  sections: [
+    {
+      type: "hero",
+      eyebrow: "Tuyển sinh lớp 6 — Năm học 2026 - 2027",
+      headline: "THCS Nguyễn Huy Tưởng",
+      subheadline:
+        "Ngôi trường giàu truyền thống tại Đông Anh, Hà Nội — nơi ươm mầm tri thức và nuôi dưỡng nhân cách cho thế hệ tương lai.",
+      image: unsplash("1509062522246-3755977927d7"),
+      ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
+      ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
+    },
+    {
+      type: "stats",
+      items: [
+        { label: "Học sinh toàn trường", value: "1.080" },
+        { label: "Giáo viên đạt chuẩn", value: "100%" },
+        { label: "Năm thành lập", value: "1996" },
+        { label: "Học sinh giỏi cấp huyện", value: "320+" },
+      ],
+    },
+    {
+      type: "about",
+      title: "Về Trường THCS Nguyễn Huy Tưởng",
+      body: "Tọa lạc tại huyện Đông Anh, Hà Nội, Trường THCS Nguyễn Huy Tưởng tự hào với bề dày truyền thống dạy tốt - học tốt. Nhà trường không ngừng đổi mới phương pháp giảng dạy, chú trọng giáo dục đạo đức và phát triển năng lực toàn diện cho mỗi học sinh.",
+      image: unsplash("1577896851231-70ef18881754", 1200),
+    },
+    {
+      type: "process",
+      title: "Quy trình đăng ký tuyển sinh",
+      steps: [
+        { title: "Khai thông tin", description: "Điền thông tin phụ huynh." },
+        { title: "Điền hồ sơ", description: "Hoàn tất biểu mẫu lớp 6." },
+        { title: "Xác thực email", description: "Nhập mã OTP gửi qua email." },
+        { title: "Nộp hồ sơ", description: "Nhận mã hồ sơ để tra cứu." },
+        { title: "Theo dõi", description: "Cập nhật kết quả xét tuyển." },
+      ],
+    },
+    {
+      type: "infoTabs",
+      title: "Thông tin tuyển sinh",
+      tabs: [
+        {
+          id: "eligibility",
+          label: "Đối tượng",
+          body: "Học sinh hoàn thành chương trình tiểu học, có hộ khẩu hoặc cư trú tại huyện Đông Anh và các khu vực lân cận theo phân tuyến.",
+        },
+        {
+          id: "schedule",
+          label: "Lịch tuyển sinh",
+          body: "Nhận hồ sơ trực tuyến từ 01/07 đến 15/07/2026. Công bố danh sách trúng tuyển dự kiến ngày 25/07/2026.",
+        },
+        {
+          id: "documents",
+          label: "Hồ sơ cần nộp",
+          body: "Giấy khai sinh, học bạ tiểu học, giấy chứng nhận hoàn thành chương trình tiểu học và ảnh thẻ 3x4.",
+        },
+      ],
+    },
+    {
+      type: "testimonials",
+      title: "Cảm nhận của phụ huynh",
+      items: [
+        {
+          name: "Chị Đỗ Hương",
+          role: "Phụ huynh lớp 6A",
+          quote:
+            "Thầy cô tận tâm, môi trường học tập kỷ luật mà vẫn ấm áp. Con tôi tiến bộ rõ rệt từng học kỳ.",
+          avatarUrl: unsplash("1534528741775-53994a69daeb", 200),
+        },
+        {
+          name: "Anh Lê Quang",
+          role: "Phụ huynh lớp 7B",
+          quote:
+            "Việc đăng ký tuyển sinh online giúp gia đình ở xa như chúng tôi tiết kiệm rất nhiều thời gian.",
+          avatarUrl: unsplash("1500648767791-00dcc994a43e", 200),
+        },
+      ],
+    },
+    {
+      type: "faq",
+      title: "Câu hỏi thường gặp",
+      items: [
+        {
+          question: "Trường có nhận học sinh trái tuyến không?",
+          answer:
+            "Nhà trường ưu tiên học sinh đúng tuyến; chỉ tiêu trái tuyến (nếu có) sẽ được thông báo công khai theo từng năm.",
+        },
+        {
+          question: "Có tổ chức khảo sát đầu vào không?",
+          answer:
+            "Tùy năm học, nhà trường có thể tổ chức khảo sát năng lực. Thông tin cụ thể sẽ gửi qua email đã đăng ký.",
+        },
+        {
+          question: "Học phí và các khoản thu như thế nào?",
+          answer:
+            "Trường công lập thu theo quy định của thành phố Hà Nội; chi tiết được niêm yết tại trường và website.",
+        },
+      ],
+    },
+    {
+      type: "footer",
+      columns: [
+        {
+          title: "Liên hệ",
+          links: [
+            { label: "Địa chỉ: Đông Anh, Hà Nội", href: "#" },
+            { label: "Hotline: 024 3883 0000", href: "tel:02438830000" },
+            {
+              label: "Email: c2nguyenhuytuong@hanoi.edu.vn",
+              href: "mailto:c2nguyenhuytuong@hanoi.edu.vn",
+            },
+          ],
+        },
+        {
+          title: "Tuyển sinh",
+          links: [
+            { label: "Đăng ký lớp 6", href: "/register" },
+            { label: "Tra cứu hồ sơ", href: "/track" },
+          ],
+        },
+      ],
+      copyright: "Trường THCS Nguyễn Huy Tưởng — Đông Anh, Hà Nội",
+    },
+  ],
+};
+
 const TENANT_CONFIGS: Readonly<Record<string, LandingConfig>> = {
   "cva-edu": CVA_CONFIG,
   "tran-dai-nghia": TDN_CONFIG,
+  "nguyen-huy-tuong": NHT_CONFIG,
 };
 
 const DEFAULT_CONFIG: LandingConfig = {

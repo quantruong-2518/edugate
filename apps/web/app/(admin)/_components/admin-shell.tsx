@@ -62,6 +62,11 @@ const MOCK_TENANTS: readonly AppShellTenantOption[] = [
     name: "Trường THPT Trần Đại Nghĩa",
     shortName: "TĐN",
   },
+  {
+    code: "nguyen-huy-tuong",
+    name: "Trường THCS Nguyễn Huy Tưởng — Đông Anh",
+    shortName: "NHT",
+  },
 ];
 
 export function AdminShell({
