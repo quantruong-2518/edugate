@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import type { ReactNode } from "react";
 import {
   Check,
   ChevronDown,
-  Globe,
   LogOut,
   Menu,
   PanelLeftClose,
@@ -37,6 +36,11 @@ export type TopBarProps = {
   /** Toggle the desktop sidebar collapse. */
   onToggleSidebar: () => void;
   sidebarCollapsed: boolean;
+  /**
+   * Locale switcher slot. Injected by the app so this package stays free of
+   * next-intl / routing concerns (the switcher persists locale via a cookie).
+   */
+  localeSwitcher?: ReactNode;
 };
 
 function userInitials(name: string): string {
@@ -83,37 +87,6 @@ function TenantSwitcher({
             )}
           </DropdownMenuItem>
         ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-function LocaleSwitcher() {
-  // Placeholder UI — task 14 wires next-intl + the routing layer. Selecting
-  // a locale here is a no-op for now.
-  const [locale, setLocale] = useState<"vi" | "en">("vi");
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Chọn ngôn ngữ"
-          className="relative"
-        >
-          <Globe className="size-4" />
-          <span className="absolute -bottom-0.5 -right-0.5 rounded bg-muted px-1 text-[9px] font-semibold uppercase">
-            {locale}
-          </span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onSelect={() => setLocale("vi")}>
-          Tiếng Việt {locale === "vi" && <Check className="ml-auto size-4" />}
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => setLocale("en")}>
-          English {locale === "en" && <Check className="ml-auto size-4" />}
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -166,6 +139,7 @@ export function TopBar({
   onOpenDrawer,
   onToggleSidebar,
   sidebarCollapsed,
+  localeSwitcher,
 }: TopBarProps) {
   return (
     <header
@@ -214,7 +188,7 @@ export function TopBar({
         {tenants && tenants.length > 1 && (
           <TenantSwitcher currentCode={currentTenantCode} tenants={tenants} />
         )}
-        <LocaleSwitcher />
+        {localeSwitcher}
         <UserMenu user={user} />
       </div>
     </header>

@@ -16,6 +16,8 @@ import {
   type NavItem,
 } from "@ui/components/app-shell";
 
+import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
+
 // `"use client"` at the top of this module turns the lucide icon imports
 // into client references — that's how we can ship the NavItem array
 // (containing component refs) across the RSC→client boundary from the
@@ -75,6 +77,7 @@ export function AdminShell({
       user={MOCK_USER}
       navItems={ADMIN_NAV}
       tenants={MOCK_TENANTS}
+      localeSwitcher={<LocaleSwitcher />}
     >
       {children}
     </AppShell>

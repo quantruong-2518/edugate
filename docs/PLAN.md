@@ -90,8 +90,12 @@
   - Renderer ở `packages/ui/src/components/form-builder/`: `<FormBuilder schema control />` render vào FormProvider của caller (page own `<Form>` + submit, để wizard task 12 compose được). `field-renderers/` mỗi type dùng `FormField/FormItem/FormControl` sẵn có. Date = native `input[type=date]`, file = native bọc style, scoring = number bounded — KHÔNG thêm dep picker/dropzone. Visibility qua `useWatch`, field ẩn render-skip.
   - Mock `getApplicationFormSchema(tenantCode)` ở `apps/web/lib/api/forms.ts` (dời từ P2) trả `FormSchema` demo per-tenant, cùng seam với `lib/api/admission.ts`.
   - Verify: demo schema có field điều kiện trên `/admin`; typecheck/lint/build.
-- [ ] **14. i18n next-intl** (VI default, EN slot, locale switcher)
+- [x] **14. i18n next-intl** (VI default, EN slot, locale switcher)
   - Runtime đã dựng ở **P1** (provider, vi.json, plugin). Task 14 còn lại = EN messages thật + locale switcher (`<LocaleSwitcher>` placeholder ở top-bar task 7).
+  - Locale persist qua **cookie** `EDUGATE_LOCALE` (không URL routing — ADR-008 giữ middleware tenant nguyên vẹn). `i18n/locale.ts` = hằng số pure (`LOCALES`/`AppLocale`/`DEFAULT_LOCALE`/`isAppLocale`) **không** import `next/headers` (an toàn cho client bundle); `i18n/locale-actions.ts` (`"use server"`) = `setUserLocale` set cookie; `request.ts` đọc cookie → `getRequestConfig`.
+  - `en.json` dịch đầy đủ 5 namespace (mirror vi.json, giữ placeholder `{code}`/`{min}`/`{max}`).
+  - `LocaleSwitcher` thật ở `apps/web/components/i18n/locale-switcher.tsx` (`"use client"`, `useLocale()` + `useTransition` → action + `router.refresh()`). `packages/ui` top-bar đổi từ placeholder no-op sang **slot** `localeSwitcher?: ReactNode` (AppShell forward) → ui không dính next-intl. Wire: AdminShell (admin top-bar) + `(public)/layout.tsx` (thanh mỏng top-right cho landing/register/track).
+  - Verify: typecheck/lint/build pass; runtime smoke — không cookie → VI, cookie `en` → text EN + `<html lang="en">` ở cả public; switcher swap qua server action.
 - [ ] **15. TanStack Query + axios client + OpenAPI codegen placeholder**
   - Mock data seam interim đã có ở **P2** (`apps/web/lib/api/*`). Task 15 = thay impl bằng axios + TanStack Query + OpenAPI codegen, giữ nguyên interface.
 - [ ] **16. Empty / loading / error state patterns** (`<EmptyState>`, skeleton, `<ErrorBoundary>`, 404, 403)

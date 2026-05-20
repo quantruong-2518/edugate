@@ -27,6 +27,8 @@ export type AppShellProps = {
   user: AppShellUser;
   navItems: readonly NavItem[];
   tenants?: readonly AppShellTenantOption[];
+  /** Locale switcher slot, forwarded to the top bar. */
+  localeSwitcher?: ReactNode;
   children: ReactNode;
 };
 
@@ -35,6 +37,7 @@ export function AppShell({
   user,
   navItems,
   tenants,
+  localeSwitcher,
   children,
 }: AppShellProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -74,6 +77,7 @@ export function AppShell({
         onOpenDrawer={() => setDrawerOpen(true)}
         onToggleSidebar={toggleSidebar}
         sidebarCollapsed={collapsed}
+        localeSwitcher={localeSwitcher}
       />
 
       <div className="flex">

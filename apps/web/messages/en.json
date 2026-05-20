@@ -1,1 +1,126 @@
-{}
+{
+  "common": {
+    "appName": "EduGate",
+    "actions": {
+      "next": "Continue",
+      "back": "Back",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "retry": "Retry",
+      "close": "Close"
+    },
+    "nav": {
+      "home": "Home",
+      "register": "Apply for admission",
+      "track": "Track application",
+      "login": "Sign in"
+    },
+    "states": {
+      "loading": "Loading…",
+      "error": "Something went wrong",
+      "empty": "No data"
+    },
+    "language": {
+      "label": "Language",
+      "vi": "Tiếng Việt",
+      "en": "English"
+    }
+  },
+  "landing": {
+    "hero": {
+      "badge": "Online admissions",
+      "ctaPrimary": "Apply now",
+      "ctaSecondary": "Track application"
+    },
+    "stats": {
+      "title": "Highlights"
+    },
+    "process": {
+      "title": "Admission process",
+      "subtitle": "Five simple steps to complete your application"
+    },
+    "infoTabs": {
+      "title": "Admission information"
+    },
+    "about": {
+      "title": "About us"
+    },
+    "testimonials": {
+      "title": "What parents & students say"
+    },
+    "faq": {
+      "title": "Frequently asked questions"
+    },
+    "footer": {
+      "rights": "All rights reserved by the school"
+    }
+  },
+  "apply": {
+    "title": "Apply for admission",
+    "steps": {
+      "applicant": "Applicant",
+      "form": "Application",
+      "verifyEmail": "Verify email",
+      "confirmation": "Done"
+    },
+    "applicant": {
+      "title": "Applicant information",
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone number",
+      "relationship": "Relationship to student",
+      "relationshipPlaceholder": "Select relationship",
+      "relationships": {
+        "father": "Father",
+        "mother": "Mother",
+        "guardian": "Guardian",
+        "self": "The student"
+      },
+      "invalidEmail": "Invalid email",
+      "invalidPhone": "Invalid phone number"
+    },
+    "verifyEmail": {
+      "title": "Verify email",
+      "description": "Enter the OTP code sent to your email",
+      "otpLabel": "Verification code",
+      "verify": "Verify & submit application",
+      "resend": "Resend code",
+      "sentToast": "Verification code (demo): {code}",
+      "invalidOtp": "Incorrect verification code"
+    },
+    "confirmation": {
+      "title": "Application submitted",
+      "codeLabel": "Your application code",
+      "trackHint": "Use this code to track your application status",
+      "trackCta": "Track application"
+    },
+    "draft": {
+      "restored": "Restored your saved draft",
+      "saved": "Draft saved"
+    }
+  },
+  "track": {
+    "title": "Track application",
+    "codeLabel": "Application code",
+    "codePlaceholder": "Enter application code",
+    "search": "Track",
+    "notFound": {
+      "title": "Application not found",
+      "description": "Check the application code and try again"
+    },
+    "timeline": {
+      "title": "Status history"
+    }
+  },
+  "form": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email",
+    "invalidNumber": "Invalid value",
+    "min": "Minimum value is {min}",
+    "max": "Maximum value is {max}",
+    "selectPlaceholder": "Select an option",
+    "filePlaceholder": "Choose a file",
+    "optional": "(optional)"
+  }
+}

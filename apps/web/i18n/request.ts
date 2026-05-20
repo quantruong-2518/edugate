@@ -1,14 +1,14 @@
 import { getRequestConfig } from "next-intl/server";
+import { cookies } from "next/headers";
 
-// Fixed locale for Phase 1 — no locale routing (see ADR-008), so the tenant
-// resolver middleware (subdomain + /t/:code) stays untouched. Task 14 adds the
-// real EN messages + a locale switcher; this only wires the runtime.
-export const DEFAULT_LOCALE = "vi" as const;
+import { DEFAULT_LOCALE, isAppLocale, LOCALE_COOKIE } from "./locale";
 
-export type AppLocale = typeof DEFAULT_LOCALE;
-
+// No locale routing (ADR-008): the active locale comes from a cookie, not a
+// URL prefix, so the tenant resolver middleware stays untouched. Defaults to
+// VI when the cookie is absent or invalid.
 export default getRequestConfig(async () => {
-  const locale: AppLocale = DEFAULT_LOCALE;
+  const cookieLocale = (await cookies()).get(LOCALE_COOKIE)?.value;
+  const locale = isAppLocale(cookieLocale) ? cookieLocale : DEFAULT_LOCALE;
 
   return {
     locale,
