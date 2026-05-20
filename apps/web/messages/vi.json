@@ -113,6 +113,22 @@
       "title": "Lịch sử trạng thái"
     }
   },
+  "errors": {
+    "retry": "Thử lại",
+    "generic": {
+      "title": "Đã có lỗi xảy ra",
+      "description": "Vui lòng thử lại. Nếu lỗi vẫn tiếp diễn, hãy liên hệ nhà trường."
+    },
+    "notFound": {
+      "title": "Không tìm thấy trang",
+      "description": "Đường dẫn bạn truy cập không tồn tại hoặc đã bị di chuyển.",
+      "home": "Về trang chủ"
+    },
+    "forbidden": {
+      "title": "Không có quyền truy cập",
+      "description": "Bạn không có quyền truy cập khu vực này."
+    }
+  },
   "form": {
     "required": "Trường này là bắt buộc",
     "invalidEmail": "Email không hợp lệ",

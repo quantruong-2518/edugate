@@ -113,6 +113,22 @@
       "title": "Status history"
     }
   },
+  "errors": {
+    "retry": "Retry",
+    "generic": {
+      "title": "Something went wrong",
+      "description": "Please try again. If the problem persists, contact the school."
+    },
+    "notFound": {
+      "title": "Page not found",
+      "description": "The page you requested does not exist or has been moved.",
+      "home": "Back to home"
+    },
+    "forbidden": {
+      "title": "Access denied",
+      "description": "You do not have permission to access this area."
+    }
+  },
   "form": {
     "required": "This field is required",
     "invalidEmail": "Invalid email",

@@ -1,18 +1,24 @@
+import { FileQuestion } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
-export default function NotFound() {
+import { Button } from "@ui/components/button";
+import { EmptyState } from "@ui/components/empty-state";
+
+export default async function NotFound() {
+  const t = await getTranslations("errors.notFound");
   return (
-    <main className="mx-auto grid min-h-dvh max-w-md place-items-center px-6 text-center">
-      <div className="space-y-3">
-        <p className="text-sm font-medium text-neutral-500">404</p>
-        <h1 className="text-2xl font-semibold">Không tìm thấy trang</h1>
-        <p className="text-sm text-neutral-600">
-          Đường dẫn bạn truy cập không tồn tại hoặc đã bị di chuyển.
-        </p>
-        <Link className="text-sm font-medium underline" href="/">
-          Về trang chủ
-        </Link>
-      </div>
+    <main className="grid min-h-dvh place-items-center px-6">
+      <EmptyState
+        icon={FileQuestion}
+        title={t("title")}
+        description={t("description")}
+        action={
+          <Button asChild variant="outline" size="sm">
+            <Link href="/">{t("home")}</Link>
+          </Button>
+        }
+      />
     </main>
   );
 }

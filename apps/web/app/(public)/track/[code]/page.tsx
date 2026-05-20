@@ -1,5 +1,6 @@
 "use client";
 
+import { FileSearch } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -10,16 +11,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@ui/components/card";
+import { EmptyState } from "@ui/components/empty-state";
+import { ErrorState } from "@ui/components/error-state";
 import { Skeleton } from "@ui/components/skeleton";
 
 import { useApplication } from "@/lib/api/queries";
 
 export default function TrackDetailPage() {
   const t = useTranslations("track");
+  const tErrors = useTranslations("errors");
   const params = useParams<{ code: string }>();
   const code = decodeURIComponent(params.code ?? "");
-  const { data: application, isPending } = useApplication(code);
-  const notFound = !isPending && !application;
+  const { data: application, isPending, isError, refetch } =
+    useApplication(code);
+  const notFound = !isPending && !isError && !application;
 
   return (
     <main className="container mx-auto px-4 py-10">
@@ -37,13 +42,22 @@ export default function TrackDetailPage() {
               <Skeleton className="h-20 w-full" />
             </div>
           )}
+          {isError && (
+            <ErrorState
+              title={tErrors("generic.title")}
+              description={tErrors("generic.description")}
+              retryLabel={tErrors("retry")}
+              onRetry={() => void refetch()}
+              className="py-6"
+            />
+          )}
           {notFound && (
-            <div className="py-6 text-center">
-              <p className="font-medium">{t("notFound.title")}</p>
-              <p className="text-sm text-muted-foreground">
-                {t("notFound.description")}
-              </p>
-            </div>
+            <EmptyState
+              icon={FileSearch}
+              title={t("notFound.title")}
+              description={t("notFound.description")}
+              className="py-6"
+            />
           )}
           {application && (
             <div className="space-y-4">

@@ -106,7 +106,13 @@
   - **OpenAPI codegen = placeholder** (chốt: `openapi-typescript` types-only + hooks viết tay, KHÔNG orval): devDep `openapi-typescript`, script `codegen:api` trỏ `./openapi/schema.json` → `./lib/api/generated/schema.d.ts` (spec chưa tồn tại, không chạy), `openapi/README.md` mô tả wiring pha 2.
   - Deps: `@tanstack/react-query` ^5.100, `axios` ^1.16, devDep `openapi-typescript` ^7.13.
   - Verify: typecheck/lint/build pass; smoke 4 route 200, `/track/[code]` render loading skeleton (useQuery), không lỗi server.
-- [ ] **16. Empty / loading / error state patterns** (`<EmptyState>`, skeleton, `<ErrorBoundary>`, 404, 403)
+- [x] **16. Empty / loading / error state patterns** (`<EmptyState>`, skeleton, `<ErrorBoundary>`, 404, 403)
+  - `packages/ui`: `<EmptyState>` (icon/iconClassName/title/description/action slot, presentational **i18n-free** — string truyền props) + `<ErrorState>` (build trên EmptyState: icon `AlertTriangle` destructive + nút retry optional). Import per-subpath `@ui/components/empty-state`/`error-state`.
+  - **ErrorBoundary = App Router `error.tsx`** (chốt: root + global-error, KHÔNG per-segment): `app/error.tsx` (client, nằm TRONG root layout → providers còn mounted → `useTranslations` chạy; `ErrorState` + `reset`); `app/global-error.tsx` (last-resort, **thay cả root layout** → ngoài `NextIntlClientProvider` → KHÔNG i18n + có thể chưa có globals.css → chuỗi VI tĩnh + **inline style** tự chứa).
+  - Sửa vi phạm CLAUDE.md cũ: `not-found.tsx` (404) chuyển hardcode VI + `text-neutral-*` → `getTranslations("errors.notFound")` + `<EmptyState>` + token + Button asChild Link về `/`. `Forbidden` (403) trong `require-permission.tsx` → `<EmptyState>` icon `ShieldX` + `useTranslations("errors.forbidden")`.
+  - Namespace messages mới `errors` (retry/generic/notFound/forbidden) ở vi.json + en.json. `track.notFound` giữ riêng (domain "không thấy hồ sơ" ≠ route 404).
+  - Wire: `/track/[code]` not-found block → `<EmptyState>` (icon `FileSearch`); thêm nhánh `isError` → `<ErrorState>` với `refetch` (mock không lỗi nhưng sẵn pattern cho pha 2). **KHÔNG** thêm `loading.tsx` route-level (loading đã in-component qua TanStack Query `isPending` + Suspense register). Track index = form, không cần empty.
+  - Verify: typecheck/lint/build pass; smoke — 404 trả status 404 + EmptyState i18n swap VI↔EN, skeleton SSR render, không lỗi server.
 
 ### Prerequisites cho feature pages (chốt 2026-05-20 — làm trước 10-12)
 - [x] **P1. next-intl runtime** (kéo phần runtime của task 14 lên trước)

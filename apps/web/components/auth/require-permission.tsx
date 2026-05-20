@@ -1,7 +1,11 @@
 "use client";
 
 import type { Action, Resource, Subject } from "@shared/auth";
+import { ShieldX } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
+
+import { EmptyState } from "@ui/components/empty-state";
 
 import { useAbility } from "@/lib/auth/ability-provider";
 
@@ -17,13 +21,15 @@ export type RequirePermissionProps = {
 };
 
 function Forbidden() {
+  const t = useTranslations("errors.forbidden");
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-2 px-4 py-16 text-center">
-      <p className="text-4xl font-semibold tracking-tight">403</p>
-      <p className="text-sm text-muted-foreground">
-        Bạn không có quyền truy cập khu vực này.
-      </p>
-    </div>
+    <EmptyState
+      icon={ShieldX}
+      iconClassName="text-destructive"
+      title={t("title")}
+      description={t("description")}
+      className="py-16"
+    />
   );
 }
 
