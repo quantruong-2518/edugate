@@ -21,6 +21,8 @@ export {
 export {
   DEFAULT_FORM_MESSAGES,
   buildZodSchema,
+  fieldShape,
+  refineFields,
   type BuiltFormValues,
   type FormValidationMessages,
 } from "./build-zod";

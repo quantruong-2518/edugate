@@ -69,18 +69,31 @@
       "fullName": "Họ và tên",
       "email": "Email",
       "phone": "Số điện thoại",
-      "relationship": "Quan hệ với học sinh"
+      "relationship": "Quan hệ với học sinh",
+      "relationshipPlaceholder": "Chọn quan hệ",
+      "relationships": {
+        "father": "Bố",
+        "mother": "Mẹ",
+        "guardian": "Người giám hộ",
+        "self": "Bản thân học sinh"
+      },
+      "invalidEmail": "Email không hợp lệ",
+      "invalidPhone": "Số điện thoại không hợp lệ"
     },
     "verifyEmail": {
       "title": "Xác thực email",
       "description": "Nhập mã OTP đã gửi tới email của bạn",
       "otpLabel": "Mã xác thực",
-      "resend": "Gửi lại mã"
+      "verify": "Xác thực & nộp hồ sơ",
+      "resend": "Gửi lại mã",
+      "sentToast": "Mã xác thực (demo): {code}",
+      "invalidOtp": "Mã xác thực không đúng"
     },
     "confirmation": {
       "title": "Nộp hồ sơ thành công",
       "codeLabel": "Mã hồ sơ của bạn",
-      "trackHint": "Dùng mã này để tra cứu trạng thái hồ sơ"
+      "trackHint": "Dùng mã này để tra cứu trạng thái hồ sơ",
+      "trackCta": "Tra cứu hồ sơ"
     },
     "draft": {
       "restored": "Đã khôi phục bản nháp đã lưu",
@@ -104,6 +117,8 @@
     "required": "Trường này là bắt buộc",
     "invalidEmail": "Email không hợp lệ",
     "invalidNumber": "Giá trị không hợp lệ",
+    "min": "Giá trị tối thiểu là {min}",
+    "max": "Giá trị tối đa là {max}",
     "selectPlaceholder": "Chọn một mục",
     "filePlaceholder": "Chọn tệp",
     "optional": "(không bắt buộc)"
