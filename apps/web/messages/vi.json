@@ -1,0 +1,111 @@
+{
+  "common": {
+    "appName": "EduGate",
+    "actions": {
+      "next": "Tiếp tục",
+      "back": "Quay lại",
+      "submit": "Gửi",
+      "cancel": "Hủy",
+      "save": "Lưu",
+      "retry": "Thử lại",
+      "close": "Đóng"
+    },
+    "nav": {
+      "home": "Trang chủ",
+      "register": "Đăng ký tuyển sinh",
+      "track": "Tra cứu hồ sơ",
+      "login": "Đăng nhập"
+    },
+    "states": {
+      "loading": "Đang tải…",
+      "error": "Đã có lỗi xảy ra",
+      "empty": "Không có dữ liệu"
+    },
+    "language": {
+      "label": "Ngôn ngữ",
+      "vi": "Tiếng Việt",
+      "en": "English"
+    }
+  },
+  "landing": {
+    "hero": {
+      "badge": "Tuyển sinh trực tuyến",
+      "ctaPrimary": "Đăng ký ngay",
+      "ctaSecondary": "Tra cứu hồ sơ"
+    },
+    "stats": {
+      "title": "Con số nổi bật"
+    },
+    "process": {
+      "title": "Quy trình tuyển sinh",
+      "subtitle": "5 bước đơn giản để hoàn tất hồ sơ"
+    },
+    "infoTabs": {
+      "title": "Thông tin tuyển sinh"
+    },
+    "about": {
+      "title": "Giới thiệu"
+    },
+    "testimonials": {
+      "title": "Phụ huynh & học sinh nói gì"
+    },
+    "faq": {
+      "title": "Câu hỏi thường gặp"
+    },
+    "footer": {
+      "rights": "Bản quyền thuộc về nhà trường"
+    }
+  },
+  "apply": {
+    "title": "Đăng ký tuyển sinh",
+    "steps": {
+      "applicant": "Người khai",
+      "form": "Hồ sơ",
+      "verifyEmail": "Xác thực email",
+      "confirmation": "Hoàn tất"
+    },
+    "applicant": {
+      "title": "Thông tin người khai",
+      "fullName": "Họ và tên",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "relationship": "Quan hệ với học sinh"
+    },
+    "verifyEmail": {
+      "title": "Xác thực email",
+      "description": "Nhập mã OTP đã gửi tới email của bạn",
+      "otpLabel": "Mã xác thực",
+      "resend": "Gửi lại mã"
+    },
+    "confirmation": {
+      "title": "Nộp hồ sơ thành công",
+      "codeLabel": "Mã hồ sơ của bạn",
+      "trackHint": "Dùng mã này để tra cứu trạng thái hồ sơ"
+    },
+    "draft": {
+      "restored": "Đã khôi phục bản nháp đã lưu",
+      "saved": "Đã lưu nháp"
+    }
+  },
+  "track": {
+    "title": "Tra cứu hồ sơ",
+    "codeLabel": "Mã hồ sơ",
+    "codePlaceholder": "Nhập mã hồ sơ",
+    "search": "Tra cứu",
+    "notFound": {
+      "title": "Không tìm thấy hồ sơ",
+      "description": "Kiểm tra lại mã hồ sơ và thử lại"
+    },
+    "timeline": {
+      "title": "Lịch sử trạng thái"
+    }
+  },
+  "form": {
+    "required": "Trường này là bắt buộc",
+    "invalidEmail": "Email không hợp lệ",
+    "invalidNumber": "Giá trị không hợp lệ",
+    "selectPlaceholder": "Chọn một mục",
+    "filePlaceholder": "Chọn tệp",
+    "optional": "(không bắt buộc)"
+  }
+}

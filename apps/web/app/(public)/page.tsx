@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import {
@@ -14,11 +16,12 @@ import { getTenantBranding, getTenantCode } from "@/lib/tenants/branding";
 export default async function LandingPage() {
   const code = await getTenantCode();
   const branding = await getTenantBranding(code);
+  const t = await getTranslations("landing.hero");
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
       <div className="space-y-3">
-        <Badge variant="secondary">Pha 1 · Frontend</Badge>
+        <Badge variant="secondary">{t("badge")}</Badge>
         <h1 className="text-3xl font-semibold tracking-tight">{branding.name}</h1>
         <p className="text-sm text-muted-foreground">
           Tenant code: <code>{code ?? "(không tenant — root site)"}</code>. Trang

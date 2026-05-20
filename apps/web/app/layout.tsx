@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 
 import { tenantThemeToCss } from "@shared/theme";
@@ -29,9 +31,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const branding = await getTenantBranding(await getTenantCode());
   const themeCss = tenantThemeToCss(branding.theme);
+  const locale = await getLocale();
 
   return (
-    <html lang="vi" suppressHydrationWarning className={fontSans.variable}>
+    <html lang={locale} suppressHydrationWarning className={fontSans.variable}>
       <body className="min-h-dvh font-sans antialiased">
         {/*
           Per-tenant token override. React 19 hoists this <style> into <head>
@@ -42,8 +45,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           id="tenant-theme"
           dangerouslySetInnerHTML={{ __html: themeCss }}
         />
-        {children}
-        <Toaster richColors position="top-right" />
+        <NextIntlClientProvider>
+          {children}
+          <Toaster richColors position="top-right" />
+        </NextIntlClientProvider>
       </body>
     </html>
   );
