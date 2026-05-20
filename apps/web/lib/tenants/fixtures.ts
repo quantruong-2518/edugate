@@ -72,8 +72,8 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
 
 export const DEFAULT_BRANDING: TenantBranding = {
   code: "default",
-  name: "Edu SaaS",
-  shortName: "Edu",
+  name: "EduGate",
+  shortName: "EduGate",
   logoUrl: null,
   theme: DEFAULT_TENANT_THEME,
 };

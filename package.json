@@ -1,8 +1,8 @@
 {
-  "name": "self-project",
+  "name": "edugate",
   "version": "0.0.0",
   "private": true,
-  "description": "Multi-tenant Education SaaS",
+  "description": "EduGate — multi-tenant education SaaS for schools (admission-first)",
   "packageManager": "pnpm@9.12.0",
   "engines": {
     "node": ">=20"

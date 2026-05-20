@@ -1,6 +1,6 @@
-# Multi-tenant Education SaaS
+# EduGate
 
-Multi-tenant SaaS cho trường học. Mô hình tham khảo: `tuyensinhlop6.cva-edu.com`.
+Multi-tenant SaaS cho trường học, admission-first (pha 1 = tuyển sinh), mở rộng dần HRMS/Fee/LMS. Mô hình tham khảo: `tuyensinhlop6.cva-edu.com`.
 
 > Tài liệu kiến trúc, convention và quy tắc làm việc — xem **[CLAUDE.md](./CLAUDE.md)**.
 > Tiến độ task — xem **[docs/PLAN.md](./docs/PLAN.md)**.

@@ -1,4 +1,4 @@
-# Project: Multi-tenant Education SaaS
+# Project: EduGate — Multi-tenant Education SaaS
 
 Multi-tenant SaaS bán cho các trường (mỗi trường = 1 tenant, isolated by `tenant_id` + Postgres RLS). Mô hình tham khảo: `tuyensinhlop6.cva-edu.com` (cogi-framework). Pha 1 chỉ ship module **Admission (tuyển sinh)**; các module HRMS/Fee/LMS/Survey/CRM/POS/Content thêm dần theo nhu cầu khách.
 
