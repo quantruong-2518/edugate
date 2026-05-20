@@ -12,3 +12,5 @@ export {
 } from "./admission";
 
 export { getApplicationFormSchema } from "./forms";
+
+export { getLandingConfig } from "./landing";

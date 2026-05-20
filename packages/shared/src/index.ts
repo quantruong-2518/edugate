@@ -63,6 +63,32 @@ export {
 } from "./form";
 
 export {
+  LANDING_SECTION_TYPES,
+  aboutSectionSchema,
+  faqSectionSchema,
+  footerSectionSchema,
+  heroSectionSchema,
+  infoTabsSectionSchema,
+  landingConfigSchema,
+  landingSectionSchema,
+  processSectionSchema,
+  statsSectionSchema,
+  testimonialsSectionSchema,
+  type AboutSection,
+  type FaqSection,
+  type FooterSection,
+  type HeroSection,
+  type InfoTabsSection,
+  type LandingConfig,
+  type LandingLink,
+  type LandingSection,
+  type LandingSectionType,
+  type ProcessSection,
+  type StatsSection,
+  type TestimonialsSection,
+} from "./landing";
+
+export {
   ACTIONS,
   CORE_MODULES,
   MODULES,
