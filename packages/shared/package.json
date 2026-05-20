@@ -1,0 +1,14 @@
+{
+  "name": "shared",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .turbo"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
