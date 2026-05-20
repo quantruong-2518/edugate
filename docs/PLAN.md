@@ -96,8 +96,16 @@
   - `en.json` dịch đầy đủ 5 namespace (mirror vi.json, giữ placeholder `{code}`/`{min}`/`{max}`).
   - `LocaleSwitcher` thật ở `apps/web/components/i18n/locale-switcher.tsx` (`"use client"`, `useLocale()` + `useTransition` → action + `router.refresh()`). `packages/ui` top-bar đổi từ placeholder no-op sang **slot** `localeSwitcher?: ReactNode` (AppShell forward) → ui không dính next-intl. Wire: AdminShell (admin top-bar) + `(public)/layout.tsx` (thanh mỏng top-right cho landing/register/track).
   - Verify: typecheck/lint/build pass; runtime smoke — không cookie → VI, cookie `en` → text EN + `<html lang="en">` ở cả public; switcher swap qua server action.
-- [ ] **15. TanStack Query + axios client + OpenAPI codegen placeholder**
+- [x] **15. TanStack Query + axios client + OpenAPI codegen placeholder**
   - Mock data seam interim đã có ở **P2** (`apps/web/lib/api/*`). Task 15 = thay impl bằng axios + TanStack Query + OpenAPI codegen, giữ nguyên interface.
+  - **Scope thực tế pha 1** (BE pha 2 chưa tồn tại → không swap network thật): dựng tầng infra + bọc Query lên seam mock. Seam bodies giữ nguyên localStorage mock; pha 2 chỉ swap ruột sang `http.<method>()`, hooks + call-site bất biến.
+  - `lib/api/http.ts`: axios instance (`baseURL` ← `NEXT_PUBLIC_API_URL` default `/api`), request interceptor set `x-tenant-code` (resolve client-side qua `@shared/tenant` `parseTenantFromHost`/`parseTenantFromPath` + `resolveRootHosts(NEXT_PUBLIC_TENANT_ROOT_HOSTS)`) + TODO auth bearer pha 2. Scaffold — chưa fire request thật.
+  - `components/providers/query-provider.tsx` (`"use client"`, `QueryClient` lazy qua `useState`, defaults staleTime 30s/retry 1/no refetchOnFocus) wrap trong root layout **bên trong** `NextIntlClientProvider`.
+  - `lib/api/queries.ts` (`"use client"`): hooks bọc seam — `useApplication(code)` (useQuery, `enabled` khi code≠rỗng), `useCreateApplication` (useMutation, `onSuccess` seed cache `admissionKeys.application(code)` → `/track/[code]` resolve tức thì), `useSendEmailOtp`/`useVerifyEmailOtp`. Query keys tập trung `admissionKeys`.
+  - Refactor call-site: `/track/[code]` bỏ useEffect/useState thủ công → `useApplication`; wizard submit → `useCreateApplication().mutateAsync`; verify-email-step → `useSendEmailOtp`/`useVerifyEmailOtp` (bỏ `sending` state, dùng `isPending`). **RSC config giữ nguyên** (`getLandingConfig`/`getApplicationFormSchema` vẫn server-fetched, KHÔNG biến thành useQuery).
+  - **OpenAPI codegen = placeholder** (chốt: `openapi-typescript` types-only + hooks viết tay, KHÔNG orval): devDep `openapi-typescript`, script `codegen:api` trỏ `./openapi/schema.json` → `./lib/api/generated/schema.d.ts` (spec chưa tồn tại, không chạy), `openapi/README.md` mô tả wiring pha 2.
+  - Deps: `@tanstack/react-query` ^5.100, `axios` ^1.16, devDep `openapi-typescript` ^7.13.
+  - Verify: typecheck/lint/build pass; smoke 4 route 200, `/track/[code]` render loading skeleton (useQuery), không lỗi server.
 - [ ] **16. Empty / loading / error state patterns** (`<EmptyState>`, skeleton, `<ErrorBoundary>`, 404, 403)
 
 ### Prerequisites cho feature pages (chốt 2026-05-20 — làm trước 10-12)

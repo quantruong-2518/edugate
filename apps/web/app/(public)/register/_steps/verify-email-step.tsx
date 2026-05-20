@@ -8,7 +8,7 @@ import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 
-import { sendEmailOtp, verifyEmailOtp } from "@/lib/api/admission";
+import { useSendEmailOtp, useVerifyEmailOtp } from "@/lib/api/queries";
 
 export function VerifyEmailStep({
   email,
@@ -19,19 +19,16 @@ export function VerifyEmailStep({
 }) {
   const t = useTranslations("apply.verifyEmail");
   const [code, setCode] = useState("");
-  const [sending, setSending] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const sentRef = useRef(false);
+  const sendOtp = useSendEmailOtp();
+  const verifyOtp = useVerifyEmailOtp();
 
+  const sendMutate = sendOtp.mutateAsync;
   const send = useCallback(async () => {
-    setSending(true);
-    try {
-      const res = await sendEmailOtp({ email });
-      toast.info(t("sentToast", { code: res.devCode }));
-    } finally {
-      setSending(false);
-    }
-  }, [email, t]);
+    const res = await sendMutate({ email });
+    toast.info(t("sentToast", { code: res.devCode }));
+  }, [email, t, sendMutate]);
 
   // Send once on entering the step.
   useEffect(() => {
@@ -42,7 +39,7 @@ export function VerifyEmailStep({
 
   const verify = async () => {
     setSubmitting(true);
-    const res = await verifyEmailOtp({ email, code });
+    const res = await verifyOtp.mutateAsync({ email, code });
     if (!res.verified) {
       setSubmitting(false);
       toast.error(t("invalidOtp"));
@@ -81,7 +78,7 @@ export function VerifyEmailStep({
           type="button"
           variant="ghost"
           onClick={() => void send()}
-          disabled={sending || submitting}
+          disabled={sendOtp.isPending || submitting}
         >
           {t("resend")}
         </Button>

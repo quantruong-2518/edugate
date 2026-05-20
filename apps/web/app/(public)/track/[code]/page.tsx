@@ -1,10 +1,8 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import type { Application } from "@shared/admission";
 import { StateBadge, StateTimeline } from "@ui/components/admission";
 import {
   Card,
@@ -14,32 +12,14 @@ import {
 } from "@ui/components/card";
 import { Skeleton } from "@ui/components/skeleton";
 
-import { getApplicationByCode } from "@/lib/api/admission";
-
-type LoadState =
-  | { status: "loading" }
-  | { status: "found"; application: Application }
-  | { status: "not-found" };
+import { useApplication } from "@/lib/api/queries";
 
 export default function TrackDetailPage() {
   const t = useTranslations("track");
   const params = useParams<{ code: string }>();
   const code = decodeURIComponent(params.code ?? "");
-  const [state, setState] = useState<LoadState>({ status: "loading" });
-
-  useEffect(() => {
-    let active = true;
-    setState({ status: "loading" });
-    getApplicationByCode(code).then((application) => {
-      if (!active) return;
-      setState(
-        application ? { status: "found", application } : { status: "not-found" },
-      );
-    });
-    return () => {
-      active = false;
-    };
-  }, [code]);
+  const { data: application, isPending } = useApplication(code);
+  const notFound = !isPending && !application;
 
   return (
     <main className="container mx-auto px-4 py-10">
@@ -48,18 +28,16 @@ export default function TrackDetailPage() {
           <CardTitle className="font-mono text-base tracking-wider">
             {code}
           </CardTitle>
-          {state.status === "found" && (
-            <StateBadge state={state.application.state} />
-          )}
+          {application && <StateBadge state={application.state} />}
         </CardHeader>
         <CardContent>
-          {state.status === "loading" && (
+          {isPending && (
             <div className="space-y-3">
               <Skeleton className="h-6 w-40" />
               <Skeleton className="h-20 w-full" />
             </div>
           )}
-          {state.status === "not-found" && (
+          {notFound && (
             <div className="py-6 text-center">
               <p className="font-medium">{t("notFound.title")}</p>
               <p className="text-sm text-muted-foreground">
@@ -67,13 +45,13 @@ export default function TrackDetailPage() {
               </p>
             </div>
           )}
-          {state.status === "found" && (
+          {application && (
             <div className="space-y-4">
               <h3 className="text-sm font-medium text-muted-foreground">
                 {t("timeline.title")}
               </h3>
               <StateTimeline
-                history={state.application.history.map((entry) => ({
+                history={application.history.map((entry) => ({
                   state: entry.state,
                   at: entry.at,
                   reason: entry.note,

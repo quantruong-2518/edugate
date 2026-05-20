@@ -29,7 +29,7 @@ import {
 import { Form } from "@ui/components/form";
 import { Stepper } from "@ui/components/stepper";
 
-import { createApplication } from "@/lib/api/admission";
+import { useCreateApplication } from "@/lib/api/queries";
 
 import { ApplicantStep } from "./applicant-step";
 import { ConfirmationStep } from "./confirmation-step";
@@ -121,6 +121,7 @@ export function RegisterWizard({
     mode: "onTouched",
   });
   const control = form.control as unknown as Control<FieldValues>;
+  const createApplication = useCreateApplication();
 
   // --- Draft hydrate (once, after mount) -----------------------------------
   const [hydrated, setHydrated] = useState(false);
@@ -231,7 +232,7 @@ export function RegisterWizard({
       phone: String(v.phone),
       relationship: v.relationship as ApplicantRelationship,
     };
-    const application = await createApplication({
+    const application = await createApplication.mutateAsync({
       tenantCode,
       applicant,
       formData,

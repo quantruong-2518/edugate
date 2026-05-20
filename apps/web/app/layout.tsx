@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { tenantThemeToCss } from "@shared/theme";
 import { Toaster } from "@ui/components/sonner";
 
+import { QueryProvider } from "@/components/providers/query-provider";
 import { getTenantBranding, getTenantCode } from "@/lib/tenants/branding";
 
 import "./globals.css";
@@ -46,8 +47,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           dangerouslySetInnerHTML={{ __html: themeCss }}
         />
         <NextIntlClientProvider>
-          {children}
-          <Toaster richColors position="top-right" />
+          <QueryProvider>
+            {children}
+            <Toaster richColors position="top-right" />
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
