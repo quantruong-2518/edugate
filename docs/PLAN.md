@@ -149,8 +149,16 @@
   - **#2 (sửa) — `/track/[code]` là CLIENT component**: `getApplicationByCode` đọc localStorage (client-only) → RSC luôn null. Page client lấy `code` từ `params`, gọi trong `useEffect`: loading skeleton → tìm thấy render `<StateBadge state>` + `<StateTimeline history>` (reuse task 8) → not found render empty state. `/track` index = client form nhập mã → `router.push('/track/<code>')`.
   - **Stepper**: dùng `<Stepper steps current>` (P2) hiển thị tiến trình 4 bước ở đầu wizard.
   - Verify: typecheck/lint/build; SSR/dev smoke 1 tenant đi hết flow applicant→confirmation, mã hồ sơ vào store, `/track/[code]` đọc lại được; back/forward + guard không nhảy bước; refresh ở confirmation vẫn giữ mã.
-- [ ] **13. Login + forgot/reset/set-password/activate**
+- [x] **13. Login + forgot/reset/set-password/activate**
   - Dùng tenant theme. `/t/:code/login` + `/login` đều work. Mock API.
+  - **5 route** (chốt: giữ đủ + share form): `(auth)/login`, `forgot-password`, `reset-password`, `set-password`, `activate`. 3 route token (`?token=`) share `<CredentialForm variant>` — chỉ khác copy + endpoint.
+  - Auth seam `lib/api/auth.ts` (single swap point pha 2 → Better-Auth): `login`/`requestPasswordReset`/`resetPassword`/`setPassword`/`activateAccount`, mock latency 250ms. **Cosmetic** (chốt): login OK → toast + `router.push('/admin')`, KHÔNG persist session giả. `requestPasswordReset` luôn trả `sent:true` (anti-enumeration). Token mock: non-empty = hợp lệ.
+  - Forms RHF + Zod (CLAUDE.md). Schema factory `lib/auth/schemas.ts` (`loginSchema`/`forgotSchema`/`credentialSchema(t)` nhận translator → message i18n; password min 8 + refine confirm match) — **local apps/web** (FE-only; pha 2 NestJS có DTO riêng), không vào `@shared`. Submit qua `useMutation` inline (isPending → disable nút).
+  - `_components/`: `auth-card.tsx` (Card title+description), `login-form.tsx`, `forgot-password-form.tsx` (state `sent` → `<EmptyState>` MailCheck + back-to-login), `credential-form.tsx` (variant reset/set/activate; no-token → `<EmptyState>` invalidToken; success → `<EmptyState>` CheckCircle; reuse task 16).
+  - **Token đọc server-side**: page RSC `async` đọc `searchParams.token` → truyền prop xuống `CredentialForm` (KHÔNG `useSearchParams`). Tránh SSR flash render nhánh invalid-link trước hydrate + bỏ luôn Suspense boundary.
+  - `(auth)/layout.tsx` nâng: fetch branding → brand chip (shortName) + tenant name + `<LocaleSwitcher>` góc trên (per-tenant theme inherit từ root layout). Sửa stub login cũ (hardcode VI + `text-neutral-600`).
+  - i18n namespace `auth` (validation/login/forgot/credential + 3 variant title/desc/submit/success) vi + en.
+  - Verify: typecheck/lint/build sạch (không warning); smoke — 5 route + `/t/cva-edu/login` đều 200, tenant theme inject, i18n swap VI↔EN, SSR branch đúng (no-token→0 password input, có token→form 2 input), không lỗi server.
 
 ### Admin & polish
 - [ ] **17. Admin UI cho tenant chỉnh branding + landing**

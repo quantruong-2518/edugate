@@ -113,6 +113,62 @@
       "title": "Lịch sử trạng thái"
     }
   },
+  "auth": {
+    "validation": {
+      "required": "Trường này là bắt buộc",
+      "invalidEmail": "Email không hợp lệ",
+      "passwordMin": "Mật khẩu tối thiểu {min} ký tự",
+      "passwordMismatch": "Mật khẩu nhập lại không khớp"
+    },
+    "login": {
+      "title": "Đăng nhập",
+      "description": "Đăng nhập vào hệ thống tuyển sinh",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "submit": "Đăng nhập",
+      "forgotLink": "Quên mật khẩu?",
+      "successToast": "Đăng nhập thành công"
+    },
+    "forgot": {
+      "title": "Quên mật khẩu",
+      "description": "Nhập email để nhận liên kết đặt lại mật khẩu",
+      "email": "Email",
+      "submit": "Gửi liên kết",
+      "sentTitle": "Đã gửi liên kết",
+      "sentDescription": "Nếu email tồn tại trong hệ thống, bạn sẽ nhận được liên kết đặt lại mật khẩu.",
+      "backToLogin": "Về trang đăng nhập"
+    },
+    "credential": {
+      "password": "Mật khẩu mới",
+      "confirmPassword": "Nhập lại mật khẩu",
+      "toLogin": "Đến trang đăng nhập",
+      "invalidToken": {
+        "title": "Liên kết không hợp lệ",
+        "description": "Liên kết đã hết hạn hoặc không đúng. Vui lòng yêu cầu liên kết mới."
+      },
+      "reset": {
+        "title": "Đặt lại mật khẩu",
+        "description": "Tạo mật khẩu mới cho tài khoản của bạn",
+        "submit": "Đặt lại mật khẩu",
+        "successTitle": "Đã đổi mật khẩu",
+        "successDescription": "Mật khẩu của bạn đã được cập nhật. Hãy đăng nhập lại."
+      },
+      "set": {
+        "title": "Đặt mật khẩu",
+        "description": "Tạo mật khẩu cho tài khoản của bạn",
+        "submit": "Lưu mật khẩu",
+        "successTitle": "Đã đặt mật khẩu",
+        "successDescription": "Mật khẩu đã được thiết lập. Hãy đăng nhập."
+      },
+      "activate": {
+        "title": "Kích hoạt tài khoản",
+        "description": "Đặt mật khẩu để kích hoạt tài khoản của bạn",
+        "submit": "Kích hoạt",
+        "successTitle": "Tài khoản đã kích hoạt",
+        "successDescription": "Tài khoản của bạn đã sẵn sàng. Hãy đăng nhập."
+      }
+    }
+  },
   "errors": {
     "retry": "Thử lại",
     "generic": {

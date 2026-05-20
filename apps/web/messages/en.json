@@ -113,6 +113,62 @@
       "title": "Status history"
     }
   },
+  "auth": {
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Invalid email",
+      "passwordMin": "Password must be at least {min} characters",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "login": {
+      "title": "Sign in",
+      "description": "Sign in to the admissions system",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "forgotLink": "Forgot password?",
+      "successToast": "Signed in successfully"
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "description": "Enter your email to receive a password reset link",
+      "email": "Email",
+      "submit": "Send link",
+      "sentTitle": "Link sent",
+      "sentDescription": "If the email exists in our system, you will receive a password reset link.",
+      "backToLogin": "Back to sign in"
+    },
+    "credential": {
+      "password": "New password",
+      "confirmPassword": "Confirm password",
+      "toLogin": "Go to sign in",
+      "invalidToken": {
+        "title": "Invalid link",
+        "description": "The link has expired or is incorrect. Please request a new one."
+      },
+      "reset": {
+        "title": "Reset password",
+        "description": "Create a new password for your account",
+        "submit": "Reset password",
+        "successTitle": "Password changed",
+        "successDescription": "Your password has been updated. Please sign in again."
+      },
+      "set": {
+        "title": "Set password",
+        "description": "Create a password for your account",
+        "submit": "Save password",
+        "successTitle": "Password set",
+        "successDescription": "Your password has been set. Please sign in."
+      },
+      "activate": {
+        "title": "Activate account",
+        "description": "Set a password to activate your account",
+        "submit": "Activate",
+        "successTitle": "Account activated",
+        "successDescription": "Your account is ready. Please sign in."
+      }
+    }
+  },
   "errors": {
     "retry": "Retry",
     "generic": {

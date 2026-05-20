@@ -8,7 +8,6 @@ import { ErrorState } from "@ui/components/error-state";
 // providers (incl. NextIntlClientProvider) are still mounted and i18n works.
 // global-error.tsx handles the rarer case where the root layout itself throws.
 export default function RouteError({
-  error,
   reset,
 }: {
   error: Error & { digest?: string };
