@@ -86,17 +86,37 @@
   - Smoke test `/admin` (cva-edu, role mặc định ADMISSION_ADMIN): 3 coarse check bị chặn (line-through) = `update:tenant_config`, `create:tenant_user`, `read:employee` (module off); `update` trên hồ sơ own DRAFT được phép. typecheck/lint/build pass.
 - [ ] **10. FormBuilder JSON schema → React Hook Form + Zod**
   - Support text/number/date/select/file/scoring/section. Conditional show/hide cơ bản.
+  - Schema ở `packages/shared/src/form/` (thêm `zod` vào deps shared): `schema.ts` (discriminated union `FormFieldSchema` theo `type` + `FormSection` + `FormSchema`; base `name/label/required?/visibleWhen?/colSpan?`; `visibleWhen:{field,op:'eq'|'ne'|'in'|'nonEmpty',value?}`), `build-zod.ts` (`buildZodSchema` — field optional + `superRefine` enforce required-when-visible, field ẩn KHÔNG chặn submit), `defaults.ts` (`defaultValuesFor`).
+  - Renderer ở `packages/ui/src/components/form-builder/`: `<FormBuilder schema control />` render vào FormProvider của caller (page own `<Form>` + submit, để wizard task 12 compose được). `field-renderers/` mỗi type dùng `FormField/FormItem/FormControl` sẵn có. Date = native `input[type=date]`, file = native bọc style, scoring = number bounded — KHÔNG thêm dep picker/dropzone. Visibility qua `useWatch`, field ẩn render-skip.
+  - Verify: demo schema có field điều kiện trên `/admin`; typecheck/lint/build.
 - [ ] **14. i18n next-intl** (VI default, EN slot, locale switcher)
+  - Runtime đã dựng ở **P1** (provider, vi.json, plugin). Task 14 còn lại = EN messages thật + locale switcher (`<LocaleSwitcher>` placeholder ở top-bar task 7).
 - [ ] **15. TanStack Query + axios client + OpenAPI codegen placeholder**
+  - Mock data seam interim đã có ở **P2** (`apps/web/lib/api/*`). Task 15 = thay impl bằng axios + TanStack Query + OpenAPI codegen, giữ nguyên interface.
 - [ ] **16. Empty / loading / error state patterns** (`<EmptyState>`, skeleton, `<ErrorBoundary>`, 404, 403)
+
+### Prerequisites cho feature pages (chốt 2026-05-20 — làm trước 10-12)
+- [ ] **P1. next-intl runtime** (kéo phần runtime của task 14 lên trước)
+  - Routes + mọi identifier tiếng Anh; CHỈ nội dung hiển thị (i18n messages) tiếng Việt.
+  - Cài `next-intl`; `apps/web/i18n/request.ts` (locale cố định `vi`, KHÔNG locale-routing → middleware tenant nguyên vẹn); `messages/vi.json` + `en.json` (slot rỗng); `createNextIntlPlugin` trong `next.config.mjs`; root layout bọc `NextIntlClientProvider`. Namespace: `common/landing/apply/track/form`. RSC dùng `getTranslations`, client dùng `useTranslations`.
+- [ ] **P2. UI primitives + mock data seam**
+  - `packages/ui`: thêm `tabs` (radix-tabs), `accordion` (radix-accordion), `Stepper` custom (không dep). Dep mới: `@radix-ui/react-tabs`, `@radix-ui/react-accordion`.
+  - `apps/web/lib/api/`: interface promise-based + mock impl (in-memory + localStorage để `/track` đọc được hồ sơ vừa nộp): admission (`createApplication`/`getApplicationByCode`/`sendEmailOtp`/`verifyEmailOtp`), landing (`getLandingConfig`), forms (`getApplicationFormSchema`). OTP mock = code dev cố định, hiện qua toast. 1 điểm swap sang axios+TanStack ở task 15.
 
 ### Feature pages
 - [ ] **11. Landing page edu + section system configurable**
   - Hero, stats, 5-step process, info tabs, about, testimonials, FAQ, footer.
-  - Section drag-orderable, mỗi section có schema content riêng.
+  - Section drag-orderable, mỗi section có schema content riêng. (Reorder editor = **task 17**; task 11 chỉ render theo thứ tự config.)
+  - Model `packages/shared/src/landing/sections.ts`: union `LandingSection` theo `type` (`hero|stats|process|infoTabs|about|testimonials|faq|footer`), mỗi loại `content` typed + Zod schema (cho editor task 17); `LandingConfig{sections[]}`.
+  - Render `apps/web`: `lib/api/landing.ts` `getLandingConfig(tenant)` mock per tenant → `components/landing/` mỗi section 1 component → `SECTION_REGISTRY` type→component → `(public)/page.tsx` RSC render theo thứ tự. Màu qua theme token; chrome qua next-intl; content per-tenant là data (không phải i18n key). Unknown type → skip + dev warn.
 - [ ] **12. Admission apply flow 5 bước**
-  - `nguoi-khai → ho-so → xac-minh-email → ma-ho-so → theo-doi`.
-  - Multi-step, draft auto-save localStorage. Trang theo dõi dùng `<StateTimeline>`.
+  - Route tiếng Anh, step = query param: `applicant → form → verify-email → confirmation` (`?step=`); tracking `/track/[code]`. (Slug VI `nguoi-khai/ho-so/...` trong mô tả gốc chỉ là khái niệm.)
+  - 1 route `(public)/register/page.tsx` client wizard. RHF form gốc = declarant zod tĩnh **merge** `buildZodSchema(campaignFormSchema)` động.
+  - "Tiếp" → `form.trigger(stepFields)` rồi `router.push('?step=...')` (mỗi bước 1 history entry → back chuẩn). **Step guard** chống nhảy bước: vào thẳng step sau khi draft rỗng → đẩy về bước hợp lệ xa nhất.
+  - Draft auto-save debounced vào localStorage (loại File — không JSON được), hydrate trong `useEffect` (SSR-safe), clear khi submit thành công.
+  - `_steps/`: `applicant-step`, `form-step` (`<FormBuilder>`), `verify-email-step` (OTP mock), `confirmation-step` (mã hồ sơ + link `/track/[code]`).
+  - Tracking `(public)/track/[code]/page.tsx`: `getApplicationByCode` → `<StateBadge>` + `<StateTimeline>` (tái dùng task 8). Not found → empty state; `/track` index nhập mã.
+  - Submit sau verify → `createApplication` mock → mã hồ sơ → lưu mock store.
 - [ ] **13. Login + forgot/reset/set-password/activate**
   - Dùng tenant theme. `/t/:code/login` + `/login` đều work. Mock API.
 
@@ -134,4 +154,5 @@ Sẽ break down khi pha 1 xong. Sơ bộ:
 - 2026-05-20: Task 6 — Dùng `react.cache` (per-request memoize) thay `unstable_cache`; pha 1 fixtures là pure lookup không IO nên không cần revalidation. Pha 2 swap sang Drizzle query + `unstable_cache` với tag `tenant:${code}`, signature giữ nguyên. Không dùng `server-only` package (chưa cài) — `next/headers` đã enforce server boundary ngầm. Style inject qua `<style dangerouslySetInnerHTML>` trong `<body>`, React 19 tự hoist vào `<head>`; đặt sau `globals.css` cho tenant tokens override.
 - 2026-05-20: Task 7 — RSC→client boundary cho nav items: lucide `LucideIcon` không thể serialize qua boundary nếu module gốc không `"use client"`. Giải pháp: định nghĩa `ADMIN_NAV` trong `_components/admin-shell.tsx` ("use client") → tất cả lucide imports được bundler treat as client references, array đi qua được. Pattern: RSC layout fetch data (branding), client shell module own UI config + composition. `next` chuyển vào `packages/ui` peerDependencies (không phải dependency) để dev không bị duplicate next install. `Link href` cast `as Route` (typedRoutes on).
 - 2026-05-20: Task 8 — Không tách `ApplicationRole` thành module riêng để chờ task 9 rationalize cùng permission matrix; hiện inline ở `transitions.ts`. State machine demo (`_components/state-machine-demo.tsx`) là throwaway sẽ thay bằng feature page thật ở task 12/17 — giữ trên `/admin` page làm visual regression test interim. `useState` toast khi transition success chỉ là mock pha 1 — pha 2 wire vào BE `POST /applications/:id/transition`.
+- 2026-05-20: Kế hoạch 10-12 + prereq chốt sau review. Routes + identifier tiếng Anh, chỉ i18n content tiếng Việt. (1) i18n: dựng next-intl runtime ngay (P1), locale cố định `vi` không locale-routing để không đụng middleware tenant → xem ADR-008. (2) Apply flow: 1 route, step = query param `?step=` (không route-per-step) — RHF form sống trong 1 client component, back/forward qua `router.push`, step guard chống nhảy bước, draft localStorage loại File. (3) Mock data seam interim (P2) thay task 15 chưa làm; date/file native không thêm dep. (4) FormBuilder: shared schema + zod, conditional required qua `superRefine` (field ẩn không chặn submit); renderer ở `packages/ui` nhận `control` để wizard compose.
 - 2026-05-20: Task 9 — Rationalize role: giữ `ApplicationRole` (transitions, +SYSTEM) tách khỏi auth `Role` (5 user role) thay vì hợp nhất — actor transition ≠ user role. Matrix flat (no inheritance) để 3 lớp FE/BE-guard/RLS diff thẳng cùng 1 file `abilities.ts`. Coarse check (subject là string) cố tình optimistic: bỏ scope + `when`, dùng cho menu/route gate; instance check mới đầy đủ. Module toggle gate theo resource được hỏi (`moduleOf`), áp cả SUPER_ADMIN; `platform` (tenant_config/tenant_user) là core không gate. `<Can>` đọc `props.this` qua property access (không destructure được reserved word). `AbilityContext` plain-serializable → truyền từ RSC layout xuống `<AbilityProvider>` client, `createAbility` chạy client-side.

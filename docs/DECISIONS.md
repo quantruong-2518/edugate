@@ -43,3 +43,9 @@
 - **Context**: User muốn làm việc qua nhiều phiên Claude Code mà không mất context/step.
 - **Decision**: CLAUDE.md (auto-load) chứa stack + convention + link. `docs/PLAN.md` là checklist `[ ]/[~]/[x]` source of truth. Mỗi task done = 1 commit + tick PLAN.md.
 - **Consequences**: + Conversation mới chỉ cần "đọc PLAN.md, tiếp". + Reviewable qua git history. − Cần kỷ luật tick PLAN.md mỗi lần xong.
+
+## ADR-008: i18n qua next-intl, dựng runtime sớm (trước feature pages)
+
+- **Context**: CLAUDE.md cấm hardcode chuỗi UI (luôn qua `t()`). Feature pages 10-12 cần chuỗi VI nhưng task 14 (i18n) xếp sau → nếu hardcode rồi retrofit sẽ tốn công và rủi ro sót.
+- **Decision**: Dựng next-intl runtime ngay (P1) — locale cố định `vi`, **không** locale-routing (không prefix `/vi`, `/en`) để middleware tenant resolver (subdomain + `/t/:code`) giữ nguyên không xung đột. Messages VI thật, EN để slot rỗng. Routes + identifier tiếng Anh, chỉ message content tiếng Việt. Locale switcher + EN messages thật để lại task 14.
+- **Consequences**: + Không hardcode, không retrofit chuỗi. + Middleware tenant nguyên vẹn. + Đổi sang multi-locale sau chỉ là thêm messages + switcher. − Task 14 bị tách đôi (runtime sớm / switcher + EN sau).
