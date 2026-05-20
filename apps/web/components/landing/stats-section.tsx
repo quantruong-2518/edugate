@@ -1,18 +1,27 @@
 import type { StatsSection } from "@shared/landing";
 
+import { Reveal } from "./reveal";
+
 export function StatsSection({ section }: { section: StatsSection }) {
   return (
-    <section className="border-y bg-card">
-      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-6 py-12 sm:grid-cols-3">
-        {section.items.map((item) => (
-          <div key={item.label} className="text-center">
-            <div className="text-4xl font-bold text-primary">{item.value}</div>
-            <div className="mt-1 text-sm text-muted-foreground">
-              {item.label}
+    <section className="px-6 py-12">
+      <Reveal className="mx-auto max-w-5xl">
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl bg-border/40 shadow-sm sm:grid-cols-4">
+          {section.items.map((item) => (
+            <div
+              key={item.label}
+              className="bg-card/80 px-6 py-10 text-center backdrop-blur transition-colors hover:bg-card"
+            >
+              <div className="bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-4xl font-bold text-transparent sm:text-5xl">
+                {item.value}
+              </div>
+              <div className="mt-2 text-sm text-muted-foreground">
+                {item.label}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </Reveal>
     </section>
   );
 }

@@ -6,24 +6,36 @@ import {
   AccordionTrigger,
 } from "@ui/components/accordion";
 
+import { Reveal } from "./reveal";
+
 export function FaqSection({ section }: { section: FaqSection }) {
   return (
-    <section className="mx-auto max-w-3xl px-6 py-16">
+    <section className="mx-auto max-w-3xl px-6 py-24">
       {section.title && (
-        <h2 className="mb-8 text-center text-3xl font-semibold tracking-tight">
-          {section.title}
-        </h2>
+        <Reveal>
+          <h2 className="mb-10 text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+            {section.title}
+          </h2>
+        </Reveal>
       )}
-      <Accordion type="single" collapsible className="w-full">
-        {section.items.map((item, index) => (
-          <AccordionItem key={item.question} value={`item-${index}`}>
-            <AccordionTrigger>{item.question}</AccordionTrigger>
-            <AccordionContent className="text-muted-foreground">
-              {item.answer}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      <Reveal>
+        <Accordion type="single" collapsible className="w-full space-y-3">
+          {section.items.map((item, index) => (
+            <AccordionItem
+              key={item.question}
+              value={`item-${index}`}
+              className="rounded-2xl border-b-0 bg-card/70 px-5 shadow-sm ring-1 ring-border/40 backdrop-blur transition-colors hover:ring-primary/30"
+            >
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                {item.question}
+              </AccordionTrigger>
+              <AccordionContent className="leading-relaxed text-muted-foreground">
+                {item.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </Reveal>
     </section>
   );
 }

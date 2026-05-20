@@ -4,16 +4,16 @@ import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <>
+    <div className="relative">
       {/*
-        Public pages have no AppShell, so the locale switcher lives here as a
-        thin top-right bar. Non-sticky + transparent to avoid disrupting the
-        landing hero / centered form layouts.
+        Public pages have no AppShell, so the locale switcher overlays the
+        top-right corner. Absolute (not a layout bar) so the landing hero can
+        run full-bleed underneath it.
       */}
-      <div className="flex justify-end px-4 py-3">
+      <div className="absolute right-4 top-3 z-50">
         <LocaleSwitcher />
       </div>
       {children}
-    </>
+    </div>
   );
 }

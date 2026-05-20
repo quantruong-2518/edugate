@@ -20,6 +20,8 @@ export const heroSectionSchema = z.object({
   eyebrow: z.string().optional(),
   headline: z.string(),
   subheadline: z.string().optional(),
+  /** Full-bleed background image URL (optional). */
+  image: z.string().optional(),
   ctaPrimary: linkSchema.optional(),
   ctaSecondary: linkSchema.optional(),
 });
@@ -47,6 +49,8 @@ export const aboutSectionSchema = z.object({
   type: z.literal("about"),
   title: z.string(),
   body: z.string(),
+  /** Side image URL (optional). */
+  image: z.string().optional(),
 });
 
 export const testimonialsSectionSchema = z.object({
@@ -57,6 +61,8 @@ export const testimonialsSectionSchema = z.object({
       name: z.string(),
       role: z.string().optional(),
       quote: z.string(),
+      /** Avatar image URL (optional). */
+      avatarUrl: z.string().optional(),
     }),
   ),
 });

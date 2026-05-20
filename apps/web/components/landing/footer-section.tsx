@@ -7,19 +7,20 @@ export function FooterSection({ section }: { section: FooterSection }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t bg-card">
-      <div className="mx-auto max-w-5xl px-6 py-12">
+    <footer className="relative isolate overflow-hidden bg-gradient-to-b from-muted/30 to-muted/60">
+      <div className="pointer-events-none absolute -bottom-24 left-1/2 -z-10 size-96 -translate-x-1/2 rounded-full bg-primary/10 blur-[120px]" />
+      <div className="mx-auto max-w-6xl px-6 py-16">
         {section.columns && section.columns.length > 0 && (
-          <div className="grid gap-8 sm:grid-cols-3">
+          <div className="grid gap-10 sm:grid-cols-3">
             {section.columns.map((column) => (
               <div key={column.title}>
                 <h3 className="text-sm font-semibold">{column.title}</h3>
-                <ul className="mt-3 space-y-2">
+                <ul className="mt-4 space-y-2.5">
                   {column.links.map((link) => (
                     <li key={link.href}>
                       <Link
                         href={link.href as Route}
-                        className="text-sm text-muted-foreground hover:text-foreground"
+                        className="text-sm text-muted-foreground transition-colors hover:text-primary"
                       >
                         {link.label}
                       </Link>
@@ -31,7 +32,7 @@ export function FooterSection({ section }: { section: FooterSection }) {
           </div>
         )}
         {section.copyright && (
-          <p className="mt-8 text-sm text-muted-foreground">
+          <p className="mt-12 border-t border-border/30 pt-6 text-sm text-muted-foreground">
             © {year} {section.copyright}
           </p>
         )}
