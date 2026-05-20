@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@ui/components/*": ["./src/components/*"],
+      "@ui/lib/*": ["./src/lib/*"],
+      "@shared/*": ["../shared/src/*"]
+    },
+    "jsx": "preserve",
+    "noEmit": true
+  },
+  "include": ["src/**/*"]
+}
