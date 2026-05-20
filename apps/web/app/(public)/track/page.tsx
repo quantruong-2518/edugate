@@ -27,7 +27,7 @@ export default function TrackIndexPage() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-10">
+    <main className="container mx-auto px-4 py-12 sm:px-6 sm:py-16">
       <Card className="mx-auto w-full max-w-md">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>

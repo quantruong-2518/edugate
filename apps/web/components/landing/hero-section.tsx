@@ -31,7 +31,7 @@ export function HeroSection({ section }: { section: HeroSection }) {
       <div className="pointer-events-none absolute -left-24 top-0 -z-10 size-72 rounded-full bg-primary/30 blur-[100px]" />
       <div className="pointer-events-none absolute -right-20 bottom-0 -z-10 size-80 rounded-full bg-primary/20 blur-[110px]" />
 
-      <div className="mx-auto flex max-w-4xl flex-col items-center px-6 py-28 text-center sm:py-40">
+      <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-20 text-center sm:px-6 sm:py-28 lg:py-40">
         <Reveal>
           {section.eyebrow && (
             <p className="mb-6 inline-flex items-center gap-2 rounded-full bg-background/60 px-4 py-1.5 text-sm font-medium text-primary shadow-sm ring-1 ring-primary/15 backdrop-blur">

@@ -11,7 +11,7 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
       <div className="absolute right-4 top-4">
         <LocaleSwitcher />
       </div>
-      <div className="grid min-h-dvh place-items-center px-6 py-12">
+      <div className="grid min-h-dvh place-items-center px-4 py-10 sm:px-6 sm:py-12">
         <div className="w-full max-w-sm space-y-6">
           {/* Tenant brand mark — auth pages inherit the per-tenant theme. */}
           <div className="flex flex-col items-center gap-2">

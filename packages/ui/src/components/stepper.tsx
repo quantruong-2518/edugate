@@ -57,7 +57,12 @@ function Stepper({ steps, current, className }: StepperProps) {
               <span
                 className={cn(
                   "max-w-20 text-center text-xs leading-tight",
-                  isCurrent ? "font-medium text-foreground" : "text-muted-foreground",
+                  // On narrow screens only the active label shows (others would
+                  // overlap); from `sm` up every label is visible.
+                  isCurrent ? "block" : "hidden sm:block",
+                  isCurrent
+                    ? "font-medium text-foreground"
+                    : "text-muted-foreground",
                 )}
               >
                 {step.label}

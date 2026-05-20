@@ -10,7 +10,7 @@ export default async function RegisterPage() {
   const formSchema = await getApplicationFormSchema(tenantCode);
 
   return (
-    <main className="container mx-auto px-4 py-10">
+    <main className="container mx-auto px-4 py-12 sm:px-6 sm:py-16">
       <Suspense>
         <RegisterWizard tenantCode={tenantCode} formSchema={formSchema} />
       </Suspense>

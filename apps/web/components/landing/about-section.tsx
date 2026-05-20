@@ -7,7 +7,7 @@ import { Reveal } from "./reveal";
 export function AboutSection({ section }: { section: AboutSection }) {
   if (!section.image) {
     return (
-      <section className="mx-auto max-w-3xl px-6 py-24 text-center">
+      <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-24">
         <Reveal>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             {section.title}
@@ -21,8 +21,8 @@ export function AboutSection({ section }: { section: AboutSection }) {
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-24">
-      <div className="grid items-center gap-12 lg:grid-cols-2">
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
+      <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
         <Reveal>
           <div className="relative">
             {/* Brand glow behind the framed image */}

@@ -27,7 +27,7 @@ export default function TrackDetailPage() {
   const notFound = !isPending && !isError && !application;
 
   return (
-    <main className="container mx-auto px-4 py-10">
+    <main className="container mx-auto px-4 py-12 sm:px-6 sm:py-16">
       <Card className="mx-auto w-full max-w-2xl">
         <CardHeader className="flex flex-row items-center justify-between gap-3">
           <CardTitle className="font-mono text-base tracking-wider">

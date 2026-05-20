@@ -4,10 +4,10 @@ import { Reveal } from "./reveal";
 
 export function ProcessSection({ section }: { section: ProcessSection }) {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-24">
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
       {section.title && (
         <Reveal>
-          <h2 className="mb-14 text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="mb-10 text-center text-3xl font-semibold tracking-tight sm:mb-14 sm:text-4xl">
             {section.title}
           </h2>
         </Reveal>
