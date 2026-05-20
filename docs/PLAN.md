@@ -112,14 +112,25 @@
   - Section drag-orderable, mỗi section có schema content riêng. (Reorder editor = **task 17**; task 11 chỉ render theo thứ tự config.)
   - Model `packages/shared/src/landing/sections.ts`: union `LandingSection` theo `type` (`hero|stats|process|infoTabs|about|testimonials|faq|footer`), mỗi loại `content` typed + Zod schema (cho editor task 17); `LandingConfig{sections[]}`.
   - Render `apps/web`: `lib/api/landing.ts` `getLandingConfig(tenant)` mock per tenant → `components/landing/` mỗi section 1 component → `SECTION_REGISTRY` type→component → `(public)/page.tsx` RSC render theo thứ tự. Màu qua theme token; chrome qua next-intl; content per-tenant là data (không phải i18n key). Unknown type → skip + dev warn.
-- [ ] **12. Admission apply flow 5 bước**
-  - Route tiếng Anh, step = query param: `applicant → form → verify-email → confirmation` (`?step=`); tracking `/track/[code]`. (Slug VI `nguoi-khai/ho-so/...` trong mô tả gốc chỉ là khái niệm.)
-  - 1 route `(public)/register/page.tsx` client wizard. RHF form gốc = declarant zod tĩnh **merge** `buildZodSchema(campaignFormSchema)` động.
-  - "Tiếp" → `form.trigger(stepFields)` rồi `router.push('?step=...')` (mỗi bước 1 history entry → back chuẩn). **Step guard** chống nhảy bước: vào thẳng step sau khi draft rỗng → đẩy về bước hợp lệ xa nhất.
-  - Draft auto-save debounced vào localStorage (loại File — không JSON được), hydrate trong `useEffect` (SSR-safe), clear khi submit thành công.
-  - `_steps/`: `applicant-step`, `form-step` (`<FormBuilder>`), `verify-email-step` (OTP mock), `confirmation-step` (mã hồ sơ + link `/track/[code]`).
-  - Tracking `(public)/track/[code]/page.tsx`: `getApplicationByCode` → `<StateBadge>` + `<StateTimeline>` (tái dùng task 8). Not found → empty state; `/track` index nhập mã.
-  - Submit sau verify → `createApplication` mock → mã hồ sơ → lưu mock store.
+- [ ] **12. Admission apply flow 5 bước** (plan chi tiết hóa 2026-05-20 sau review — sửa 6 điểm vs mô tả gốc)
+  - **Routes** (English, content VI qua next-intl namespace `apply`): wizard 1 route `(public)/register/page.tsx`; step = query param `?step=` theo thứ tự `applicant → form → verify-email → confirmation`. Tracking: `(public)/track/page.tsx` (index nhập mã) + `(public)/track/[code]/page.tsx`.
+  - **#1 (sửa) — KHÔNG `.merge` zod được**: `buildZodSchema` trả `ZodEffects` (`.superRefine`) → không có `.merge`/`.extend`. Refactor `@shared/form` export 2 mảnh: `fieldShape(schema)` (record `name→ZodTypeAny` base, chưa refine) + `refineFields(fields, data, ctx, messages)` (body required-when-visible + numeric min/max). Wizard tự build 1 schema phẳng:
+    ```
+    z.object({ ...declarantShape, ...fieldShape(campaignFormSchema) })
+      .superRefine((data, ctx) => refineFields(allFields(campaignFormSchema), data, ctx, msgs))
+    ```
+    `buildZodSchema` cũ giữ nguyên (refactor nội bộ gọi 2 hàm mới — không đổi chữ ký). Field name declarant (`fullName/email/phone/relationship`) ≠ dynamic (`studentName...`) nên phẳng không đụng. 1 `useForm` + 1 resolver → `form.trigger(stepFields)` chạy native.
+  - **Declarant schema tĩnh** (zod): `fullName` min 1, `email` `.email()`, `phone` regex VN cơ bản, `relationship` `z.enum(["father","mother","guardian","self"])` (khớp `ApplicantRelationship` ở `@shared/admission`). Messages VI qua `useTranslations("apply"/"form")`.
+  - **Điều hướng step**: "Tiếp" → `await form.trigger(STEP_FIELDS[step])`; pass → `router.push('?step=next')` (mỗi bước 1 history entry → back chuẩn). "Quay lại" → `router.back()` hoặc push prev.
+  - **#3 (sửa) — Suspense**: `register/page.tsx` (RSC mỏng) bọc `<Suspense>` quanh `<RegisterWizard>` client vì wizard dùng `useSearchParams()` (Next 15 yêu cầu boundary, nếu không lỗi build).
+  - **#4 (sửa) — Step guard dùng `replace`**: tính `furthestValidStep` từ data đã có (applicant valid? form valid?); nếu `?step=` vượt quá → `router.replace('?step=<furthest>')` (KHÔNG push, tránh history rác). Guard chạy trong `useEffect` sau hydrate.
+  - **#5 (sửa) — draft KHÔNG cần loại File**: task 10 đã quyết file field lưu **filename string** → toàn bộ values JSON-serialize được. Draft auto-save debounced (~500ms) toàn bộ values vào localStorage key `edugate:draft:register:<tenant>`; hydrate trong `useEffect` (SSR-safe, tránh hydration mismatch); clear khi submit thành công.
+  - **`_steps/`**: `applicant-step.tsx` (4 field declarant hand-written RHF, KHÔNG qua FormBuilder), `form-step.tsx` (`<FormBuilder schema control />` với `campaignFormSchema` từ `getApplicationFormSchema(tenant)`), `verify-email-step.tsx` (OTP mock), `confirmation-step.tsx`.
+  - **Verify-email**: vào step → `sendEmailOtp({ email: declarantEmail })` (1 lần, có nút "Gửi lại"); `devCode` hiện qua `toast` (mock). Nhập mã → `verifyEmailOtp`. Verify OK → trigger submit toàn form → `createApplication({ tenantCode, applicant, formData })` (tách declarant vs dynamic từ values theo key) → nhận `code`.
+  - **#6 (sửa) — confirmation refresh-safe**: sau `createApplication` → `router.replace('?step=confirmation&code=<CODE>')` + clear draft; `confirmation-step` đọc `code` từ query (không giữ ở state) → hiện mã + link `/track/[code]`.
+  - **#2 (sửa) — `/track/[code]` là CLIENT component**: `getApplicationByCode` đọc localStorage (client-only) → RSC luôn null. Page client lấy `code` từ `params`, gọi trong `useEffect`: loading skeleton → tìm thấy render `<StateBadge state>` + `<StateTimeline history>` (reuse task 8) → not found render empty state. `/track` index = client form nhập mã → `router.push('/track/<code>')`.
+  - **Stepper**: dùng `<Stepper steps current>` (P2) hiển thị tiến trình 4 bước ở đầu wizard.
+  - Verify: typecheck/lint/build; SSR/dev smoke 1 tenant đi hết flow applicant→confirmation, mã hồ sơ vào store, `/track/[code]` đọc lại được; back/forward + guard không nhảy bước; refresh ở confirmation vẫn giữ mã.
 - [ ] **13. Login + forgot/reset/set-password/activate**
   - Dùng tenant theme. `/t/:code/login` + `/login` đều work. Mock API.
 
