@@ -194,5 +194,102 @@
     "selectPlaceholder": "Chọn một mục",
     "filePlaceholder": "Chọn tệp",
     "optional": "(không bắt buộc)"
+  },
+  "marketing": {
+    "nav": {
+      "features": "Tính năng",
+      "modules": "Phân hệ",
+      "demo": "Xem demo",
+      "login": "Đăng nhập",
+      "tryFree": "Dùng thử miễn phí"
+    },
+    "hero": {
+      "eyebrow": "Nền tảng SaaS cho trường học",
+      "headline": "Số hóa tuyển sinh & quản lý cho trường học",
+      "subheadline": "EduGate cho mỗi trường một cổng tuyển sinh trực tuyến riêng — thương hiệu riêng, dữ liệu cách ly, triển khai trong một ngày. Mở rộng dần sang nhân sự, học phí, học tập khi cần.",
+      "ctaPrimary": "Đặt lịch demo",
+      "ctaSecondary": "Xem cổng tuyển sinh mẫu"
+    },
+    "proof": {
+      "title": "Các trường đang dùng EduGate",
+      "viewDemo": "Xem cổng tuyển sinh"
+    },
+    "features": {
+      "title": "Mọi thứ một trường cần để tuyển sinh trực tuyến",
+      "subtitle": "Hạ tầng đa tenant sẵn sàng vận hành — bạn chỉ việc cấu hình.",
+      "items": {
+        "multiTenant": {
+          "title": "Đa trường, một nền tảng",
+          "desc": "Mỗi trường là một tenant độc lập, có miền và cấu hình riêng."
+        },
+        "security": {
+          "title": "Cách ly dữ liệu cấp cơ sở dữ liệu",
+          "desc": "Postgres Row-Level Security đảm bảo dữ liệu trường này không bao giờ lộ sang trường khác."
+        },
+        "formBuilder": {
+          "title": "Biểu mẫu tùy biến",
+          "desc": "Tự dựng biểu mẫu tuyển sinh bằng JSON schema, không cần lập trình."
+        },
+        "theming": {
+          "title": "Thương hiệu riêng từng trường",
+          "desc": "Logo, màu sắc, nội dung landing — đổi tức thì, không cần deploy lại."
+        },
+        "tracking": {
+          "title": "Theo dõi hồ sơ thời gian thực",
+          "desc": "Phụ huynh tra cứu trạng thái mọi lúc; nhà trường duyệt theo quy trình."
+        },
+        "i18n": {
+          "title": "Song ngữ Việt – Anh",
+          "desc": "Giao diện đa ngôn ngữ sẵn sàng cho cả trường quốc tế."
+        }
+      }
+    },
+    "modules": {
+      "title": "Một nền tảng, mở rộng theo nhu cầu",
+      "subtitle": "Bắt đầu với tuyển sinh, thêm phân hệ khi trường lớn lên.",
+      "live": "Đang vận hành",
+      "comingSoon": "Sắp ra mắt",
+      "items": {
+        "admission": { "name": "Tuyển sinh", "desc": "Cổng đăng ký, xét duyệt, tra cứu hồ sơ." },
+        "hrms": { "name": "Nhân sự", "desc": "Hồ sơ giáo viên, chấm công, hợp đồng." },
+        "fee": { "name": "Học phí", "desc": "Thu phí, hóa đơn, nhắc thanh toán." },
+        "lms": { "name": "Học tập", "desc": "Lớp học, bài giảng, điểm số." },
+        "survey": { "name": "Khảo sát", "desc": "Thu thập phản hồi phụ huynh, học sinh." },
+        "crm": { "name": "Chăm sóc", "desc": "Quản lý tương tác và tư vấn tuyển sinh." }
+      }
+    },
+    "steps": {
+      "title": "Lên sóng trong một ngày",
+      "subtitle": "Không cần đội kỹ thuật.",
+      "items": {
+        "one": { "title": "Tạo trường", "desc": "Chúng tôi khởi tạo tenant và miền riêng cho trường." },
+        "two": { "title": "Tùy chỉnh thương hiệu & biểu mẫu", "desc": "Đổi logo, màu, dựng biểu mẫu tuyển sinh trong trình quản trị." },
+        "three": { "title": "Mở cổng tuyển sinh", "desc": "Chia sẻ đường dẫn cho phụ huynh và bắt đầu nhận hồ sơ." }
+      }
+    },
+    "cta": {
+      "title": "Sẵn sàng số hóa tuyển sinh cho trường bạn?",
+      "subtitle": "Đặt lịch demo 15 phút hoặc dùng thử ngay với dữ liệu mẫu.",
+      "primary": "Đặt lịch demo",
+      "secondary": "Đăng nhập"
+    },
+    "footer": {
+      "tagline": "Nền tảng tuyển sinh & quản lý cho trường học Việt Nam.",
+      "dataResidency": "Dữ liệu lưu trữ tại Việt Nam.",
+      "product": "Sản phẩm",
+      "company": "Công ty",
+      "legal": "Pháp lý",
+      "links": {
+        "features": "Tính năng",
+        "modules": "Phân hệ",
+        "demo": "Cổng tuyển sinh mẫu",
+        "login": "Đăng nhập",
+        "about": "Về chúng tôi",
+        "contact": "Liên hệ",
+        "privacy": "Chính sách bảo mật",
+        "terms": "Điều khoản"
+      },
+      "copyright": "EduGate. Bảo lưu mọi quyền."
+    }
   }
 }

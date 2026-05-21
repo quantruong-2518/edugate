@@ -194,5 +194,102 @@
     "selectPlaceholder": "Select an option",
     "filePlaceholder": "Choose a file",
     "optional": "(optional)"
+  },
+  "marketing": {
+    "nav": {
+      "features": "Features",
+      "modules": "Modules",
+      "demo": "View demo",
+      "login": "Log in",
+      "tryFree": "Try for free"
+    },
+    "hero": {
+      "eyebrow": "SaaS platform for schools",
+      "headline": "Digitise admissions & operations for your school",
+      "subheadline": "EduGate gives every school its own online admissions portal — own branding, isolated data, live in a day. Grow into HR, fees and learning when you need them.",
+      "ctaPrimary": "Book a demo",
+      "ctaSecondary": "See a sample portal"
+    },
+    "proof": {
+      "title": "Schools running on EduGate",
+      "viewDemo": "View portal"
+    },
+    "features": {
+      "title": "Everything a school needs to enrol online",
+      "subtitle": "A production-ready multi-tenant platform — you just configure it.",
+      "items": {
+        "multiTenant": {
+          "title": "Many schools, one platform",
+          "desc": "Each school is an isolated tenant with its own domain and configuration."
+        },
+        "security": {
+          "title": "Database-level data isolation",
+          "desc": "Postgres Row-Level Security guarantees one school's data never leaks to another."
+        },
+        "formBuilder": {
+          "title": "Customisable forms",
+          "desc": "Build admission forms from a JSON schema — no coding required."
+        },
+        "theming": {
+          "title": "Per-school branding",
+          "desc": "Logo, colours, landing content — changed instantly, no redeploy."
+        },
+        "tracking": {
+          "title": "Real-time application tracking",
+          "desc": "Parents check status anytime; schools review along a clear workflow."
+        },
+        "i18n": {
+          "title": "Vietnamese – English",
+          "desc": "A bilingual interface ready for international schools too."
+        }
+      }
+    },
+    "modules": {
+      "title": "One platform, grows with you",
+      "subtitle": "Start with admissions, add modules as the school grows.",
+      "live": "Live",
+      "comingSoon": "Coming soon",
+      "items": {
+        "admission": { "name": "Admissions", "desc": "Application portal, review, status lookup." },
+        "hrms": { "name": "HR", "desc": "Teacher records, attendance, contracts." },
+        "fee": { "name": "Fees", "desc": "Billing, invoices, payment reminders." },
+        "lms": { "name": "Learning", "desc": "Classes, lessons, grades." },
+        "survey": { "name": "Surveys", "desc": "Collect parent and student feedback." },
+        "crm": { "name": "CRM", "desc": "Manage interactions and admissions advisory." }
+      }
+    },
+    "steps": {
+      "title": "Live in a day",
+      "subtitle": "No technical team needed.",
+      "items": {
+        "one": { "title": "Create the school", "desc": "We provision the tenant and a dedicated domain." },
+        "two": { "title": "Customise branding & forms", "desc": "Change logo, colours and build admission forms in the admin." },
+        "three": { "title": "Open the portal", "desc": "Share the link with parents and start receiving applications." }
+      }
+    },
+    "cta": {
+      "title": "Ready to digitise admissions for your school?",
+      "subtitle": "Book a 15-minute demo or try it now with sample data.",
+      "primary": "Book a demo",
+      "secondary": "Log in"
+    },
+    "footer": {
+      "tagline": "Admissions & operations platform for Vietnamese schools.",
+      "dataResidency": "Data hosted in Vietnam.",
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal",
+      "links": {
+        "features": "Features",
+        "modules": "Modules",
+        "demo": "Sample portal",
+        "login": "Log in",
+        "about": "About us",
+        "contact": "Contact",
+        "privacy": "Privacy policy",
+        "terms": "Terms"
+      },
+      "copyright": "EduGate. All rights reserved."
+    }
   }
 }
