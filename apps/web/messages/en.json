@@ -320,6 +320,42 @@
     }
   },
   "admin": {
+    "audit": {
+      "title": "Activity log",
+      "subtitle": "Track operations performed in your school's system.",
+      "search": "Search by person or target…",
+      "filterAction": "Filter by action",
+      "allActions": "All actions",
+      "note": "Pha 1 shows sample data · Pha 2 records real audit entries from the server.",
+      "columns": {
+        "time": "Time",
+        "actor": "Performed by",
+        "action": "Action",
+        "target": "Target"
+      },
+      "empty": {
+        "title": "No activity",
+        "description": "No activity matches the current filter."
+      },
+      "actions": {
+        "create": "Created",
+        "update": "Updated",
+        "delete": "Deleted",
+        "approve": "Approved",
+        "reject": "Rejected",
+        "login": "Signed in",
+        "export": "Exported",
+        "state_change": "State change",
+        "settings_update": "Settings change"
+      },
+      "roles": {
+        "APPLICANT": "Parent",
+        "REVIEWER": "Reviewer",
+        "ADMISSION_ADMIN": "Admission admin",
+        "TENANT_ADMIN": "School admin",
+        "SUPER_ADMIN": "Platform admin"
+      }
+    },
     "appearance": {
       "title": "Appearance & Landing",
       "subtitle": "Customise your school's branding and admission landing content.",

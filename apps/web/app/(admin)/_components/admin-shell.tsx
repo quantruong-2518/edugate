@@ -4,6 +4,7 @@ import {
   FileText,
   LayoutDashboard,
   Megaphone,
+  ScrollText,
   Settings,
   Users,
 } from "lucide-react";
@@ -41,6 +42,11 @@ const ADMIN_NAV: readonly NavItem[] = [
     href: "/admin/campaigns",
     label: "Đợt tuyển sinh",
     Icon: Megaphone,
+  },
+  {
+    href: "/admin/audit-log",
+    label: "Nhật ký hoạt động",
+    Icon: ScrollText,
   },
   { href: "/admin/settings", label: "Cài đặt", Icon: Settings },
 ];

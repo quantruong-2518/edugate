@@ -320,6 +320,42 @@
     }
   },
   "admin": {
+    "audit": {
+      "title": "Nhật ký hoạt động",
+      "subtitle": "Theo dõi các thao tác trong hệ thống của trường.",
+      "search": "Tìm theo người hoặc đối tượng…",
+      "filterAction": "Lọc theo hành động",
+      "allActions": "Tất cả hành động",
+      "note": "Pha 1 hiển thị dữ liệu mẫu · Pha 2 ghi nhật ký thực từ máy chủ.",
+      "columns": {
+        "time": "Thời gian",
+        "actor": "Người thực hiện",
+        "action": "Hành động",
+        "target": "Đối tượng"
+      },
+      "empty": {
+        "title": "Không có hoạt động",
+        "description": "Chưa có hoạt động nào khớp bộ lọc."
+      },
+      "actions": {
+        "create": "Tạo mới",
+        "update": "Cập nhật",
+        "delete": "Xóa",
+        "approve": "Duyệt",
+        "reject": "Từ chối",
+        "login": "Đăng nhập",
+        "export": "Xuất dữ liệu",
+        "state_change": "Đổi trạng thái",
+        "settings_update": "Đổi cấu hình"
+      },
+      "roles": {
+        "APPLICANT": "Phụ huynh",
+        "REVIEWER": "Cán bộ duyệt",
+        "ADMISSION_ADMIN": "Quản trị tuyển sinh",
+        "TENANT_ADMIN": "Quản trị trường",
+        "SUPER_ADMIN": "Quản trị hệ thống"
+      }
+    },
     "appearance": {
       "title": "Giao diện & Trang tuyển sinh",
       "subtitle": "Tùy chỉnh thương hiệu và nội dung trang tuyển sinh của trường.",

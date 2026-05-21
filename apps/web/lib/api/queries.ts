@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-query";
 
 import type { Application, ApplicationCode } from "@shared/admission";
+import type { AuditLogEntry, AuditLogFilters } from "@shared/audit";
 
 import {
   createApplication,
@@ -21,6 +22,7 @@ import {
   type VerifyEmailOtpInput,
   type VerifyEmailOtpResult,
 } from "./admission";
+import { getAuditLog } from "./audit";
 
 /**
  * TanStack Query hooks for the admission seam. They wrap the data functions in
@@ -34,6 +36,12 @@ export const admissionKeys = {
   all: ["admission"] as const,
   application: (code: string) =>
     [...admissionKeys.all, "application", code] as const,
+};
+
+export const auditKeys = {
+  all: ["audit"] as const,
+  list: (tenantCode: string, filters: AuditLogFilters) =>
+    [...auditKeys.all, "list", tenantCode, filters] as const,
 };
 
 export function useApplication(
@@ -62,6 +70,16 @@ export function useCreateApplication(): UseMutationResult<
         application,
       );
     },
+  });
+}
+
+export function useAuditLog(
+  tenantCode: string,
+  filters: AuditLogFilters,
+): UseQueryResult<AuditLogEntry[]> {
+  return useQuery({
+    queryKey: auditKeys.list(tenantCode, filters),
+    queryFn: () => getAuditLog(tenantCode, filters),
   });
 }
 

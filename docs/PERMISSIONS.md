@@ -13,7 +13,7 @@ Resource = application | campaign | review | form_template | notification_templa
          | fee_item | fee_sheet | payment
          | learner | class
          | service_item | service_order
-         | tenant_config | tenant_user
+         | tenant_config | tenant_user | audit_log
          | article | journal | slider
          | survey | survey_response
          | request
@@ -41,6 +41,8 @@ Pha 2+: `HR_MANAGER`, `FINANCE`, `TEACHER`, `LEARNER`, `EDITOR`, `SALES`.
 | **ADMISSION_ADMIN** | CRUD:tenant, approve, reject, confirm, export | CRUD:tenant | CRUD:tenant | CRUD:tenant | read:tenant | read:tenant |
 | **TENANT_ADMIN** | CRUD:tenant, export | CRUD:tenant | CRUD:tenant | CRUD:tenant | RU:tenant | CRUD:tenant |
 | **SUPER_ADMIN** | * | * | * | * | * | * |
+
+`audit_log` (module `platform`, core — không gate theo gói): `read:tenant` cho **TENANT_ADMIN**; `*` cho **SUPER_ADMIN**. Các role khác không xem được nhật ký. `export:audit_log` (xuất CSV) để pha 2.
 
 ## FE usage patterns
 

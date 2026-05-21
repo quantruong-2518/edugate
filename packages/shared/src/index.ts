@@ -17,6 +17,14 @@ export {
 export type { TenantBranding } from "./branding";
 
 export {
+  AUDIT_ACTIONS,
+  type AuditAction,
+  type AuditActor,
+  type AuditLogEntry,
+  type AuditLogFilters,
+} from "./audit";
+
+export {
   APPLICATION_ROLES,
   APPLICATION_STATE_CODES,
   APPLICATION_STATES,

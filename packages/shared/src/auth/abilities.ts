@@ -112,6 +112,7 @@ export const ROLE_ABILITIES: Readonly<Record<Role, readonly AbilityRule[]>> = {
     { action: "read", resource: "tenant_config", scope: "tenant" },
     { action: "update", resource: "tenant_config", scope: "tenant" },
     ...rules("tenant_user", "tenant", CRUD),
+    { action: "read", resource: "audit_log", scope: "tenant" },
   ],
   SUPER_ADMIN: [{ action: "*", resource: "*", scope: "*" }],
 };
