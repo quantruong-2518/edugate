@@ -291,5 +291,74 @@
       },
       "copyright": "EduGate. Bảo lưu mọi quyền."
     }
+  },
+  "admin": {
+    "appearance": {
+      "title": "Giao diện & Trang tuyển sinh",
+      "subtitle": "Tùy chỉnh thương hiệu và nội dung trang tuyển sinh của trường.",
+      "save": "Lưu thay đổi",
+      "reset": "Khôi phục mặc định",
+      "saved": "Đã lưu thay đổi.",
+      "resetDone": "Đã khôi phục về cấu hình gốc.",
+      "invalid": "Cấu hình chưa hợp lệ, vui lòng kiểm tra lại các trường bắt buộc.",
+      "previewTitle": "Xem trước",
+      "previewNote": "Cập nhật theo thời gian thực · Pha 1 lưu cục bộ trên trình duyệt",
+      "tabs": {
+        "branding": "Thương hiệu",
+        "sections": "Nội dung"
+      },
+      "branding": {
+        "logoUrl": "Đường dẫn logo",
+        "logoUrlPlaceholder": "https://… (để trống dùng tên chữ)",
+        "radius": "Độ bo góc",
+        "font": "Phông chữ",
+        "colors": "Màu sắc",
+        "primaryLight": "Màu chính (nền sáng)",
+        "primaryForegroundLight": "Chữ trên màu chính (sáng)",
+        "primaryDark": "Màu chính (nền tối)",
+        "primaryForegroundDark": "Chữ trên màu chính (tối)"
+      },
+      "sections": {
+        "add": "Thêm section",
+        "addItem": "Thêm mục",
+        "empty": "Chưa có section nào. Thêm section để bắt đầu.",
+        "dragHint": "Kéo để sắp xếp",
+        "unsupported": "Loại section “{type}” chưa hỗ trợ chỉnh sửa.",
+        "types": {
+          "hero": "Hero",
+          "stats": "Thống kê",
+          "process": "Quy trình",
+          "infoTabs": "Tab thông tin",
+          "about": "Giới thiệu",
+          "testimonials": "Cảm nhận",
+          "faq": "Hỏi đáp",
+          "footer": "Chân trang"
+        }
+      },
+      "fields": {
+        "eyebrow": "Nhãn nhỏ",
+        "headline": "Tiêu đề chính",
+        "subheadline": "Mô tả",
+        "image": "Ảnh (URL)",
+        "ctaPrimary": "Nút chính",
+        "ctaSecondary": "Nút phụ",
+        "label": "Nhãn",
+        "href": "Đường dẫn",
+        "value": "Giá trị",
+        "title": "Tiêu đề",
+        "description": "Mô tả",
+        "body": "Nội dung",
+        "name": "Tên",
+        "role": "Vai trò",
+        "quote": "Trích dẫn",
+        "avatarUrl": "Ảnh đại diện (URL)",
+        "question": "Câu hỏi",
+        "answer": "Trả lời",
+        "copyright": "Bản quyền",
+        "tabId": "Mã tab",
+        "tabLabel": "Nhãn tab",
+        "columnTitle": "Tiêu đề cột"
+      }
+    }
   }
 }

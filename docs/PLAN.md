@@ -161,9 +161,16 @@
   - Verify: typecheck/lint/build sạch (không warning); smoke — 5 route + `/t/cva-edu/login` đều 200, tenant theme inject, i18n swap VI↔EN, SSR branch đúng (no-token→0 password input, có token→form 2 input), không lỗi server.
 
 ### Admin & polish
-- [ ] **17. Admin UI cho tenant chỉnh branding + landing**
+- [x] **17. Admin UI cho tenant chỉnh branding + landing**
   - Form chỉnh logo, colors (color picker), font, hero, sections (drag reorder), FAQ.
   - Preview live bên cạnh.
+  - Route `(admin)/admin/settings/page.tsx` (RSC, nav "Cài đặt" đã trỏ sẵn): fetch fixtures `getTenantBranding`+`getLandingConfig` → pass initial xuống client editor; bọc `<RequirePermission action=update resource=tenant_config>`.
+  - **Persona**: bump `MOCK_ABILITY_CONTEXT.roles` → `TENANT_ADMIN` (ADMISSION_ADMIN chỉ `read:tenant_config`). Ability-demo task 9 **không** ảnh hưởng vì nó tự dựng `AbilityProvider` riêng (default ADMISSION_ADMIN qua dropdown).
+  - **Seam** `lib/api/appearance.ts`: `loadAppearanceDraft`/`saveAppearanceDraft`/`clearAppearanceDraft` localStorage mock client-only (giống `store.ts`). Pha 1 limitation: edit lưu cục bộ, **không** phản chiếu lên trang public RSC (đọc fixtures) khi reload — pha 2 swap sang API+DB, RSC đọc cùng row.
+  - **Editor** `_components/`: `appearance-editor.tsx` (state branding + items{id,section}, hydrate draft post-mount, save validate qua `landingConfigSchema.safeParse`, reset), `branding-panel.tsx` (logo URL, font select, radius range, 4 ColorField light/dark), `color-field.tsx` (text canonical + native swatch — token nhận "any CSS color" nên ghi hex thẳng, **không** cần lib oklch↔hex), `sections-panel.tsx` (@dnd-kit sortable + add/remove section), `section-card.tsx`, `section-fields.tsx` (editor đủ 8 type + `emptySection`), `field-kit.tsx` (LabeledInput/Textarea/ArrayEditor), `landing-preview.tsx` (reuse `LandingSectionRenderer` thật, scope branding qua inline CSS var light + `RevealStaticContext` tắt animation).
+  - **Reveal** thêm `RevealStaticContext` (default false) → preview set true để section không kẹt `opacity-0` trong panel.
+  - **Deps**: `@dnd-kit/core`+`/sortable`+`/utilities`. **id sections** deterministic `s-<i>` (SSR/client khớp), mint `n-<n++>` khi add, `d-<i>` khi hydrate draft.
+  - i18n namespace `admin.appearance` (vi + en). Verify: typecheck/lint/build pass; SSR smoke 3 tenant + root + EN đều 200, gate pass (no Forbidden DOM), 4 color input + save + preview hero per-tenant đúng, h1 VI/EN swap. Interactive (drag/add/remove/edit→preview/save→localStorage/reset) chưa headless-test — cần browser.
 - [ ] **18. PDF export hồ sơ + biên lai** (template trước, hook BE pha 2)
 - [ ] **19. Audit log viewer admin** (UI trước, BE pha 2)
 

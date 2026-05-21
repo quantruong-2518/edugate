@@ -291,5 +291,74 @@
       },
       "copyright": "EduGate. All rights reserved."
     }
+  },
+  "admin": {
+    "appearance": {
+      "title": "Appearance & Landing",
+      "subtitle": "Customise your school's branding and admission landing content.",
+      "save": "Save changes",
+      "reset": "Reset to default",
+      "saved": "Changes saved.",
+      "resetDone": "Reverted to the original configuration.",
+      "invalid": "Configuration is invalid — please check the required fields.",
+      "previewTitle": "Preview",
+      "previewNote": "Updates live · Pha 1 stores locally in your browser",
+      "tabs": {
+        "branding": "Branding",
+        "sections": "Content"
+      },
+      "branding": {
+        "logoUrl": "Logo URL",
+        "logoUrlPlaceholder": "https://… (leave empty for text logo)",
+        "radius": "Corner radius",
+        "font": "Font",
+        "colors": "Colors",
+        "primaryLight": "Primary (light)",
+        "primaryForegroundLight": "On-primary text (light)",
+        "primaryDark": "Primary (dark)",
+        "primaryForegroundDark": "On-primary text (dark)"
+      },
+      "sections": {
+        "add": "Add section",
+        "addItem": "Add item",
+        "empty": "No sections yet. Add one to get started.",
+        "dragHint": "Drag to reorder",
+        "unsupported": "Section type “{type}” is not editable.",
+        "types": {
+          "hero": "Hero",
+          "stats": "Stats",
+          "process": "Process",
+          "infoTabs": "Info tabs",
+          "about": "About",
+          "testimonials": "Testimonials",
+          "faq": "FAQ",
+          "footer": "Footer"
+        }
+      },
+      "fields": {
+        "eyebrow": "Eyebrow",
+        "headline": "Headline",
+        "subheadline": "Subheadline",
+        "image": "Image (URL)",
+        "ctaPrimary": "Primary button",
+        "ctaSecondary": "Secondary button",
+        "label": "Label",
+        "href": "Link",
+        "value": "Value",
+        "title": "Title",
+        "description": "Description",
+        "body": "Body",
+        "name": "Name",
+        "role": "Role",
+        "quote": "Quote",
+        "avatarUrl": "Avatar (URL)",
+        "question": "Question",
+        "answer": "Answer",
+        "copyright": "Copyright",
+        "tabId": "Tab id",
+        "tabLabel": "Tab label",
+        "columnTitle": "Column title"
+      }
+    }
   }
 }
