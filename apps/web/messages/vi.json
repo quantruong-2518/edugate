@@ -195,6 +195,33 @@
     "filePlaceholder": "Chọn tệp",
     "optional": "(không bắt buộc)"
   },
+  "print": {
+    "actions": {
+      "print": "In / Lưu PDF",
+      "back": "Quay lại"
+    },
+    "download": {
+      "profile": "Tải hồ sơ",
+      "receipt": "Tải biên lai"
+    },
+    "printedAt": "In lúc {date}",
+    "notFound": "Không tìm thấy hồ sơ {code}.",
+    "profile": {
+      "title": "Hồ sơ tuyển sinh",
+      "declarant": "Thông tin người khai",
+      "formData": "Thông tin hồ sơ",
+      "history": "Lịch sử trạng thái"
+    },
+    "receipt": {
+      "title": "Biên lai nộp hồ sơ",
+      "note": "Vui lòng giữ mã hồ sơ để tra cứu trạng thái hồ sơ."
+    },
+    "fields": {
+      "code": "Mã hồ sơ",
+      "status": "Trạng thái",
+      "submittedAt": "Ngày nộp"
+    }
+  },
   "marketing": {
     "nav": {
       "features": "Tính năng",

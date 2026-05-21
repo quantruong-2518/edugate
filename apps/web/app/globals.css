@@ -125,3 +125,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Print: A4 page + force brand/state colors to render on paper (task 18). */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+  .print-document {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

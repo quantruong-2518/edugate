@@ -195,6 +195,33 @@
     "filePlaceholder": "Choose a file",
     "optional": "(optional)"
   },
+  "print": {
+    "actions": {
+      "print": "Print / Save PDF",
+      "back": "Back"
+    },
+    "download": {
+      "profile": "Download profile",
+      "receipt": "Download receipt"
+    },
+    "printedAt": "Printed at {date}",
+    "notFound": "Application {code} not found.",
+    "profile": {
+      "title": "Admission application",
+      "declarant": "Declarant information",
+      "formData": "Application details",
+      "history": "Status history"
+    },
+    "receipt": {
+      "title": "Submission receipt",
+      "note": "Please keep this code to track your application status."
+    },
+    "fields": {
+      "code": "Application code",
+      "status": "Status",
+      "submittedAt": "Submitted on"
+    }
+  },
   "marketing": {
     "nav": {
       "features": "Features",

@@ -171,7 +171,14 @@
   - **Reveal** thêm `RevealStaticContext` (default false) → preview set true để section không kẹt `opacity-0` trong panel.
   - **Deps**: `@dnd-kit/core`+`/sortable`+`/utilities`. **id sections** deterministic `s-<i>` (SSR/client khớp), mint `n-<n++>` khi add, `d-<i>` khi hydrate draft.
   - i18n namespace `admin.appearance` (vi + en). Verify: typecheck/lint/build pass; SSR smoke 3 tenant + root + EN đều 200, gate pass (no Forbidden DOM), 4 color input + save + preview hero per-tenant đúng, h1 VI/EN swap. Interactive (drag/add/remove/edit→preview/save→localStorage/reset) chưa headless-test — cần browser.
-- [ ] **18. PDF export hồ sơ + biên lai** (template trước, hook BE pha 2)
+- [x] **18. PDF export hồ sơ + biên lai** (template trước, hook BE pha 2)
+  - **Kỹ thuật: print-CSS + `window.print()`** (chốt — xem ADR-009; KHÔNG @react-pdf/dep PDF nào). Template = React+Tailwind thường ở route riêng → pha 2 Puppeteer navigate headless đúng route → PDF lưu/email, single source of truth.
+  - Route `(public)/track/[code]/print/page.tsx` (RSC `ƒ` dynamic): đọc `params.code` + `searchParams.doc` (`profile`|`receipt`, default profile), fetch `getTenantBranding` + `getApplicationFormSchema` server-side → pass xuống `<PrintView>` client. Application data đọc client (localStorage mock qua `useApplication`) như `/track/[code]`.
+  - `apps/web/components/print/`: `print-view.tsx` (`"use client"`, toolbar `print:hidden` back+in, auto `window.print()` 500ms sau khi data ready, loading skeleton + EmptyState notFound, dispatch profile/receipt), `document-shell.tsx` (khung A4 `max-w-[210mm]`, brand header logo-or-shortName-chip + tên trường + code, footer printedAt; export `DocSection`+`Field`), `application-document.tsx` (status badge + ngày nộp + người khai + formData đã điền map label/value qua schema + StateTimeline), `receipt-document.tsx` (code lớn + 4 field + ghi chú giữ mã).
+  - **Màu paper hardcode neutral** (white bg + neutral ink) như precedent state-tone task 8 — document phải in được bất kể theme light/dark; brand accent vẫn qua `text-primary`. `@media print { @page A4 14mm } + .print-document { print-color-adjust: exact }` ở globals.css. `print:hidden` cho LocaleSwitcher overlay ở `(public)/layout.tsx`.
+  - Nút download: `/track/[code]` (2 nút "Tải hồ sơ"/"Tải biên lai", Link `target=_blank` mở print route) + confirmation step register ("Tải biên lai"). i18n namespace `print` vi+en.
+  - **Limitation pha 1**: download = browser print dialog (Save as PDF), chưa file thật/silent. Export từ admin (cần applications list) = pha 2. QR biên lai = pha 2 (BE sinh). `logoUrl` fixtures đang null → render chip shortName; nhánh `<img>` (eslint-disable no-img-element) sẵn cho pha 2.
+  - Verify: typecheck/lint/build pass; SSR smoke print route (cva-edu) `?doc=profile`+`?doc=receipt` đều 200, toolbar + `print:hidden` + namespace render, dev log sạch. **Interactive** (data thật từ localStorage → auto window.print → PDF output) chưa headless-test — cần browser.
 - [ ] **19. Audit log viewer admin** (UI trước, BE pha 2)
 
 ### Platform (mặt tiền sản phẩm)

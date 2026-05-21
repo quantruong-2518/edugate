@@ -1,10 +1,13 @@
 "use client";
 
-import { FileSearch } from "lucide-react";
+import type { Route } from "next";
+import Link from "next/link";
+import { FileSearch, FileText, Receipt } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { StateBadge, StateTimeline } from "@ui/components/admission";
+import { Button } from "@ui/components/button";
 import {
   Card,
   CardContent,
@@ -20,6 +23,7 @@ import { useApplication } from "@/lib/api/queries";
 export default function TrackDetailPage() {
   const t = useTranslations("track");
   const tErrors = useTranslations("errors");
+  const tPrint = useTranslations("print");
   const params = useParams<{ code: string }>();
   const code = decodeURIComponent(params.code ?? "");
   const { data: application, isPending, isError, refetch } =
@@ -71,6 +75,26 @@ export default function TrackDetailPage() {
                   reason: entry.note,
                 }))}
               />
+              <div className="flex flex-wrap gap-2 border-t pt-4">
+                <Button variant="outline" size="sm" asChild>
+                  <Link
+                    href={`/track/${code}/print?doc=profile` as Route}
+                    target="_blank"
+                  >
+                    <FileText className="size-4" aria-hidden />
+                    {tPrint("download.profile")}
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link
+                    href={`/track/${code}/print?doc=receipt` as Route}
+                    target="_blank"
+                  >
+                    <Receipt className="size-4" aria-hidden />
+                    {tPrint("download.receipt")}
+                  </Link>
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>

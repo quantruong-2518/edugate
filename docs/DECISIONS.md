@@ -49,3 +49,9 @@
 - **Context**: CLAUDE.md cấm hardcode chuỗi UI (luôn qua `t()`). Feature pages 10-12 cần chuỗi VI nhưng task 14 (i18n) xếp sau → nếu hardcode rồi retrofit sẽ tốn công và rủi ro sót.
 - **Decision**: Dựng next-intl runtime ngay (P1) — locale cố định `vi`, **không** locale-routing (không prefix `/vi`, `/en`) để middleware tenant resolver (subdomain + `/t/:code`) giữ nguyên không xung đột. Messages VI thật, EN để slot rỗng. Routes + identifier tiếng Anh, chỉ message content tiếng Việt. Locale switcher + EN messages thật để lại task 14.
 - **Consequences**: + Không hardcode, không retrofit chuỗi. + Middleware tenant nguyên vẹn. + Đổi sang multi-locale sau chỉ là thêm messages + switcher. − Task 14 bị tách đôi (runtime sớm / switcher + EN sau).
+
+## ADR-009: PDF export qua print-CSS + dedicated route (KHÔNG @react-pdf, KHÔNG client PDF lib)
+
+- **Context**: Task 18 cần xuất hồ sơ + biên lai PDF, "template trước, hook BE pha 2". Document phải mang brand từng tenant và trông giống web. Yêu cầu data residency VN (self-host).
+- **Decision**: Template = React + Tailwind thường, render ở route riêng `(public)/track/[code]/print` (`?doc=profile|receipt`). Pha 1: download = `window.print()` (browser → Save as PDF). Pha 2: NestJS worker dùng Puppeteer navigate headless đúng route này → PDF lưu/đính email — template là single source of truth, không viết lại. Màu paper hardcode neutral (white bg + neutral ink) như precedent state-tone (task 8) vì document phải in được bất kể theme light/dark; brand accent vẫn qua token `text-primary`. Zero dep mới (kể cả QR — để pha 2 BE sinh).
+- **Consequences**: + Reuse token + branding + `StateBadge`/`StateTimeline`, không hệ style thứ 2. + Seam BE sạch (chỉ là 1 URL). + Pha 1 không thêm bundle. − Pha 1 qua print dialog browser (chưa file thật/silent download). − Pha 2 cần chromium trên BE (chấp nhận với self-host). − Export từ admin (cần applications list) để pha 2.
