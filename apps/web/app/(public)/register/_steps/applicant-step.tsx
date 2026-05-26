@@ -25,15 +25,18 @@ export function ApplicantStep({ control }: { control: Control<FieldValues> }) {
   const t = useTranslations("apply.applicant");
 
   return (
-    <div className="space-y-5">
-      <h3 className="text-base font-semibold">{t("title")}</h3>
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-lg font-semibold tracking-tight">{t("title")}</h2>
+        <p className="text-sm text-muted-foreground">{t("description")}</p>
+      </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           control={control}
           name="fullName"
           render={({ field }) => (
             <FormItem className="sm:col-span-2">
-              <FormLabel>{t("fullName")}</FormLabel>
+              <FormLabel>{t("fullName")}<span className="text-destructive"> *</span></FormLabel>
               <FormControl>
                 <Input autoComplete="name" {...field} value={field.value ?? ""} />
               </FormControl>
@@ -46,7 +49,7 @@ export function ApplicantStep({ control }: { control: Control<FieldValues> }) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("email")}</FormLabel>
+              <FormLabel>{t("email")}<span className="text-destructive"> *</span></FormLabel>
               <FormControl>
                 <Input
                   type="email"
@@ -65,7 +68,7 @@ export function ApplicantStep({ control }: { control: Control<FieldValues> }) {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("phone")}</FormLabel>
+              <FormLabel>{t("phone")}<span className="text-destructive"> *</span></FormLabel>
               <FormControl>
                 <Input
                   type="tel"
@@ -84,7 +87,7 @@ export function ApplicantStep({ control }: { control: Control<FieldValues> }) {
           name="relationship"
           render={({ field }) => (
             <FormItem className="sm:col-span-2">
-              <FormLabel>{t("relationship")}</FormLabel>
+              <FormLabel>{t("relationship")}<span className="text-destructive"> *</span></FormLabel>
               <Select
                 onValueChange={field.onChange}
                 value={field.value ? String(field.value) : ""}

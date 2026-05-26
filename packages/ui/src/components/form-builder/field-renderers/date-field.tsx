@@ -23,7 +23,7 @@ export function DateFieldRenderer({ field, control }: FieldProps<DateFieldSchema
         <FormItem>
           <FormLabel>
             {field.label}
-            {field.required && " *"}
+            {field.required && <span className="text-destructive"> *</span>}
           </FormLabel>
           <FormControl>
             <Input

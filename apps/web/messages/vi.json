@@ -58,14 +58,24 @@
   },
   "apply": {
     "title": "Đăng ký tuyển sinh",
+    "subtitle": "Hoàn tất 4 bước để nộp hồ sơ trực tuyến.",
+    "stepOf": "Bước {current}/{total}",
+    "autosave": "Thông tin được lưu nháp tự động trên thiết bị này.",
     "steps": {
       "applicant": "Người khai",
       "form": "Hồ sơ",
       "verifyEmail": "Xác thực email",
       "confirmation": "Hoàn tất"
     },
+    "hints": {
+      "applicant": "Ai đang nộp hồ sơ",
+      "form": "Thông tin học sinh",
+      "verifyEmail": "Mã OTP qua email",
+      "confirmation": "Nhận mã hồ sơ"
+    },
     "applicant": {
       "title": "Thông tin người khai",
+      "description": "Cho chúng tôi biết ai đang nộp hồ sơ này.",
       "fullName": "Họ và tên",
       "email": "Email",
       "phone": "Số điện thoại",
@@ -91,6 +101,9 @@
     },
     "confirmation": {
       "title": "Nộp hồ sơ thành công",
+      "greeting": "Cảm ơn {name} đã nộp hồ sơ!",
+      "greetingNoName": "Cảm ơn bạn đã nộp hồ sơ!",
+      "await": "Nhà trường sẽ xem xét hồ sơ và phản hồi tới bạn trong thời gian sớm nhất. Vui lòng theo dõi email và dùng mã hồ sơ bên dưới để tra cứu trạng thái.",
       "codeLabel": "Mã hồ sơ của bạn",
       "trackHint": "Dùng mã này để tra cứu trạng thái hồ sơ",
       "trackCta": "Tra cứu hồ sơ"
@@ -214,6 +227,8 @@
     },
     "receipt": {
       "title": "Biên lai nộp hồ sơ",
+      "received": "Hồ sơ của bạn đã được tiếp nhận",
+      "sequence": "Hồ sơ số {seq} / {total}",
       "note": "Vui lòng giữ mã hồ sơ để tra cứu trạng thái hồ sơ."
     },
     "fields": {
@@ -320,6 +335,124 @@
     }
   },
   "admin": {
+    "dashboard": {
+      "title": "Bảng điều khiển",
+      "subtitle": "Tổng quan tình hình tuyển sinh của trường.",
+      "stats": {
+        "today": "Hồ sơ nộp hôm nay",
+        "inReview": "Đang duyệt",
+        "needsInfo": "Cần bổ sung",
+        "approved": "Đã duyệt",
+        "total": "Tổng hồ sơ",
+        "thisWeek": "Trong 7 ngày qua"
+      },
+      "distribution": {
+        "title": "Phân bố theo trạng thái",
+        "description": "Tỷ lệ hồ sơ theo từng trạng thái xử lý."
+      },
+      "trend": {
+        "title": "Hồ sơ nộp theo ngày",
+        "description": "14 ngày gần nhất.",
+        "empty": "Chưa có hồ sơ nào trong khoảng này."
+      },
+      "funnel": {
+        "title": "Phễu tuyển sinh",
+        "description": "Số hồ sơ đã đi qua từng bước.",
+        "ofTotal": "{percent}% tổng hồ sơ"
+      },
+      "viewAll": "Xem tất cả hồ sơ",
+      "recent": {
+        "title": "Hồ sơ mới nhất",
+        "description": "5 hồ sơ được nộp gần đây."
+      }
+    },
+    "applications": {
+      "title": "Quản lý hồ sơ",
+      "subtitle": "Tiếp nhận, tìm kiếm và xử lý hồ sơ tuyển sinh.",
+      "searchPlaceholder": "Tìm theo mã, tên phụ huynh hoặc học sinh…",
+      "search": "Tìm kiếm hồ sơ",
+      "stats": {
+        "total": "Tổng hồ sơ",
+        "submitted": "Đã nộp",
+        "underReview": "Đang duyệt",
+        "needsInfo": "Cần bổ sung",
+        "approved": "Đã duyệt"
+      },
+      "filters": {
+        "title": "Bộ lọc",
+        "state": "Trạng thái",
+        "stateAll": "Tất cả trạng thái",
+        "stateCount": "{count} trạng thái",
+        "dateFrom": "Từ ngày",
+        "dateTo": "Đến ngày",
+        "score": "Điểm TB",
+        "scoreMin": "Điểm tối thiểu",
+        "scoreMax": "Điểm tối đa",
+        "apply": "Áp dụng",
+        "clear": "Xóa lọc",
+        "clearAll": "Xóa tất cả",
+        "active": "Bộ lọc đang áp dụng"
+      },
+      "sort": {
+        "label": "Sắp xếp",
+        "createdAtDesc": "Mới nhất",
+        "createdAtAsc": "Cũ nhất",
+        "scoreDesc": "Điểm cao → thấp",
+        "scoreAsc": "Điểm thấp → cao"
+      },
+      "columns": {
+        "code": "Mã hồ sơ",
+        "applicant": "Phụ huynh",
+        "student": "Học sinh",
+        "state": "Trạng thái",
+        "submittedAt": "Ngày nộp",
+        "score": "Điểm TB"
+      },
+      "pagination": {
+        "pageSize": "Số dòng",
+        "prev": "Trước",
+        "next": "Sau",
+        "range": "{from}–{to} trên {total}",
+        "page": "Trang {page}"
+      },
+      "empty": {
+        "title": "Không có hồ sơ",
+        "description": "Không tìm thấy hồ sơ nào khớp bộ lọc hiện tại."
+      },
+      "error": {
+        "title": "Không tải được hồ sơ",
+        "description": "Đã có lỗi khi tải danh sách. Vui lòng thử lại."
+      },
+      "detail": {
+        "title": "Chi tiết hồ sơ",
+        "applicantInfo": "Thông tin phụ huynh",
+        "fullName": "Họ và tên",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "relationship": "Quan hệ",
+        "formData": "Thông tin khai báo",
+        "timeline": "Lịch sử trạng thái",
+        "actions": "Hành động",
+        "submittedAt": "Ngày nộp",
+        "noValue": "—"
+      },
+      "relationships": {
+        "father": "Bố",
+        "mother": "Mẹ",
+        "guardian": "Người giám hộ",
+        "self": "Tự đăng ký"
+      },
+      "transitionSuccess": "Đã cập nhật trạng thái hồ sơ.",
+      "viewDetail": "Xem chi tiết"
+    },
+    "notifications": {
+      "title": "Thông báo",
+      "open": "Mở thông báo",
+      "unread": "{count} chưa đọc",
+      "markAllRead": "Đánh dấu đã đọc tất cả",
+      "empty": "Không có thông báo nào.",
+      "viewApplication": "Xem hồ sơ"
+    },
     "audit": {
       "title": "Nhật ký hoạt động",
       "subtitle": "Theo dõi các thao tác trong hệ thống của trường.",

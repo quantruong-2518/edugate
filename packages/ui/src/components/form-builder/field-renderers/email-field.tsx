@@ -1,6 +1,6 @@
 "use client";
 
-import type { TextField as TextFieldSchema } from "@shared/form";
+import type { EmailField as EmailFieldSchema } from "@shared/form";
 
 import {
   FormControl,
@@ -11,11 +11,13 @@ import {
   FormMessage,
 } from "@ui/components/form";
 import { Input } from "@ui/components/input";
-import { Textarea } from "@ui/components/textarea";
 
 import type { FieldProps } from "./types";
 
-export function TextFieldRenderer({ field, control }: FieldProps<TextFieldSchema>) {
+export function EmailFieldRenderer({
+  field,
+  control,
+}: FieldProps<EmailFieldSchema>) {
   return (
     <FormField
       control={control}
@@ -27,21 +29,14 @@ export function TextFieldRenderer({ field, control }: FieldProps<TextFieldSchema
             {field.required && <span className="text-destructive"> *</span>}
           </FormLabel>
           <FormControl>
-            {field.multiline ? (
-              <Textarea
-                placeholder={field.placeholder}
-                maxLength={field.maxLength}
-                {...f}
-                value={(f.value as string | undefined) ?? ""}
-              />
-            ) : (
-              <Input
-                placeholder={field.placeholder}
-                maxLength={field.maxLength}
-                {...f}
-                value={(f.value as string | undefined) ?? ""}
-              />
-            )}
+            <Input
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder={field.placeholder}
+              {...f}
+              value={(f.value as string | undefined) ?? ""}
+            />
           </FormControl>
           {field.description && (
             <FormDescription>{field.description}</FormDescription>

@@ -32,7 +32,7 @@ export function SelectFieldRenderer({
         <FormItem>
           <FormLabel>
             {field.label}
-            {field.required && " *"}
+            {field.required && <span className="text-destructive"> *</span>}
           </FormLabel>
           <Select
             value={(f.value as string | undefined) || undefined}

@@ -11,6 +11,10 @@ import {
 
 import { cn } from "@ui/lib/utils";
 
+import {
+  FormBuilderConfigProvider,
+  type StudentResolver,
+} from "./context";
 import { FieldRenderer } from "./field-renderers";
 
 /**
@@ -24,6 +28,8 @@ export type FormBuilderProps = {
   schema: FormSchema;
   control: Control<FieldValues>;
   className?: string;
+  /** App-injected resolver for `studentLookup` fields (keeps `ui` API-free). */
+  studentResolver?: StudentResolver;
 };
 
 function colSpanClass(field: FormFieldSchema): string {
@@ -50,10 +56,16 @@ function FieldGate({
   );
 }
 
-export function FormBuilder({ schema, control, className }: FormBuilderProps) {
+export function FormBuilder({
+  schema,
+  control,
+  className,
+  studentResolver,
+}: FormBuilderProps) {
   return (
-    <div className={cn("space-y-8", className)}>
-      {schema.sections.map((section, index) => (
+    <FormBuilderConfigProvider value={{ studentResolver }}>
+      <div className={cn("space-y-8", className)}>
+        {schema.sections.map((section, index) => (
         <section key={section.title ?? index} className="space-y-4">
           {(section.title || section.description) && (
             <div className="space-y-1">
@@ -72,8 +84,9 @@ export function FormBuilder({ schema, control, className }: FormBuilderProps) {
               <FieldGate key={field.name} field={field} control={control} />
             ))}
           </div>
-        </section>
-      ))}
-    </div>
+          </section>
+        ))}
+      </div>
+    </FormBuilderConfigProvider>
   );
 }

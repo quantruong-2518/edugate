@@ -58,14 +58,24 @@
   },
   "apply": {
     "title": "Apply for admission",
+    "subtitle": "Complete 4 steps to submit your application online.",
+    "stepOf": "Step {current}/{total}",
+    "autosave": "Your answers are auto-saved as a draft on this device.",
     "steps": {
       "applicant": "Applicant",
       "form": "Application",
       "verifyEmail": "Verify email",
       "confirmation": "Done"
     },
+    "hints": {
+      "applicant": "Who is applying",
+      "form": "Student details",
+      "verifyEmail": "OTP via email",
+      "confirmation": "Get your code"
+    },
     "applicant": {
       "title": "Applicant information",
+      "description": "Tell us who is submitting this application.",
       "fullName": "Full name",
       "email": "Email",
       "phone": "Phone number",
@@ -91,6 +101,9 @@
     },
     "confirmation": {
       "title": "Application submitted",
+      "greeting": "Thank you, {name}, for your application!",
+      "greetingNoName": "Thank you for your application!",
+      "await": "The school will review your application and respond as soon as possible. Please watch your email and use the code below to track its status.",
       "codeLabel": "Your application code",
       "trackHint": "Use this code to track your application status",
       "trackCta": "Track application"
@@ -214,6 +227,8 @@
     },
     "receipt": {
       "title": "Submission receipt",
+      "received": "Your application has been received",
+      "sequence": "Application no. {seq} / {total}",
       "note": "Please keep this code to track your application status."
     },
     "fields": {
@@ -320,6 +335,124 @@
     }
   },
   "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Overview of your school's admissions.",
+      "stats": {
+        "today": "Submitted today",
+        "inReview": "Under review",
+        "needsInfo": "Needs info",
+        "approved": "Approved",
+        "total": "Total applications",
+        "thisWeek": "Last 7 days"
+      },
+      "distribution": {
+        "title": "Status distribution",
+        "description": "Share of applications by processing state."
+      },
+      "trend": {
+        "title": "Submissions per day",
+        "description": "Last 14 days.",
+        "empty": "No applications in this window yet."
+      },
+      "funnel": {
+        "title": "Admission funnel",
+        "description": "Applications that reached each step.",
+        "ofTotal": "{percent}% of total"
+      },
+      "viewAll": "View all applications",
+      "recent": {
+        "title": "Latest applications",
+        "description": "5 most recently submitted."
+      }
+    },
+    "applications": {
+      "title": "Applications",
+      "subtitle": "Receive, search and process admission applications.",
+      "searchPlaceholder": "Search by code, parent or student name…",
+      "search": "Search applications",
+      "stats": {
+        "total": "Total",
+        "submitted": "Submitted",
+        "underReview": "Under review",
+        "needsInfo": "Needs info",
+        "approved": "Approved"
+      },
+      "filters": {
+        "title": "Filters",
+        "state": "Status",
+        "stateAll": "All statuses",
+        "stateCount": "{count} statuses",
+        "dateFrom": "From date",
+        "dateTo": "To date",
+        "score": "GPA",
+        "scoreMin": "Min score",
+        "scoreMax": "Max score",
+        "apply": "Apply",
+        "clear": "Clear filters",
+        "clearAll": "Clear all",
+        "active": "Active filters"
+      },
+      "sort": {
+        "label": "Sort",
+        "createdAtDesc": "Newest",
+        "createdAtAsc": "Oldest",
+        "scoreDesc": "Score high → low",
+        "scoreAsc": "Score low → high"
+      },
+      "columns": {
+        "code": "Code",
+        "applicant": "Parent",
+        "student": "Student",
+        "state": "Status",
+        "submittedAt": "Submitted",
+        "score": "GPA"
+      },
+      "pagination": {
+        "pageSize": "Rows",
+        "prev": "Prev",
+        "next": "Next",
+        "range": "{from}–{to} of {total}",
+        "page": "Page {page}"
+      },
+      "empty": {
+        "title": "No applications",
+        "description": "No applications match the current filters."
+      },
+      "error": {
+        "title": "Could not load applications",
+        "description": "Something went wrong loading the list. Please retry."
+      },
+      "detail": {
+        "title": "Application detail",
+        "applicantInfo": "Parent information",
+        "fullName": "Full name",
+        "email": "Email",
+        "phone": "Phone",
+        "relationship": "Relationship",
+        "formData": "Submitted information",
+        "timeline": "Status history",
+        "actions": "Actions",
+        "submittedAt": "Submitted",
+        "noValue": "—"
+      },
+      "relationships": {
+        "father": "Father",
+        "mother": "Mother",
+        "guardian": "Guardian",
+        "self": "Self"
+      },
+      "transitionSuccess": "Application status updated.",
+      "viewDetail": "View detail"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "open": "Open notifications",
+      "unread": "{count} unread",
+      "markAllRead": "Mark all as read",
+      "empty": "No notifications.",
+      "viewApplication": "View application"
+    },
     "audit": {
       "title": "Activity log",
       "subtitle": "Track operations performed in your school's system.",

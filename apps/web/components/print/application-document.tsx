@@ -2,7 +2,15 @@ import { useTranslations } from "next-intl";
 
 import type { Application } from "@shared/admission";
 import type { TenantBranding } from "@shared/branding";
-import { allFields, type FormFieldSchema, type FormSchema } from "@shared/form";
+import {
+  allFields,
+  isDisplayField,
+  isFieldEmpty,
+  type AddressValue,
+  type FormFieldSchema,
+  type FormSchema,
+  type StudentLookupValue,
+} from "@shared/form";
 import { StateBadge, StateTimeline } from "@ui/components/admission";
 
 import { DocSection, DocumentShell, Field } from "./document-shell";
@@ -16,13 +24,32 @@ function formatDate(value: string): string {
 
 /** Render a stored form value into a human-readable string for the document. */
 function formatFieldValue(field: FormFieldSchema, value: unknown): string {
-  if (field.type === "select") {
-    return field.options.find((o) => o.value === value)?.label ?? String(value);
+  switch (field.type) {
+    case "select":
+    case "radio":
+      return (
+        field.options.find((o) => o.value === value)?.label ?? String(value)
+      );
+    case "checkbox":
+      if (Array.isArray(value)) {
+        return value
+          .map((v) => field.options.find((o) => o.value === v)?.label ?? v)
+          .join(", ");
+      }
+      return "";
+    case "date":
+      return typeof value === "string" ? formatDate(value) : String(value);
+    case "address": {
+      const a = value as Partial<AddressValue>;
+      return [a.ward, a.district, a.province].filter(Boolean).join(", ");
+    }
+    case "studentLookup": {
+      const s = value as Partial<StudentLookupValue>;
+      return s.name ? `${s.name} (${s.code})` : (s.code ?? "");
+    }
+    default:
+      return String(value);
   }
-  if (field.type === "date" && typeof value === "string") {
-    return formatDate(value);
-  }
-  return String(value);
 }
 
 export function ApplicationDocument({
@@ -38,8 +65,9 @@ export function ApplicationDocument({
   const tApplicant = useTranslations("apply.applicant");
 
   const answered = allFields(formSchema)
+    .filter((field) => !isDisplayField(field))
     .map((field) => ({ field, value: application.formData[field.name] }))
-    .filter(({ value }) => value !== undefined && value !== null && value !== "");
+    .filter(({ field, value }) => !isFieldEmpty(field, value));
 
   return (
     <DocumentShell

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Control, type FieldValues } from "react-hook-form";
 import { useTranslations } from "next-intl";
+import { ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -14,20 +15,18 @@ import {
   allFields,
   defaultValuesFor,
   fieldShape,
+  isDisplayField,
+  isFieldEmpty,
   isFieldVisible,
   refineFields,
   type FormSchema,
   type FormValidationMessages,
 } from "@shared/form";
 import { Button } from "@ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@ui/components/card";
+import { Card, CardContent } from "@ui/components/card";
 import { Form } from "@ui/components/form";
 import { Stepper } from "@ui/components/stepper";
+import { cn } from "@ui/lib/utils";
 
 import { useCreateApplication } from "@/lib/api/queries";
 
@@ -82,6 +81,8 @@ export function RegisterWizard({
       required: formT("required"),
       min: (min) => formT("min", { min }),
       max: (max) => formT("max", { max }),
+      email: formT("invalidEmail"),
+      phone: t("applicant.invalidPhone"),
     };
     return z
       .object({
@@ -173,9 +174,10 @@ export function RegisterWizard({
   const isFormValid = useCallback(
     (v: FieldValues): boolean =>
       dynamicFields.every((field) => {
+        if (isDisplayField(field)) return true;
         if (!isFieldVisible(field, v)) return true;
         if (!field.required) return true;
-        return !isEmpty(v[field.name]);
+        return !isFieldEmpty(field, v[field.name]);
       }),
     [dynamicFields],
   );
@@ -247,55 +249,139 @@ export function RegisterWizard({
     );
   };
 
+  const labelFor = (id: Step) =>
+    t(`steps.${id === "verify-email" ? "verifyEmail" : id}`);
   const stepperSteps = STEPS.map((id) => ({
     id,
-    label: t(`steps.${id === "verify-email" ? "verifyEmail" : id}`),
+    label: labelFor(id),
+    description: t(`hints.${id === "verify-email" ? "verifyEmail" : id}`),
   }));
+  const total = STEPS.length;
+
+  // Live per-step validity drives the Next button's enabled state. `watch()`
+  // re-renders on every change so the gate tracks the form in real time.
+  const watched = form.watch();
+  const canAdvance =
+    step === "applicant"
+      ? isApplicantValid(watched)
+      : step === "form"
+        ? isFormValid(watched)
+        : false;
+
+  // Confirmation is a terminal success screen — no rail, progress, or nav.
+  if (step === "confirmation") {
+    return (
+      <div className="mx-auto w-full max-w-xl">
+        <Card className="rounded-2xl">
+          <CardContent className="p-6 sm:p-8">
+            <Form {...form}>
+              <ConfirmationStep code={codeParam ?? ""} />
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <Card className="mx-auto w-full max-w-2xl">
-      <CardHeader className="space-y-6">
-        <CardTitle className="text-xl">{t("title")}</CardTitle>
-        <Stepper steps={stepperSteps} current={stepIndex} />
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <Form {...form}>
-          {step === "applicant" && <ApplicantStep control={control} />}
-          {step === "form" && (
-            <FormStep schema={formSchema} control={control} />
-          )}
-          {step === "verify-email" && (
-            <VerifyEmailStep
-              email={String(form.getValues("email"))}
-              onSubmit={submit}
+    <div className="mx-auto w-full max-w-5xl">
+      <div className="lg:grid lg:grid-cols-[260px_1fr] lg:gap-12">
+        {/* Desktop side rail: title + vertical progress + reassurance */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-24 space-y-8">
+            <div className="space-y-1.5">
+              <h1 className="text-xl font-semibold tracking-tight">
+                {t("title")}
+              </h1>
+              <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+            </div>
+            <Stepper
+              steps={stepperSteps}
+              current={stepIndex}
+              orientation="vertical"
             />
-          )}
-          {step === "confirmation" && (
-            <ConfirmationStep code={codeParam ?? ""} />
-          )}
-        </Form>
+            <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/40 p-3 text-xs text-muted-foreground">
+              <ShieldCheck
+                className="mt-0.5 size-4 shrink-0 text-primary"
+                aria-hidden
+              />
+              <span>{t("autosave")}</span>
+            </div>
+          </div>
+        </aside>
 
-        {step !== "confirmation" && (
-          <div className="flex items-center justify-between gap-3 pt-2">
+        {/* Main column */}
+        <div className="space-y-5">
+          {/* Mobile/tablet progress header */}
+          <div className="space-y-3 lg:hidden">
+            <div className="flex items-center justify-between gap-3">
+              <h1 className="text-lg font-semibold tracking-tight">
+                {t("title")}
+              </h1>
+              <span className="shrink-0 text-xs font-medium text-muted-foreground">
+                {t("stepOf", { current: stepIndex + 1, total })}
+              </span>
+            </div>
+            <div className="flex gap-1.5" aria-hidden>
+              {STEPS.map((id, i) => (
+                <span
+                  key={id}
+                  className={cn(
+                    "h-1.5 flex-1 rounded-full transition-colors",
+                    i <= stepIndex ? "bg-primary" : "bg-border",
+                  )}
+                />
+              ))}
+            </div>
+            <p className="text-sm font-medium text-foreground">
+              {stepperSteps[stepIndex]?.label}
+            </p>
+          </div>
+
+          <Card className="rounded-2xl">
+            <CardContent className="p-5 sm:p-7">
+              <Form {...form}>
+                {step === "applicant" && <ApplicantStep control={control} />}
+                {step === "form" && (
+                  <FormStep schema={formSchema} control={control} />
+                )}
+                {step === "verify-email" && (
+                  <VerifyEmailStep
+                    email={String(form.getValues("email"))}
+                    onSubmit={submit}
+                  />
+                )}
+              </Form>
+            </CardContent>
+          </Card>
+
+          {/* Navigation: sticky thumb bar on mobile, inline on desktop */}
+          <div className="sticky bottom-0 z-10 -mx-4 flex items-center justify-between gap-3 border-t bg-background/80 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:mx-0 sm:rounded-xl sm:border sm:px-4 lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
             {stepIndex > 0 ? (
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
               >
+                <ChevronLeft className="size-4" aria-hidden />
                 {actionsT("back")}
               </Button>
             ) : (
               <span />
             )}
             {stepIndex < 2 && (
-              <Button type="button" onClick={goNext}>
+              <Button
+                type="button"
+                onClick={goNext}
+                disabled={!canAdvance}
+              >
                 {actionsT("next")}
+                <ChevronRight className="size-4" aria-hidden />
               </Button>
             )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+    </div>
   );
 }
