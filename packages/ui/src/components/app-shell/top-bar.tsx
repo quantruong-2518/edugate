@@ -41,6 +41,9 @@ export type TopBarProps = {
    * next-intl / routing concerns (the switcher persists locale via a cookie).
    */
   localeSwitcher?: ReactNode;
+  /** Notifications slot (bell button + dropdown). App-owned so this package
+   * stays free of data-fetching concerns. */
+  notifications?: ReactNode;
 };
 
 function userInitials(name: string): string {
@@ -140,6 +143,7 @@ export function TopBar({
   onToggleSidebar,
   sidebarCollapsed,
   localeSwitcher,
+  notifications,
 }: TopBarProps) {
   return (
     <header
@@ -188,6 +192,7 @@ export function TopBar({
         {tenants && tenants.length > 1 && (
           <TenantSwitcher currentCode={currentTenantCode} tenants={tenants} />
         )}
+        {notifications}
         {localeSwitcher}
         <UserMenu user={user} />
       </div>

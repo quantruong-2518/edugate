@@ -3,8 +3,13 @@ import {
   type Applicant,
   type Application,
   type ApplicationCode,
+  type ApplicationState,
 } from "@shared/admission";
 
+import {
+  generateApplications,
+  REFERENCE_DATE,
+} from "./mock-applications";
 import { findApplication, saveApplication } from "./store";
 
 /**
@@ -87,4 +92,364 @@ export async function verifyEmailOtp(
   input: VerifyEmailOtpInput,
 ): Promise<VerifyEmailOtpResult> {
   return delay({ verified: input.code.trim() === MOCK_OTP_CODE });
+}
+
+// ---------------------------------------------------------------------------
+// Management seam: list / analytics / notifications.
+//
+// These power the admin dashboard (task: admission management). Pha 1 reads
+// from the deterministic seeded generator; pha 2 swaps each body for a real
+// `GET /applications`, `GET /applications/analytics`, `GET /notifications`
+// keeping these signatures. The per-tenant dataset is memoized so repeated
+// calls within a session don't re-generate.
+// ---------------------------------------------------------------------------
+
+const datasetCache = new Map<string, Application[]>();
+
+function datasetFor(tenantCode: string): Application[] {
+  const key = tenantCode || "default";
+  let rows = datasetCache.get(key);
+  if (!rows) {
+    rows = generateApplications(key);
+    datasetCache.set(key, rows);
+  }
+  return rows;
+}
+
+function normalize(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "");
+}
+
+/** Numeric score used for the "score" column / range filter (the gpa field). */
+export function applicationScore(application: Application): number | null {
+  const gpa = application.formData["gpa"];
+  return typeof gpa === "number" ? gpa : null;
+}
+
+/** Student name pulled from the dynamic form data, with a safe fallback. */
+export function studentNameOf(application: Application): string {
+  const name = application.formData["studentName"];
+  return typeof name === "string" ? name : "—";
+}
+
+export type ApplicationSort =
+  | "createdAt:desc"
+  | "createdAt:asc"
+  | "score:desc"
+  | "score:asc";
+
+export type ListApplicationsInput = {
+  tenantCode: string;
+  search?: string;
+  states?: readonly ApplicationState[];
+  /** ISO date (yyyy-mm-dd) inclusive lower bound on createdAt. */
+  dateFrom?: string;
+  /** ISO date (yyyy-mm-dd) inclusive upper bound on createdAt. */
+  dateTo?: string;
+  scoreMin?: number;
+  scoreMax?: number;
+  sort?: ApplicationSort;
+  page?: number;
+  pageSize?: number;
+};
+
+export type ListApplicationsResult = {
+  items: Application[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
+export async function listApplications(
+  input: ListApplicationsInput,
+): Promise<ListApplicationsResult> {
+  const {
+    tenantCode,
+    search,
+    states,
+    dateFrom,
+    dateTo,
+    scoreMin,
+    scoreMax,
+    sort = "createdAt:desc",
+    page = 1,
+    pageSize = 10,
+  } = input;
+
+  const q = search?.trim() ? normalize(search.trim()) : null;
+  const stateSet = states && states.length > 0 ? new Set(states) : null;
+  const fromMs = dateFrom ? new Date(`${dateFrom}T00:00:00`).getTime() : null;
+  const toMs = dateTo ? new Date(`${dateTo}T23:59:59`).getTime() : null;
+
+  let rows = datasetFor(tenantCode).filter((app) => {
+    if (stateSet && !stateSet.has(app.state)) return false;
+    const createdMs = new Date(app.createdAt).getTime();
+    if (fromMs !== null && createdMs < fromMs) return false;
+    if (toMs !== null && createdMs > toMs) return false;
+    if (scoreMin !== undefined || scoreMax !== undefined) {
+      const score = applicationScore(app);
+      if (score === null) return false;
+      if (scoreMin !== undefined && score < scoreMin) return false;
+      if (scoreMax !== undefined && score > scoreMax) return false;
+    }
+    if (q) {
+      const haystack = normalize(
+        `${app.code} ${app.applicant.fullName} ${studentNameOf(app)}`,
+      );
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  });
+
+  rows = sortApplications(rows, sort);
+
+  const total = rows.length;
+  const safePage = Math.max(1, page);
+  const start = (safePage - 1) * pageSize;
+  const items = rows.slice(start, start + pageSize);
+
+  return delay({ items, total, page: safePage, pageSize });
+}
+
+function sortApplications(
+  rows: Application[],
+  sort: ApplicationSort,
+): Application[] {
+  const sorted = [...rows];
+  switch (sort) {
+    case "createdAt:asc":
+      sorted.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+      break;
+    case "score:desc":
+      sorted.sort(
+        (a, b) => (applicationScore(b) ?? -1) - (applicationScore(a) ?? -1),
+      );
+      break;
+    case "score:asc":
+      sorted.sort(
+        (a, b) => (applicationScore(a) ?? Infinity) - (applicationScore(b) ?? Infinity),
+      );
+      break;
+    case "createdAt:desc":
+    default:
+      sorted.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+      break;
+  }
+  return sorted;
+}
+
+export type AnalyticsPoint = {
+  /** ISO date (yyyy-mm-dd). */
+  date: string;
+  count: number;
+};
+
+export type FunnelStep = {
+  state: ApplicationState;
+  count: number;
+};
+
+export type ApplicationAnalytics = {
+  total: number;
+  byState: Record<ApplicationState, number>;
+  todaySubmissions: number;
+  weekSubmissions: number;
+  /** Daily submission counts for the trailing window (oldest first). */
+  series: AnalyticsPoint[];
+  /** Approval funnel (submitted → reviewed → approved → confirmed → enrolled). */
+  funnel: FunnelStep[];
+};
+
+const SERIES_DAYS = 14;
+
+const FUNNEL_ORDER: readonly ApplicationState[] = [
+  "SUBMITTED",
+  "UNDER_REVIEW",
+  "APPROVED",
+  "CONFIRMED",
+  "ENROLLED",
+];
+
+function emptyByState(): Record<ApplicationState, number> {
+  return {
+    DRAFT: 0,
+    SUBMITTED: 0,
+    UNDER_REVIEW: 0,
+    NEEDS_INFO: 0,
+    APPROVED: 0,
+    REJECTED: 0,
+    CONFIRMED: 0,
+    ENROLLED: 0,
+    CANCELLED: 0,
+    EXPIRED: 0,
+  };
+}
+
+function dateKey(ms: number): string {
+  return new Date(ms).toISOString().slice(0, 10);
+}
+
+export async function getApplicationAnalytics(
+  tenantCode: string,
+): Promise<ApplicationAnalytics> {
+  const rows = datasetFor(tenantCode);
+  const byState = emptyByState();
+
+  const now = REFERENCE_DATE;
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+  const startOfWeek = new Date(startOfToday.getTime() - 6 * 86_400_000);
+
+  let todaySubmissions = 0;
+  let weekSubmissions = 0;
+
+  // Seed the trailing-window buckets so days with no submissions render as 0.
+  const buckets = new Map<string, number>();
+  for (let i = SERIES_DAYS - 1; i >= 0; i -= 1) {
+    buckets.set(dateKey(startOfToday.getTime() - i * 86_400_000), 0);
+  }
+
+  for (const app of rows) {
+    byState[app.state] += 1;
+    const createdMs = new Date(app.createdAt).getTime();
+    if (createdMs >= startOfToday.getTime()) todaySubmissions += 1;
+    if (createdMs >= startOfWeek.getTime()) weekSubmissions += 1;
+    const key = dateKey(createdMs);
+    if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + 1);
+  }
+
+  const series: AnalyticsPoint[] = Array.from(buckets.entries()).map(
+    ([date, count]) => ({ date, count }),
+  );
+
+  // Funnel: each step counts applications that reached at least that state
+  // (i.e. passed through it on their way to the current state).
+  const reachedAtLeast = (target: ApplicationState): number =>
+    rows.filter((app) => app.history.some((h) => h.state === target)).length;
+
+  const funnel: FunnelStep[] = FUNNEL_ORDER.map((state) => ({
+    state,
+    count: reachedAtLeast(state),
+  }));
+
+  return delay({
+    total: rows.length,
+    byState,
+    todaySubmissions,
+    weekSubmissions,
+    series,
+    funnel,
+  });
+}
+
+export type NotificationKind =
+  | "new_application"
+  | "needs_review"
+  | "deadline"
+  | "status_change";
+
+export type AppNotification = {
+  id: string;
+  kind: NotificationKind;
+  title: string;
+  description: string;
+  /** ISO 8601. */
+  at: string;
+  read: boolean;
+  /** Optional application code the notification links to. */
+  applicationCode?: string;
+};
+
+/**
+ * In-memory notification store, derived deterministically from the dataset so
+ * counts line up with what the staff would see. Mutable for mark-as-read within
+ * a session (pha 2: real rows + PATCH /notifications/:id/read).
+ */
+const notificationCache = new Map<string, AppNotification[]>();
+
+function buildNotifications(tenantCode: string): AppNotification[] {
+  const rows = datasetFor(tenantCode);
+  const recentSubmitted = rows
+    .filter((a) => a.state === "SUBMITTED")
+    .slice(0, 3);
+  const needsReview = rows
+    .filter((a) => a.state === "UNDER_REVIEW" || a.state === "NEEDS_INFO")
+    .slice(0, 2);
+
+  const items: AppNotification[] = [];
+
+  recentSubmitted.forEach((app, i) => {
+    items.push({
+      id: `n-new-${app.code}`,
+      kind: "new_application",
+      title: "Hồ sơ mới được nộp",
+      description: `${studentNameOf(app)} · ${app.code}`,
+      at: app.createdAt,
+      read: i > 0,
+      applicationCode: app.code,
+    });
+  });
+
+  needsReview.forEach((app) => {
+    items.push({
+      id: `n-review-${app.code}`,
+      kind: "needs_review",
+      title: "Hồ sơ cần xem xét",
+      description: `${studentNameOf(app)} · ${app.code}`,
+      at: app.updatedAt,
+      read: false,
+      applicationCode: app.code,
+    });
+  });
+
+  items.push({
+    id: "n-deadline-2026",
+    kind: "deadline",
+    title: "Sắp đến hạn đợt tuyển sinh",
+    description: "Đợt tuyển sinh 2026 còn 3 ngày trước khi đóng nhận hồ sơ.",
+    at: new Date(REFERENCE_DATE.getTime() - 2 * 3600_000).toISOString(),
+    read: false,
+  });
+
+  return items.sort((a, b) => (a.at < b.at ? 1 : -1));
+}
+
+function notificationsFor(tenantCode: string): AppNotification[] {
+  const key = tenantCode || "default";
+  let items = notificationCache.get(key);
+  if (!items) {
+    items = buildNotifications(key);
+    notificationCache.set(key, items);
+  }
+  return items;
+}
+
+export async function listNotifications(
+  tenantCode: string,
+): Promise<AppNotification[]> {
+  // Return clones so callers can't mutate the cache directly.
+  return delay(notificationsFor(tenantCode).map((n) => ({ ...n })));
+}
+
+export async function markNotificationRead(
+  tenantCode: string,
+  id: string,
+): Promise<AppNotification[]> {
+  const items = notificationsFor(tenantCode);
+  const target = items.find((n) => n.id === id);
+  if (target) target.read = true;
+  return delay(items.map((n) => ({ ...n })));
+}
+
+export async function markAllNotificationsRead(
+  tenantCode: string,
+): Promise<AppNotification[]> {
+  const items = notificationsFor(tenantCode);
+  items.forEach((n) => {
+    n.read = true;
+  });
+  return delay(items.map((n) => ({ ...n })));
 }

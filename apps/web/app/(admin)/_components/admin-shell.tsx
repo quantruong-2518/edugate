@@ -17,6 +17,7 @@ import {
   type NavItem,
 } from "@ui/components/app-shell";
 
+import { NotificationsBell } from "@/components/admin/notifications-bell";
 import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
 
 // `"use client"` at the top of this module turns the lucide icon imports
@@ -51,11 +52,16 @@ const ADMIN_NAV: readonly NavItem[] = [
   { href: "/admin/settings", label: "Cài đặt", Icon: Settings },
 ];
 
-// Pha 1 mock — pha 2 will derive from the authenticated session.
+// Pha 1 mock — pha 2 will derive from the authenticated session. Email mirrors
+// the demo login (tuyensinh.nht@edu.vn) loosely so the shell feels like the
+// logged-in identity; it stays a mock.
 const MOCK_USER: AppShellUser = {
-  name: "Nguyễn Quản Trị",
-  email: "admin@cva-edu.local",
+  name: "Cán bộ Tuyển sinh",
+  email: "tuyensinh.nht@edu.vn",
 };
+
+/** Tenant the admin demo defaults to when no tenant resolves from the URL. */
+const DEFAULT_ADMIN_TENANT = "nguyen-huy-tuong";
 
 const MOCK_TENANTS: readonly AppShellTenantOption[] = [
   {
@@ -82,6 +88,10 @@ export function AdminShell({
   branding: { code: string; name: string; shortName: string };
   children: ReactNode;
 }) {
+  const tenantCode =
+    branding.code && branding.code !== "default"
+      ? branding.code
+      : DEFAULT_ADMIN_TENANT;
   return (
     <AppShell
       branding={branding}
@@ -89,6 +99,7 @@ export function AdminShell({
       navItems={ADMIN_NAV}
       tenants={MOCK_TENANTS}
       localeSwitcher={<LocaleSwitcher />}
+      notifications={<NotificationsBell tenantCode={tenantCode} />}
     >
       {children}
     </AppShell>

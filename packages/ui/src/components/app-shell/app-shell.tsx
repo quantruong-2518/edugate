@@ -29,6 +29,8 @@ export type AppShellProps = {
   tenants?: readonly AppShellTenantOption[];
   /** Locale switcher slot, forwarded to the top bar. */
   localeSwitcher?: ReactNode;
+  /** Notifications slot (e.g. a bell button), forwarded to the top bar. */
+  notifications?: ReactNode;
   children: ReactNode;
 };
 
@@ -38,6 +40,7 @@ export function AppShell({
   navItems,
   tenants,
   localeSwitcher,
+  notifications,
   children,
 }: AppShellProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -78,6 +81,7 @@ export function AppShell({
         onToggleSidebar={toggleSidebar}
         sidebarCollapsed={collapsed}
         localeSwitcher={localeSwitcher}
+        notifications={notifications}
       />
 
       <div className="flex">
