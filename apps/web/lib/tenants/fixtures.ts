@@ -85,6 +85,40 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
       },
     }),
   },
+  "nguyen-van-huyen": {
+    code: "nguyen-van-huyen",
+    name: "Trường THCS Nguyễn Văn Huyên — Hoài Đức, Hà Nội",
+    shortName: "NVH",
+    logoUrl: null,
+    theme: tenantTheme({
+      // Tailwind violet-600 / violet-400 in oklch — "trường học hạnh phúc".
+      light: {
+        primary: "oklch(0.541 0.281 293.009)",
+        primaryForeground: "oklch(0.985 0 0)",
+      },
+      dark: {
+        primary: "oklch(0.702 0.183 293.541)",
+        primaryForeground: "oklch(0.205 0 0)",
+      },
+    }),
+  },
+  "nguyen-gia-thieu": {
+    code: "nguyen-gia-thieu",
+    name: "Trường THCS Nguyễn Gia Thiều — Long Biên, Hà Nội",
+    shortName: "NGT",
+    logoUrl: null,
+    theme: tenantTheme({
+      // Tailwind amber-700 / amber-400 in oklch — gold for a heritage school.
+      light: {
+        primary: "oklch(0.555 0.163 48.998)",
+        primaryForeground: "oklch(0.985 0 0)",
+      },
+      dark: {
+        primary: "oklch(0.828 0.189 84.429)",
+        primaryForeground: "oklch(0.205 0 0)",
+      },
+    }),
+  },
 };
 
 export const DEFAULT_BRANDING: TenantBranding = {

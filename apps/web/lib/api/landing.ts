@@ -325,10 +325,266 @@ const NHT_CONFIG: LandingConfig = {
   ],
 };
 
+const NVH_CONFIG: LandingConfig = {
+  sections: [
+    {
+      type: "hero",
+      eyebrow: "Tuyển sinh lớp 6 — Năm học 2026 - 2027",
+      headline: "THCS Nguyễn Văn Huyên",
+      subheadline:
+        "Trường học hạnh phúc — nơi mỗi học sinh được yêu thương, tôn trọng và phát triển trọn vẹn cả tài lẫn đức.",
+      image: unsplash("1580582932707-520aed937b7b"),
+      ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
+      ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
+    },
+    {
+      type: "stats",
+      items: [
+        { label: "Đỗ THPT công lập", value: "100%" },
+        { label: "Học sinh vào trường chuyên", value: "34" },
+        { label: "Giáo viên đạt chuẩn", value: "100%" },
+        { label: "Xếp hạng thi HSG huyện", value: "Nhất" },
+      ],
+    },
+    {
+      type: "about",
+      title: "Lời ngỏ của Cô Hương — Hiệu trưởng",
+      body: "Tại Trường THCS Nguyễn Văn Huyên (Hoài Đức, Hà Nội), chúng tôi xây dựng một 'Trường học Hạnh phúc' — nơi học sinh đến trường mỗi ngày là một niềm vui. Với đội ngũ 38 giáo viên đều đạt trình độ đại học, tận tâm và giàu chuyên môn, nhà trường cam kết đồng hành cùng từng em trên hành trình trưởng thành về cả trí tuệ lẫn nhân cách.",
+      image: unsplash("1577896851231-70ef18881754", 1200),
+    },
+    {
+      type: "process",
+      title: "Quy trình đăng ký tuyển sinh",
+      steps: [
+        { title: "Khai thông tin", description: "Điền thông tin phụ huynh." },
+        { title: "Điền hồ sơ", description: "Hoàn tất biểu mẫu lớp 6." },
+        { title: "Xác thực email", description: "Nhập mã OTP gửi qua email." },
+        { title: "Nộp hồ sơ", description: "Nhận mã hồ sơ để tra cứu." },
+        { title: "Theo dõi", description: "Cập nhật kết quả xét tuyển." },
+      ],
+    },
+    {
+      type: "infoTabs",
+      title: "Thông tin tuyển sinh",
+      tabs: [
+        {
+          id: "eligibility",
+          label: "Đối tượng",
+          body: "Học sinh hoàn thành chương trình tiểu học, có hộ khẩu hoặc cư trú tại huyện Hoài Đức và khu vực lân cận theo phân tuyến của Phòng Giáo dục.",
+        },
+        {
+          id: "schedule",
+          label: "Lịch tuyển sinh",
+          body: "Nhận hồ sơ trực tuyến từ 01/07 đến 15/07/2026. Công bố danh sách trúng tuyển dự kiến ngày 25/07/2026.",
+        },
+        {
+          id: "documents",
+          label: "Hồ sơ cần nộp",
+          body: "Giấy khai sinh, học bạ tiểu học, giấy chứng nhận hoàn thành chương trình tiểu học và ảnh thẻ 3x4.",
+        },
+      ],
+    },
+    {
+      type: "testimonials",
+      title: "Cảm nhận của phụ huynh",
+      items: [
+        {
+          name: "Chị Vũ Mai",
+          role: "Phụ huynh lớp 6C",
+          quote:
+            "Con tôi đi học về luôn kể chuyện vui ở lớp. 'Trường học hạnh phúc' không chỉ là khẩu hiệu mà là điều có thật ở đây.",
+          avatarUrl: unsplash("1487412720507-e7ab37603c6f", 200),
+        },
+        {
+          name: "Anh Nguyễn Thành",
+          role: "Phụ huynh lớp 9A",
+          quote:
+            "Thầy cô tận tâm, sát sao từng học sinh. Năm nay lớp con tôi đỗ công lập gần như tuyệt đối.",
+          avatarUrl: unsplash("1507003211169-0a1dd7228f2d", 200),
+        },
+      ],
+    },
+    {
+      type: "faq",
+      title: "Câu hỏi thường gặp",
+      items: [
+        {
+          question: "'Trường học hạnh phúc' nghĩa là gì?",
+          answer:
+            "Là mô hình giáo dục lấy học sinh làm trung tâm, đề cao sự an toàn, yêu thương và tôn trọng — giúp các em chủ động, tự tin và hạnh phúc khi đến trường.",
+        },
+        {
+          question: "Trường có nhận học sinh trái tuyến không?",
+          answer:
+            "Nhà trường ưu tiên học sinh đúng tuyến; chỉ tiêu trái tuyến (nếu có) được thông báo công khai theo từng năm học.",
+        },
+        {
+          question: "Học phí và các khoản thu như thế nào?",
+          answer:
+            "Trường công lập thu theo quy định của thành phố Hà Nội; chi tiết được niêm yết tại trường và trên website.",
+        },
+      ],
+    },
+    {
+      type: "footer",
+      columns: [
+        {
+          title: "Liên hệ",
+          links: [
+            { label: "Địa chỉ: Hoài Đức, Hà Nội", href: "#" },
+            { label: "Hotline: 024 3386 0000", href: "tel:02433860000" },
+            {
+              label: "Email: c2nguyenvanhuyen@hanoi.edu.vn",
+              href: "mailto:c2nguyenvanhuyen@hanoi.edu.vn",
+            },
+          ],
+        },
+        {
+          title: "Tuyển sinh",
+          links: [
+            { label: "Đăng ký lớp 6", href: "/register" },
+            { label: "Tra cứu hồ sơ", href: "/track" },
+          ],
+        },
+      ],
+      copyright: "Trường THCS Nguyễn Văn Huyên — Hoài Đức, Hà Nội",
+    },
+  ],
+};
+
+const NGT_CONFIG: LandingConfig = {
+  sections: [
+    {
+      type: "hero",
+      eyebrow: "Tuyển sinh lớp 6 — Năm học 2026 - 2027",
+      headline: "THCS Nguyễn Gia Thiều",
+      subheadline:
+        "Giữ vững truyền thống dạy tốt - học tốt, chắp cánh ước mơ cho bao thế hệ học trò đất Long Biên.",
+      image: unsplash("1535982330050-f1c2fb79ff78"),
+      ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
+      ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
+    },
+    {
+      type: "stats",
+      items: [
+        { label: "Bề dày truyền thống", value: "70+ năm" },
+        { label: "Tỷ lệ học sinh khá - giỏi", value: "95%" },
+        { label: "Giáo viên đạt chuẩn", value: "100%" },
+        { label: "Giải HSG cấp Quận", value: "150+" },
+      ],
+    },
+    {
+      type: "about",
+      title: "Lời ngỏ của Cô Thúy — Hiệu trưởng",
+      body: "Mang tên danh nhân văn hóa Nguyễn Gia Thiều, ngôi trường tại quận Long Biên, Hà Nội tự hào tiếp nối bề dày truyền thống 'dạy tốt - học tốt' qua nhiều thế hệ. Chúng tôi không ngừng đổi mới phương pháp giảng dạy, vun đắp nền tảng tri thức vững chắc và phẩm chất tốt đẹp để mỗi học sinh tự tin bước vào tương lai.",
+      image: unsplash("1562774053-701939374585", 1200),
+    },
+    {
+      type: "process",
+      title: "Quy trình đăng ký tuyển sinh",
+      steps: [
+        { title: "Khai thông tin", description: "Điền thông tin phụ huynh." },
+        { title: "Điền hồ sơ", description: "Hoàn tất biểu mẫu lớp 6." },
+        { title: "Xác thực email", description: "Nhập mã OTP gửi qua email." },
+        { title: "Nộp hồ sơ", description: "Nhận mã hồ sơ để tra cứu." },
+        { title: "Theo dõi", description: "Cập nhật kết quả xét tuyển." },
+      ],
+    },
+    {
+      type: "infoTabs",
+      title: "Thông tin tuyển sinh",
+      tabs: [
+        {
+          id: "eligibility",
+          label: "Đối tượng",
+          body: "Học sinh hoàn thành chương trình tiểu học, có hộ khẩu hoặc cư trú tại quận Long Biên và khu vực lân cận theo phân tuyến.",
+        },
+        {
+          id: "schedule",
+          label: "Lịch tuyển sinh",
+          body: "Nhận hồ sơ trực tuyến từ 01/07 đến 15/07/2026. Công bố danh sách trúng tuyển dự kiến ngày 25/07/2026.",
+        },
+        {
+          id: "documents",
+          label: "Hồ sơ cần nộp",
+          body: "Giấy khai sinh, học bạ tiểu học, giấy chứng nhận hoàn thành chương trình tiểu học và ảnh thẻ 3x4.",
+        },
+      ],
+    },
+    {
+      type: "testimonials",
+      title: "Cảm nhận của phụ huynh",
+      items: [
+        {
+          name: "Chị Lê Hồng",
+          role: "Phụ huynh lớp 6B",
+          quote:
+            "Ngôi trường giàu truyền thống, nề nếp kỷ cương mà vẫn hiện đại. Tôi hoàn toàn yên tâm gửi gắm con ở đây.",
+          avatarUrl: unsplash("1438761681033-6461ffad8d80", 200),
+        },
+        {
+          name: "Anh Phạm Hùng",
+          role: "Cựu học sinh, phụ huynh lớp 8A",
+          quote:
+            "Tôi từng học ở đây, nay cho con theo học. Tinh thần 'dạy tốt - học tốt' của trường vẫn vẹn nguyên sau bao năm.",
+          avatarUrl: unsplash("1500648767791-00dcc994a43e", 200),
+        },
+      ],
+    },
+    {
+      type: "faq",
+      title: "Câu hỏi thường gặp",
+      items: [
+        {
+          question: "Trường có lớp chọn / lớp chất lượng cao không?",
+          answer:
+            "Nhà trường tổ chức các lớp mũi nhọn theo định hướng bồi dưỡng học sinh giỏi; tiêu chí xét chọn được công bố đầu mỗi năm học.",
+        },
+        {
+          question: "Trường có nhận học sinh trái tuyến không?",
+          answer:
+            "Nhà trường ưu tiên học sinh đúng tuyến; chỉ tiêu trái tuyến (nếu có) được thông báo công khai theo từng năm.",
+        },
+        {
+          question: "Học phí và các khoản thu như thế nào?",
+          answer:
+            "Trường công lập thu theo quy định của thành phố Hà Nội; chi tiết được niêm yết tại trường và trên website.",
+        },
+      ],
+    },
+    {
+      type: "footer",
+      columns: [
+        {
+          title: "Liên hệ",
+          links: [
+            { label: "Địa chỉ: Long Biên, Hà Nội", href: "#" },
+            { label: "Hotline: 024 3827 0000", href: "tel:02438270000" },
+            {
+              label: "Email: c2nguyengiathieu@hanoi.edu.vn",
+              href: "mailto:c2nguyengiathieu@hanoi.edu.vn",
+            },
+          ],
+        },
+        {
+          title: "Tuyển sinh",
+          links: [
+            { label: "Đăng ký lớp 6", href: "/register" },
+            { label: "Tra cứu hồ sơ", href: "/track" },
+          ],
+        },
+      ],
+      copyright: "Trường THCS Nguyễn Gia Thiều — Long Biên, Hà Nội",
+    },
+  ],
+};
+
 const TENANT_CONFIGS: Readonly<Record<string, LandingConfig>> = {
   "cva-edu": CVA_CONFIG,
   "tran-dai-nghia": TDN_CONFIG,
   "nguyen-huy-tuong": NHT_CONFIG,
+  "nguyen-van-huyen": NVH_CONFIG,
+  "nguyen-gia-thieu": NGT_CONFIG,
 };
 
 const DEFAULT_CONFIG: LandingConfig = {
