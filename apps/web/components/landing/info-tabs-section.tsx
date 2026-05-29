@@ -1,11 +1,32 @@
-import type { InfoTabsSection } from "@shared/landing";
+import {
+  Calendar,
+  FileText,
+  GraduationCap,
+  Info,
+  MapPin,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+
+import type { InfoTabIcon, InfoTabsSection } from "@shared/landing";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 
 import { Reveal } from "./reveal";
 
+const ICONS: Record<InfoTabIcon, LucideIcon> = {
+  users: Users,
+  calendar: Calendar,
+  fileText: FileText,
+  mapPin: MapPin,
+  graduationCap: GraduationCap,
+  info: Info,
+};
+
 export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
   const firstTab = section.tabs[0];
   if (!firstTab) return null;
+
+  const layout = section.layout ?? "tabs";
 
   return (
     <section className="relative isolate overflow-hidden px-4 py-16 sm:px-6 sm:py-24">
@@ -16,24 +37,50 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
             {section.title}
           </h2>
         )}
-        <Tabs defaultValue={firstTab.id} className="gap-5">
-          <TabsList className="mx-auto h-auto w-full max-w-md flex-wrap bg-card/70 shadow-sm ring-1 ring-border/40 backdrop-blur sm:w-fit sm:flex-nowrap">
+        {layout === "list" ? (
+          <ul className="divide-y divide-border/60 overflow-hidden rounded-3xl bg-card/70 shadow-sm ring-1 ring-border/40 backdrop-blur">
+            {section.tabs.map((tab) => {
+              const Icon = tab.icon ? ICONS[tab.icon] : Info;
+              return (
+                <li
+                  key={tab.id}
+                  className="flex gap-4 p-6 sm:gap-5 sm:p-7"
+                >
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Icon className="size-5" aria-hidden />
+                  </span>
+                  <div className="space-y-1.5">
+                    <h3 className="text-base font-semibold tracking-tight text-foreground sm:text-lg">
+                      {tab.label}
+                    </h3>
+                    <p className="text-[15px] leading-relaxed text-muted-foreground">
+                      {tab.body}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <Tabs defaultValue={firstTab.id} className="gap-5">
+            <TabsList className="mx-auto h-auto w-full max-w-md flex-wrap bg-card/70 shadow-sm ring-1 ring-border/40 backdrop-blur sm:w-fit sm:flex-nowrap">
+              {section.tabs.map((tab) => (
+                <TabsTrigger key={tab.id} value={tab.id}>
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
             {section.tabs.map((tab) => (
-              <TabsTrigger key={tab.id} value={tab.id}>
-                {tab.label}
-              </TabsTrigger>
+              <TabsContent
+                key={tab.id}
+                value={tab.id}
+                className="rounded-3xl bg-card/70 p-6 text-[15px] leading-relaxed text-muted-foreground shadow-sm ring-1 ring-border/40 backdrop-blur sm:p-8"
+              >
+                {tab.body}
+              </TabsContent>
             ))}
-          </TabsList>
-          {section.tabs.map((tab) => (
-            <TabsContent
-              key={tab.id}
-              value={tab.id}
-              className="rounded-3xl bg-card/70 p-6 text-[15px] leading-relaxed text-muted-foreground shadow-sm ring-1 ring-border/40 backdrop-blur sm:p-8"
-            >
-              {tab.body}
-            </TabsContent>
-          ))}
-        </Tabs>
+          </Tabs>
+        )}
       </Reveal>
     </section>
   );

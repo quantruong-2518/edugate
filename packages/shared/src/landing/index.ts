@@ -1,4 +1,5 @@
 export {
+  INFO_TABS_ICONS,
   LANDING_SECTION_TYPES,
   aboutSectionSchema,
   faqSectionSchema,
@@ -14,6 +15,7 @@ export {
   type FaqSection,
   type FooterSection,
   type HeroSection,
+  type InfoTabIcon,
   type InfoTabsSection,
   type LandingConfig,
   type LandingLink,

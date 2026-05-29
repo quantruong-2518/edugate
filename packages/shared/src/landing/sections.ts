@@ -37,11 +37,35 @@ export const processSectionSchema = z.object({
   steps: z.array(z.object({ title: z.string(), description: z.string() })),
 });
 
+/**
+ * Curated icon set for `infoTabs.list` layout. Keep the list short so the
+ * editor (task 17) can offer a picker. Adding a name here is the *only* way
+ * to extend it — the renderer maps it to a Lucide component statically so the
+ * bundle doesn't pull in every icon.
+ */
+export const INFO_TABS_ICONS = [
+  "users",
+  "calendar",
+  "fileText",
+  "mapPin",
+  "graduationCap",
+  "info",
+] as const;
+export type InfoTabIcon = (typeof INFO_TABS_ICONS)[number];
+
 export const infoTabsSectionSchema = z.object({
   type: z.literal("infoTabs"),
   title: z.string().optional(),
+  /** "tabs" (default) shows a tab strip; "list" stacks all items as a guide. */
+  layout: z.enum(["tabs", "list"]).optional(),
   tabs: z.array(
-    z.object({ id: z.string(), label: z.string(), body: z.string() }),
+    z.object({
+      id: z.string(),
+      label: z.string(),
+      body: z.string(),
+      /** Optional leading icon — only rendered in the "list" layout. */
+      icon: z.enum(INFO_TABS_ICONS).optional(),
+    }),
   ),
 });
 
