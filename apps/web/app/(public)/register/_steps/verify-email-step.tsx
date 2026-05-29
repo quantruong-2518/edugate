@@ -97,7 +97,7 @@ function OtpInput({
           onKeyDown={(e) => handleKeyDown(i, e)}
           aria-label={`Ô ${i + 1}`}
           className={cn(
-            "size-12 p-0 text-center font-mono text-xl font-semibold sm:size-14 sm:text-2xl",
+            "size-12 p-0 text-center text-xl font-semibold sm:size-14 sm:text-2xl",
           )}
         />
       ))}

@@ -94,7 +94,7 @@ export function ApplicationDetailSheet({
       >
         <SheetHeader className="space-y-2 border-b p-5 text-left">
           <div className="flex flex-wrap items-center gap-2">
-            <SheetTitle className="font-mono text-base">
+            <SheetTitle className="text-base">
               {application.code}
             </SheetTitle>
             <StateBadge state={application.state} />

@@ -54,7 +54,7 @@ export function ReceiptDocument({
         <p className="text-xs uppercase tracking-wide text-neutral-500">
           {t("fields.code")}
         </p>
-        <p className="font-mono text-3xl font-bold tracking-wider text-primary">
+        <p className="text-3xl font-bold tracking-wider text-primary">
           {application.code}
         </p>
       </div>

@@ -36,7 +36,7 @@ export function ConfirmationStep({ code }: { code: string }) {
         <p className="text-xs uppercase tracking-wide text-muted-foreground">
           {t("codeLabel")}
         </p>
-        <p className="mt-1 font-mono text-3xl font-bold tracking-[0.2em] text-primary">
+        <p className="mt-1 text-3xl font-bold tracking-[0.2em] text-primary">
           {code}
         </p>
       </div>

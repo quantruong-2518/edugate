@@ -17,25 +17,31 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const authedSlug =
     sessionSlug && isValidTenantCode(sessionSlug) ? sessionSlug : null;
 
-  // No session → show the access gate, pre-filling the slug from the host
-  // when it resolves to a tenant (subdomain / custom domain / path).
+  // No session → show the access gate. The slug is driven by the host tenant
+  // (read-only); admin is always reached via the school's own domain/subdomain.
   if (!authedSlug) {
     const hostCode = await getTenantCode();
-    return <AdminGate defaultSlug={hostCode ?? ""} />;
+    return (
+      <div className="admin-neutral">
+        <AdminGate slug={hostCode ?? ""} />
+      </div>
+    );
   }
 
   const branding = await getTenantBranding(authedSlug);
   return (
-    <AbilityProvider context={MOCK_ABILITY_CONTEXT}>
-      <AdminShell
-        branding={{
-          code: branding.code,
-          name: branding.name,
-          shortName: branding.shortName,
-        }}
-      >
-        {children}
-      </AdminShell>
-    </AbilityProvider>
+    <div className="admin-neutral">
+      <AbilityProvider context={MOCK_ABILITY_CONTEXT}>
+        <AdminShell
+          branding={{
+            code: branding.code,
+            name: branding.name,
+            shortName: branding.shortName,
+          }}
+        >
+          {children}
+        </AdminShell>
+      </AbilityProvider>
+    </div>
   );
 }

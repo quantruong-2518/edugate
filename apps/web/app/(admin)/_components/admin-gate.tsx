@@ -18,34 +18,34 @@ import {
   FormMessage,
 } from "@ui/components/form";
 import { Input } from "@ui/components/input";
+import { Label } from "@ui/components/label";
 
 import { signInAdmin } from "../_actions/admin-access";
 
 /**
- * Admin sign-in gate (desktop, see [[feedback-admin-desktop-only]]). Two
- * credentials: the tenant slug (pre-filled from the resolved host when
- * available) and the access code issued to the school. Verifies via the
- * `signInAdmin` server action, then refreshes so the layout swaps the gate
- * for the shell.
+ * Admin sign-in gate (desktop, neutral palette — see [[feedback-admin-desktop-only]]).
+ * The tenant slug is driven by the resolved host and shown read-only; only the
+ * access code (issued to the school) is entered. Verifies via the
+ * `signInAdmin` server action, then refreshes so the layout swaps the gate for
+ * the shell.
  */
-export function AdminGate({ defaultSlug }: { defaultSlug: string }) {
+export function AdminGate({ slug }: { slug: string }) {
   const t = useTranslations("auth");
   const router = useRouter();
   const [failed, setFailed] = useState(false);
 
   const schema = z.object({
-    slug: z.string().trim().min(1, t("validation.slugRequired")),
     code: z.string().trim().min(1, t("validation.codeRequired")),
   });
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: { slug: defaultSlug, code: "" },
+    defaultValues: { code: "" },
   });
 
   async function onSubmit(values: z.infer<typeof schema>) {
     setFailed(false);
-    const result = await signInAdmin(values.slug, values.code);
+    const result = await signInAdmin(slug, values.code);
     if (result.ok) {
       router.refresh();
       return;
@@ -73,25 +73,17 @@ export function AdminGate({ defaultSlug }: { defaultSlug: string }) {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="slug"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("gate.slug")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      autoCapitalize="none"
-                      autoCorrect="off"
-                      spellCheck={false}
-                      placeholder={t("gate.slugPlaceholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Slug is fixed by the host tenant — read-only, not part of the form. */}
+            <div className="space-y-2">
+              <Label htmlFor="admin-slug">{t("gate.slug")}</Label>
+              <Input
+                id="admin-slug"
+                value={slug}
+                readOnly
+                disabled
+                aria-readonly="true"
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -101,11 +93,9 @@ export function AdminGate({ defaultSlug }: { defaultSlug: string }) {
                   <FormLabel>{t("gate.code")}</FormLabel>
                   <FormControl>
                     <Input
-                      autoCapitalize="characters"
                       autoComplete="off"
                       spellCheck={false}
                       placeholder={t("gate.codePlaceholder")}
-                      className="font-mono uppercase tracking-[0.25em]"
                       {...field}
                     />
                   </FormControl>
@@ -123,7 +113,7 @@ export function AdminGate({ defaultSlug }: { defaultSlug: string }) {
             <Button
               type="submit"
               className="w-full"
-              disabled={form.formState.isSubmitting}
+              disabled={!slug || form.formState.isSubmitting}
             >
               {t("gate.submit")}
             </Button>

@@ -448,7 +448,7 @@ export function ApplicationsView({
                         className="cursor-pointer"
                         onClick={() => openDetail(app)}
                       >
-                        <TableCell className="font-mono text-xs font-medium">
+                        <TableCell className="text-xs font-medium">
                           {app.code}
                         </TableCell>
                         <TableCell>{app.applicant.fullName}</TableCell>
@@ -496,7 +496,7 @@ export function ApplicationsView({
                     <Card className="transition-colors hover:bg-muted/40">
                       <CardContent className="space-y-2 p-4">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-mono text-xs font-medium">
+                          <span className="text-xs font-medium">
                             {app.code}
                           </span>
                           <StateBadge state={app.state} />
