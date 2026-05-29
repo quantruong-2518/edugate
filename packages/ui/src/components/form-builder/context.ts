@@ -21,7 +21,7 @@ export type StudentResolver = (
 export type FileUploader = (
   file: File,
   context: { fieldName: string },
-) => Promise<{ key: string; filename: string }>;
+) => Promise<{ key: string; name: string }>;
 
 export type FormBuilderConfig = {
   /** Injected by the app so the `ui` package stays free of API dependencies. */

@@ -34,6 +34,24 @@ function formatValue(value: unknown): string {
   if (value === null || value === undefined || value === "") return "—";
   if (typeof value === "number") return String(value);
   if (typeof value === "boolean") return value ? "✓" : "—";
+  if (typeof value === "object") {
+    const o = value as Record<string, unknown>;
+    // File field: prefer the human filename over the opaque storage key.
+    if (typeof o["name"] === "string" && typeof o["key"] === "string") {
+      return o["name"] as string;
+    }
+    // Student lookup: "Name (code)" matches the print document's rendering.
+    if (typeof o["name"] === "string" && typeof o["code"] === "string") {
+      return `${o["name"]} (${o["code"]})`;
+    }
+    // Vietnamese address: ward, district, province.
+    if (typeof o["province"] === "string") {
+      return [o["ward"], o["district"], o["province"]]
+        .filter((s) => typeof s === "string" && s)
+        .join(", ");
+    }
+    return JSON.stringify(value);
+  }
   return String(value);
 }
 
@@ -109,6 +127,12 @@ export function ApplicationDetailSheet({
           <section>
             <h3 className="mb-1 text-sm font-semibold">{t("applicantInfo")}</h3>
             <div className="divide-y rounded-lg border px-3">
+              {application.applicant.studentFullName && (
+                <DetailRow
+                  label={t("studentFullName")}
+                  value={application.applicant.studentFullName}
+                />
+              )}
               <DetailRow label={t("fullName")} value={application.applicant.fullName} />
               <DetailRow label={t("email")} value={application.applicant.email} />
               <DetailRow label={t("phone")} value={application.applicant.phone} />

@@ -138,14 +138,21 @@ export function VerifyEmailStep({
     async (value: string) => {
       if (value.length !== OTP_LENGTH) return;
       setSubmitting(true);
-      const res = await verifyOtp.mutateAsync({ email, code: value });
-      if (!res.verified || !res.otpToken) {
+      try {
+        const res = await verifyOtp.mutateAsync({ email, code: value });
+        if (!res.verified || !res.otpToken) {
+          toast.error(t("invalidOtp"));
+          return;
+        }
+        await onSubmit(res.otpToken);
+      } catch (err) {
+        // Verify or submit failed (network drop, 422 CAMPAIGN_CLOSED, etc.).
+        // Surface the error so the user can retry instead of being stuck on a
+        // permanently-disabled OTP UI.
+        toast.error((err as Error).message || t("invalidOtp"));
+      } finally {
         setSubmitting(false);
-        toast.error(t("invalidOtp"));
-        return;
       }
-      // Wizard navigates away on success; keep the button disabled meanwhile.
-      await onSubmit(res.otpToken);
     },
     [email, onSubmit, t, verifyOtp],
   );

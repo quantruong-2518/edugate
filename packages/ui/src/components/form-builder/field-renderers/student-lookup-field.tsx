@@ -62,7 +62,7 @@ export function StudentLookupFieldRenderer({
 
         const lookup = async () => {
           const code = (value.code ?? "").trim();
-          if (!code || !studentResolver) return;
+          if (!code || !studentResolver || loading) return;
           setLoading(true);
           setNotFound(false);
           try {
@@ -76,6 +76,15 @@ export function StudentLookupFieldRenderer({
           } finally {
             setLoading(false);
           }
+        };
+
+        // Auto-lookup on blur so parents don't have to discover the "Tra cứu"
+        // button — typing a code then tabbing away triggers the resolve. We
+        // still keep the explicit button for keyboard / accessibility paths.
+        const onBlur = () => {
+          f.onBlur();
+          const code = (value.code ?? "").trim();
+          if (code && !value.name && !loading) void lookup();
         };
 
         return (
@@ -97,7 +106,7 @@ export function StudentLookupFieldRenderer({
                       void lookup();
                     }
                   }}
-                  onBlur={f.onBlur}
+                  onBlur={onBlur}
                 />
               </FormControl>
               <Button
@@ -142,7 +151,15 @@ export function StudentLookupFieldRenderer({
               </p>
             )}
 
-            {field.description && !resolved && (
+            {/* Code typed but not yet resolved — nudge the user to look it up
+                before they hit the global "required" error from validation. */}
+            {!resolved && !notFound && !loading && (value.code ?? "").trim() && (
+              <p className="text-xs text-muted-foreground">
+                Bấm <span className="font-medium">Tra cứu</span> để xác minh mã học sinh.
+              </p>
+            )}
+
+            {field.description && !resolved && !(value.code ?? "").trim() && (
               <FormDescription>{field.description}</FormDescription>
             )}
             <FormMessage />

@@ -429,7 +429,8 @@
       "detail": {
         "title": "Chi tiết hồ sơ",
         "applicantInfo": "Thông tin phụ huynh",
-        "fullName": "Họ và tên",
+        "studentFullName": "Họ và tên học sinh",
+        "fullName": "Họ và tên người khai",
         "email": "Email",
         "phone": "Số điện thoại",
         "relationship": "Quan hệ",

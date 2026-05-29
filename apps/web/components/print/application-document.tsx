@@ -47,6 +47,13 @@ function formatFieldValue(field: FormFieldSchema, value: unknown): string {
       const s = value as Partial<StudentLookupValue>;
       return s.name ? `${s.name} (${s.code})` : (s.code ?? "");
     }
+    case "file": {
+      // New writes carry `{ key, name }`; legacy mocks still hold a bare
+      // filename string. Prefer the human name and never print the opaque key.
+      if (typeof value === "string") return value;
+      const f = value as { name?: string } | null | undefined;
+      return f?.name ?? "";
+    }
     default:
       return String(value);
   }

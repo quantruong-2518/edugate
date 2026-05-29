@@ -224,10 +224,29 @@ export function applicationScore(application: Application): number | null {
   return typeof gpa === "number" ? gpa : null;
 }
 
-/** Student name pulled from the dynamic form data, with a safe fallback. */
+/**
+ * Student name, resolved in priority order so every tenant's flow surfaces a
+ * non-"—" name where one exists:
+ *   1. `applicant.studentFullName` — tenants that collect the name up-front
+ *      on the wizard's applicant step (e.g. NGT).
+ *   2. `form_data.student.name` — the studentLookup field's resolved record.
+ *   3. `form_data.studentName` — legacy flat text field (CVA seed).
+ * Matches the GIN index in migration 0012 so admin search and the visible
+ * column agree on what counts as "the student name".
+ */
 export function studentNameOf(application: Application): string {
-  const name = application.formData["studentName"];
-  return typeof name === "string" ? name : "—";
+  const fromApplicant = application.applicant.studentFullName;
+  if (typeof fromApplicant === "string" && fromApplicant.trim()) {
+    return fromApplicant;
+  }
+  const lookup = application.formData["student"];
+  if (lookup && typeof lookup === "object") {
+    const name = (lookup as { name?: unknown }).name;
+    if (typeof name === "string" && name.trim()) return name;
+  }
+  const flat = application.formData["studentName"];
+  if (typeof flat === "string" && flat.trim()) return flat;
+  return "—";
 }
 
 export type ApplicationSort =
@@ -274,39 +293,30 @@ export async function listApplications(
     pageSize = 10,
   } = input;
 
-  const q = search?.trim() ? normalize(search.trim()) : null;
-  const stateSet = states && states.length > 0 ? new Set(states) : null;
-  const fromMs = dateFrom ? new Date(`${dateFrom}T00:00:00`).getTime() : null;
-  const toMs = dateTo ? new Date(`${dateTo}T23:59:59`).getTime() : null;
-
-  let rows = datasetFor(tenantCode).filter((app) => {
-    if (stateSet && !stateSet.has(app.state)) return false;
-    const createdMs = new Date(app.createdAt).getTime();
-    if (fromMs !== null && createdMs < fromMs) return false;
-    if (toMs !== null && createdMs > toMs) return false;
-    if (scoreMin !== undefined || scoreMax !== undefined) {
-      const score = applicationScore(app);
-      if (score === null) return false;
-      if (scoreMin !== undefined && score < scoreMin) return false;
-      if (scoreMax !== undefined && score > scoreMax) return false;
-    }
-    if (q) {
-      const haystack = normalize(
-        `${app.code} ${app.applicant.fullName} ${studentNameOf(app)}`,
-      );
-      if (!haystack.includes(q)) return false;
-    }
-    return true;
+  // BE filtering + sort + pagination via GIN search index + tenant-scoped
+  // tx (RLS). `tenantCode` is sent as an HTTP header by the axios
+  // interceptor, not as a query param, so it is omitted here.
+  const { data } = await http.get<{
+    items: Application[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>("/v1/admin/applications", {
+    headers: { "x-tenant-code": tenantCode },
+    params: {
+      ...(search?.trim() ? { search: search.trim() } : {}),
+      ...(states && states.length > 0 ? { states: states.join(",") } : {}),
+      ...(dateFrom ? { dateFrom } : {}),
+      ...(dateTo ? { dateTo } : {}),
+      ...(scoreMin !== undefined ? { scoreMin } : {}),
+      ...(scoreMax !== undefined ? { scoreMax } : {}),
+      sort,
+      page,
+      pageSize,
+    },
   });
 
-  rows = sortApplications(rows, sort);
-
-  const total = rows.length;
-  const safePage = Math.max(1, page);
-  const start = (safePage - 1) * pageSize;
-  const items = rows.slice(start, start + pageSize);
-
-  return delay({ items, total, page: safePage, pageSize });
+  return data;
 }
 
 function sortApplications(

@@ -71,6 +71,17 @@ export type SelectField = FieldBase & {
   options: SelectOption[];
 };
 
+/**
+ * The persisted value of a `file` field. `key` is the opaque storage key
+ * (R2 object key in pha 2); `name` is the human filename so receipts/print
+ * docs / admin views display something parents recognise. Both must be set
+ * for the field to count as non-empty.
+ */
+export type FileValue = {
+  key: string;
+  name: string;
+};
+
 export type FileField = FieldBase & {
   type: "file";
   accept?: string;
@@ -197,6 +208,14 @@ export function isFieldEmpty(field: FormFieldSchema, value: unknown): boolean {
     case "studentLookup": {
       const s = value as Partial<StudentLookupValue> | null | undefined;
       return !s || !s.code || !s.name;
+    }
+    case "file": {
+      // Tolerate the legacy plain-string shape (pha-1 mocks stored filename
+      // only) so existing drafts/seed data still validate. New writes always
+      // produce { key, name }.
+      if (typeof value === "string") return value === "";
+      const f = value as Partial<FileValue> | null | undefined;
+      return !f || !f.key || !f.name;
     }
     case "number":
     case "scoring":

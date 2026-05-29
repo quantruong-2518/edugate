@@ -429,7 +429,8 @@
       "detail": {
         "title": "Application detail",
         "applicantInfo": "Parent information",
-        "fullName": "Full name",
+        "studentFullName": "Student full name",
+        "fullName": "Parent full name",
         "email": "Email",
         "phone": "Phone",
         "relationship": "Relationship",

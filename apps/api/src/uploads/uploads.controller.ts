@@ -11,6 +11,7 @@ import {
 } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
+import { SkipTenantTx } from "../common/tenant/skip-tenant-tx.decorator.js";
 import type { AppRequest } from "../common/types.js";
 import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
 import {
@@ -28,6 +29,7 @@ import { R2Service } from "./r2.service.js";
  */
 @ApiTags("uploads")
 @Controller("uploads")
+@SkipTenantTx()
 export class UploadsController {
   constructor(@Inject(R2Service) private readonly r2: R2Service) {}
 
@@ -44,7 +46,11 @@ export class UploadsController {
         message: "Dịch vụ lưu trữ chưa được cấu hình.",
       });
     }
-    const tenantCode = req.tenant?.code;
+    // SkipTenantTx means the interceptor did not resolve req.tenant, so the
+    // sign endpoint reads the tenant code straight from the header. This is
+    // safe — the key is purely a path prefix; an attacker that fakes the
+    // header still cannot read other tenants' keys.
+    const tenantCode = readTenantHeader(req.headers["x-tenant-code"]);
     if (!tenantCode) {
       throw new ForbiddenException({
         code: "TENANT_REQUIRED",
@@ -60,4 +66,10 @@ export class UploadsController {
       });
     }
   }
+}
+
+function readTenantHeader(value: string | string[] | undefined): string | null {
+  if (!value) return null;
+  if (Array.isArray(value)) return value[0]?.trim() || null;
+  return value.trim() || null;
 }

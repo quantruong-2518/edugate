@@ -65,9 +65,9 @@ const STUDENT_PHOTO_FIELD: FormSchema["sections"][number]["fields"][number] = {
 };
 
 /**
- * Nguyễn Gia Thiều only collects the MOET student code + the student's ID
- * photo — no học bạ / transcript upload (per docx). Keep the optional note
- * field so parents can flag special cases (e.g. mã học sinh chưa cấp).
+ * Nguyễn Gia Thiều: free-text student code (no MOET lookup), student ID
+ * photo, optional note. Per the school: validation against the MOET
+ * registry happens offline during admission review, not at submit time.
  */
 const NGT_FORM_SCHEMA: FormSchema = {
   sections: [
@@ -75,12 +75,29 @@ const NGT_FORM_SCHEMA: FormSchema = {
       title: "Thông tin học sinh",
       fields: [
         {
-          type: "studentLookup",
-          name: "student",
+          type: "text",
+          name: "studentCode",
           label: "Mã học sinh (do Bộ GD&ĐT cấp)",
           required: true,
           placeholder: "VD: 79012345678",
           description: "Nhập mã định danh học sinh.",
+          colSpan: 1,
+        },
+        {
+          type: "date",
+          name: "dob",
+          label: "Ngày sinh",
+          required: true,
+          colSpan: 1,
+        },
+        {
+          type: "text",
+          name: "residence",
+          label: "Địa chỉ thường trú",
+          required: true,
+          multiline: true,
+          maxLength: 300,
+          placeholder: "Số nhà, tổ/thôn, phường/xã, quận/huyện, tỉnh/thành",
         },
         STUDENT_PHOTO_FIELD,
         {

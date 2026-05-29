@@ -18,6 +18,12 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export type UploadKind = "student_photo" | "transcript";
 
+const CONTENT_TYPE_EXT: Readonly<Record<string, string>> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "application/pdf": ".pdf",
+};
+
 const KIND_RULES: Record<
   UploadKind,
   { prefix: string; allowedContentTypes: readonly string[] }
@@ -98,7 +104,10 @@ export class R2Service {
       );
     }
 
-    const ext = extOf(input.filename, input.contentType);
+    // Derive the extension from the *allowlisted* content type, not the
+    // attacker-controlled filename. Stops a request from creating a key like
+    // `.../<uuid>.svg` whose extension diverges from the object metadata.
+    const ext = CONTENT_TYPE_EXT[input.contentType] ?? "";
     const now = new Date();
     const yyyymm = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
     const id = randomUUID();
@@ -122,12 +131,3 @@ export class R2Service {
   }
 }
 
-/** Pick a safe extension from filename, fall back to the content type. */
-function extOf(filename: string, contentType: string): string {
-  const m = filename.toLowerCase().match(/\.([a-z0-9]{2,5})$/);
-  if (m) return `.${m[1]}`;
-  if (contentType === "image/jpeg") return ".jpg";
-  if (contentType === "image/png") return ".png";
-  if (contentType === "application/pdf") return ".pdf";
-  return "";
-}

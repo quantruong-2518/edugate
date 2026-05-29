@@ -66,6 +66,18 @@ function fieldBaseZod(field: FormFieldSchema): z.ZodTypeAny {
       .partial()
       .optional();
   }
+  if (field.type === "file") {
+    // New writes produce `{ key, name }`; legacy drafts may still hold a bare
+    // filename string. Accept both — `isFieldEmpty` enforces non-empty when
+    // the field is required.
+    return z
+      .union([
+        z.object({ key: z.string(), name: z.string() }).partial(),
+        z.string(),
+      ])
+      .optional()
+      .default("");
+  }
   return z.string().optional().default("");
 }
 

@@ -12,6 +12,7 @@ export {
   type DateField,
   type EmailField,
   type FileField,
+  type FileValue,
   type FormFieldSchema,
   type FormFieldType,
   type FormSchema,

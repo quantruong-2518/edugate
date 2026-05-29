@@ -24,3 +24,8 @@ export {
   type ApplicationCode,
   type ApplicationHistoryEntry,
 } from "./application";
+
+export {
+  resolveApplicantConfig,
+  type ApplicantConfig,
+} from "./applicant-config";

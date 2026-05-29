@@ -1,6 +1,8 @@
 import { randomInt } from "node:crypto";
 
 import {
+  BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   Logger,
@@ -10,6 +12,7 @@ import {
 import { sql } from "drizzle-orm";
 
 import type { AppRequest } from "../../common/types.js";
+import { resolveApplicantConfig } from "../applicant-config.js";
 import { MailService } from "../mail/mail.service.js";
 import { OtpService } from "../otp/otp.service.js";
 import type { SubmitApplicationInput } from "./application.dto.js";
@@ -151,27 +154,75 @@ export class ApplicationService {
     // 1) Validate the OTP submit token (single-use, tied to applicant email).
     await this.otp.consumeSubmitToken(req, input.applicant.email, input.otpToken);
 
+    // 1b) Enforce the tenant's applicant config server-side. The FE narrows
+    //     the relationship select + makes studentFullName required for some
+    //     tenants, but the FE is UX-only (CLAUDE.md). Re-check here so a
+    //     devtools-crafted POST cannot bypass the rules.
+    const applicantCfg = resolveApplicantConfig(tenantCode);
+    if (
+      !(applicantCfg.relationships as readonly string[]).includes(
+        input.applicant.relationship,
+      )
+    ) {
+      throw new BadRequestException({
+        code: "RELATIONSHIP_NOT_ALLOWED",
+        message: "Quan hệ với học sinh không hợp lệ cho trường này.",
+      });
+    }
+    if (
+      applicantCfg.showStudentName &&
+      !input.applicant.studentFullName?.trim()
+    ) {
+      throw new BadRequestException({
+        code: "STUDENT_FULL_NAME_REQUIRED",
+        message: "Vui lòng nhập họ và tên học sinh.",
+      });
+    }
+
     // 2) Look up the target campaign + form template.
     const campaign = await this.resolveCampaign(req, input.campaignId);
 
     // 3) Generate a human-friendly application code unique per tenant.
     const code = generateApplicationCode(tenantCode);
 
+    // 3b) Compute the dedup key (one student × one school = one live row).
+    //     `applications_tenant_dedupe_uniq` enforces it server-side; we map
+    //     the unique-violation error to a friendly 409 below.
+    const dedupeKey = computeDedupeKey(input.applicant, input.formData);
+
     // 4) Insert the application + its first history row inside the same tx
     //    so partial state is impossible (rollback on either failure).
-    const insertedRows = (await tx.execute(sql`
-      INSERT INTO applications
-        (tenant_id, campaign_id, code, state, applicant, form_data,
-         form_template_id, form_template_version, submitted_at)
-      VALUES
-        (${tenantId}, ${campaign.id}, ${code}, 'SUBMITTED',
-         ${JSON.stringify(input.applicant)}::jsonb,
-         ${JSON.stringify(input.formData)}::jsonb,
-         ${campaign.form_template_id}, ${campaign.form_template_version}, now())
-      RETURNING id, code, state, created_at
-    `)) as {
+    let insertedRows: {
       rows: Array<{ id: string; code: string; state: string; created_at: string }>;
     };
+    try {
+      insertedRows = (await tx.execute(sql`
+        INSERT INTO applications
+          (tenant_id, campaign_id, code, state, applicant, form_data,
+           form_template_id, form_template_version, submitted_at, dedupe_key)
+        VALUES
+          (${tenantId}, ${campaign.id}, ${code}, 'SUBMITTED',
+           ${JSON.stringify(input.applicant)}::jsonb,
+           ${JSON.stringify(input.formData)}::jsonb,
+           ${campaign.form_template_id}, ${campaign.form_template_version}, now(),
+           ${dedupeKey})
+        RETURNING id, code, state, created_at
+      `)) as {
+        rows: Array<{ id: string; code: string; state: string; created_at: string }>;
+      };
+    } catch (err) {
+      // Postgres unique_violation = 23505. Surfaces when (tenant_id, dedupe_key)
+      // already has a live row that hasn't been rejected/cancelled.
+      const pgCode = (err as { code?: string }).code;
+      if (pgCode === "23505") {
+        throw new ConflictException({
+          code: "DUPLICATE_APPLICATION",
+          message:
+            "Học sinh này đã có hồ sơ tại trường. Mỗi học sinh chỉ nộp được một hồ sơ.",
+        });
+      }
+      throw err;
+    }
     const inserted = insertedRows.rows[0];
     if (!inserted) {
       throw new Error("Insert returned no rows; check RLS policies.");
@@ -283,4 +334,77 @@ function generateApplicationCode(tenantCode: string): string {
     suffix += CODE_ALPHABET[randomInt(0, CODE_ALPHABET.length)];
   }
   return `${prefix}-${year}-${suffix}`;
+}
+
+/**
+ * Lowercase + accent-strip + drop punctuation + collapse whitespace so the
+ * dedup hash tolerates the trailing-comma / double-space variants parents
+ * routinely produce. Same accent-stripping convention as the SQL
+ * `immutable_unaccent` helper in migration 0001.
+ */
+function normalizeForDedupe(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Build the dedup key as `name | dob | province / district / ward`.
+ *
+ * Two genuinely-different students sharing name + DOB in the same school
+ * catchment is rare but possible; address (when collected) cuts the false-
+ * positive rate to ~zero. Tenants that don't ask for an address fall back
+ * to name + DOB — they accept the tighter constraint by virtue of not
+ * collecting the discriminator.
+ *
+ * Returns null when name or dob is missing so the partial unique index
+ * (which treats NULL as distinct) opts those tenants out of dedup entirely.
+ */
+function computeDedupeKey(
+  applicant: { studentFullName?: string },
+  formData: Record<string, unknown>,
+): string | null {
+  const lookup = formData["student"] as
+    | { name?: unknown; dob?: unknown }
+    | undefined;
+  const name = [
+    applicant.studentFullName,
+    typeof lookup?.name === "string" ? lookup.name : undefined,
+    typeof formData["studentName"] === "string"
+      ? (formData["studentName"] as string)
+      : undefined,
+  ].find((s) => s && s.trim());
+  const dob = [
+    typeof formData["dob"] === "string" ? (formData["dob"] as string) : undefined,
+    typeof lookup?.dob === "string" ? lookup.dob : undefined,
+  ].find((s) => s && s.trim());
+  if (!name || !dob) return null;
+
+  // Address discriminator. The tenant may collect it as a free-text string
+  // (`residence` / `address`) or as a structured `{province, district,
+  // ward}` (the AddressField type). We check both conventional field names
+  // and both shapes; tenants that don't collect either fall through with an
+  // empty addr part, narrowing the formula back to name + DOB.
+  const addrSlot = formData["residence"] ?? formData["address"];
+  let addrPart = "";
+  if (typeof addrSlot === "string") {
+    addrPart = normalizeForDedupe(addrSlot);
+  } else if (
+    addrSlot &&
+    typeof addrSlot === "object" &&
+    "province" in addrSlot &&
+    "district" in addrSlot &&
+    "ward" in addrSlot
+  ) {
+    const o = addrSlot as { province?: unknown; district?: unknown; ward?: unknown };
+    addrPart = [o.province, o.district, o.ward]
+      .map((s) => (typeof s === "string" ? normalizeForDedupe(s) : ""))
+      .join("/");
+  }
+
+  return `${normalizeForDedupe(name)}|${dob.trim()}|${addrPart}`;
 }

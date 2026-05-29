@@ -28,7 +28,7 @@ type SignResponse = {
 export async function uploadFile(
   file: File,
   context: { fieldName: string },
-): Promise<{ key: string; filename: string }> {
+): Promise<{ key: string; name: string }> {
   const kind = FIELD_KIND[context.fieldName] ?? "student_photo";
   const contentType = file.type || "application/octet-stream";
 
@@ -49,5 +49,5 @@ export async function uploadFile(
     throw new Error(`R2 upload failed (HTTP ${res.status})`);
   }
 
-  return { key: signed.key, filename: file.name };
+  return { key: signed.key, name: file.name };
 }

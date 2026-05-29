@@ -4,7 +4,10 @@ import { useRef, useState } from "react";
 import { FileCheck2, Loader2, UploadCloud, X } from "lucide-react";
 import { toast } from "sonner";
 
-import type { FileField as FileFieldSchema } from "@shared/form";
+import type {
+  FileField as FileFieldSchema,
+  FileValue,
+} from "@shared/form";
 
 import {
   FormControl,
@@ -51,7 +54,6 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [displayName, setDisplayName] = useState<string | null>(null);
   const { fileUploader } = useFormBuilderConfig();
 
   return (
@@ -59,11 +61,12 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
       control={control}
       name={field.name}
       render={({ field: f }) => {
-        const stored = (f.value as string | undefined) ?? "";
-        // displayName covers the freshly-picked file; on draft rehydrate we
-        // fall back to the stored value (key or filename) so the user still
-        // sees *something* familiar.
-        const filename = displayName ?? stored;
+        // Field value is `{key, name}` for new writes; legacy drafts may still
+        // carry a plain filename string from the pha-1 mocks. Normalise both
+        // so the chip + downstream consumers see a consistent shape.
+        const raw = f.value as FileValue | string | undefined;
+        const filename =
+          typeof raw === "string" ? raw : (raw?.name ?? "");
 
         const accept = async (file: File): Promise<void> => {
           if (!matchesAccept(file.name, field.accept)) {
@@ -71,17 +74,17 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
             return;
           }
           if (!fileUploader) {
-            f.onChange(file.name);
-            setDisplayName(file.name);
+            // No upload pipeline wired (preview / mocks) — record the filename
+            // only so callers that don't need an object store still work.
+            f.onChange({ key: "", name: file.name });
             toast.success(COPY.successToast, { description: file.name });
             return;
           }
           setUploading(true);
           try {
             const result = await fileUploader(file, { fieldName: field.name });
-            f.onChange(result.key);
-            setDisplayName(result.filename);
-            toast.success(COPY.successToast, { description: result.filename });
+            f.onChange({ key: result.key, name: result.name });
+            toast.success(COPY.successToast, { description: result.name });
           } catch (err) {
             toast.error(COPY.failedToast, {
               description: (err as Error).message,
@@ -144,10 +147,7 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
                 <button
                   type="button"
                   aria-label="Xóa tệp"
-                  onClick={() => {
-                    f.onChange("");
-                    setDisplayName(null);
-                  }}
+                  onClick={() => f.onChange("")}
                   className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
                 >
                   <X className="size-4" aria-hidden />
