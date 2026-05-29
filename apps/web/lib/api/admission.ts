@@ -1,5 +1,6 @@
+import axios from "axios";
+
 import {
-  generateApplicationCode,
   type Applicant,
   type Application,
   type ApplicationCode,
@@ -10,32 +11,28 @@ import {
   generateApplications,
   REFERENCE_DATE,
 } from "./mock-applications";
-import { findApplication, saveApplication } from "./store";
+import { http } from "./http";
 
 /**
- * Admission API seam. In pha 1 these are localStorage-backed mocks; task 15
- * replaces the bodies with axios + TanStack Query against the NestJS API while
- * keeping these signatures identical. Treat this module as the single swap
- * point — UI code depends only on the exported functions, never on the store.
+ * Admission API seam. The 4 public flows below talk to the NestJS API via
+ * `http` (axios) — base URL from `NEXT_PUBLIC_API_URL`, `x-tenant-code`
+ * header set by the request interceptor. The seam preserves signatures so
+ * the TanStack Query hooks in `queries.ts` and every call site stayed
+ * unchanged across the swap (the one exception is `otpToken`, which the
+ * wizard now threads from verify → submit per API_SPEC §3.3 + §3.1).
+ *
+ * Management endpoints (`listApplications`, `getApplicationAnalytics`,
+ * notifications) are still mock-backed until the corresponding NestJS
+ * routes land in Day 6+.
  */
-
-/** Fixed OTP for the mock email-verification step. Surfaced to the user via a
- * toast by the verify-email step so the demo is self-serve. Dev-only. */
-export const MOCK_OTP_CODE = "123456";
-
-/** Simulated network latency so loading states (task 16) have something to
- * render against. */
-const MOCK_LATENCY_MS = 250;
-
-function delay<T>(value: T): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), MOCK_LATENCY_MS));
-}
 
 export type CreateApplicationInput = {
   tenantCode: string;
   applicant: Applicant;
   formData: Record<string, unknown>;
   campaignId?: string;
+  /** Single-use token from POST /v1/applications/otp/verify. */
+  otpToken: string;
 };
 
 export type SendEmailOtpInput = {
@@ -44,8 +41,9 @@ export type SendEmailOtpInput = {
 
 export type SendEmailOtpResult = {
   sent: true;
-  /** Mock-only: the code the UI should display. Removed in pha 2. */
-  devCode: string;
+  expiresAt: string;
+  /** Dev-only: the issued code so the UI can self-serve a demo without SMTP. */
+  devCode?: string;
 };
 
 export type VerifyEmailOtpInput = {
@@ -55,43 +53,140 @@ export type VerifyEmailOtpInput = {
 
 export type VerifyEmailOtpResult = {
   verified: boolean;
+  /** Single-use token to hand to POST /v1/applications. Empty when verify failed. */
+  otpToken: string;
+  expiresAt: string;
 };
 
+type CreateApplicationResponse = {
+  code: string;
+  state: ApplicationState;
+  createdAt: string;
+};
+
+type GetApplicationResponse = {
+  code: string;
+  state: ApplicationState;
+  applicant: Applicant;
+  formData: Record<string, unknown>;
+  history: Array<{
+    state: ApplicationState;
+    at: string;
+    byRole: string | null;
+    note: string | null;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+  submittedAt: string | null;
+};
+
+/**
+ * Submit a new application. The API returns a thin acknowledgement; we
+ * project it into the FE `Application` shape using the fields the caller
+ * already had so consumers (confirmation page, TanStack Query cache seed)
+ * don't need a second round-trip.
+ */
 export async function createApplication(
   input: CreateApplicationInput,
 ): Promise<Application> {
-  const now = new Date().toISOString();
-  const application: Application = {
-    code: generateApplicationCode(input.tenantCode),
-    tenantCode: input.tenantCode,
+  const { data } = await http.post<CreateApplicationResponse>("/v1/applications", {
     campaignId: input.campaignId,
-    state: "SUBMITTED",
     applicant: input.applicant,
     formData: input.formData,
-    history: [{ state: "SUBMITTED", at: now }],
-    createdAt: now,
-    updatedAt: now,
+    otpToken: input.otpToken,
+  });
+  return {
+    code: data.code,
+    tenantCode: input.tenantCode,
+    campaignId: input.campaignId,
+    state: data.state,
+    applicant: input.applicant,
+    formData: input.formData,
+    history: [{ state: data.state, at: data.createdAt }],
+    createdAt: data.createdAt,
+    updatedAt: data.createdAt,
   };
-  saveApplication(application);
-  return delay(application);
 }
 
 export async function getApplicationByCode(
   code: ApplicationCode,
 ): Promise<Application | null> {
-  return delay(findApplication(code.trim().toUpperCase()));
+  try {
+    const { data } = await http.get<GetApplicationResponse>(
+      `/v1/applications/by-code/${encodeURIComponent(code.trim().toUpperCase())}`,
+    );
+    // Cross-tenant codes return 404 via RLS; non-404 errors fall through to
+    // the catch and bubble up so the caller's error UI fires.
+    const tenantCode = readTenantCodeFromUrl();
+    return {
+      code: data.code,
+      tenantCode,
+      state: data.state,
+      applicant: data.applicant,
+      formData: data.formData,
+      history: data.history.map((h) => ({
+        state: h.state,
+        at: h.at,
+        ...(h.note !== null ? { note: h.note } : {}),
+      })),
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 404) {
+      return null;
+    }
+    throw err;
+  }
 }
 
 export async function sendEmailOtp(
-  _input: SendEmailOtpInput,
+  input: SendEmailOtpInput,
 ): Promise<SendEmailOtpResult> {
-  return delay({ sent: true, devCode: MOCK_OTP_CODE });
+  const { data } = await http.post<SendEmailOtpResult>(
+    "/v1/applications/otp/send",
+    { email: input.email },
+  );
+  return data;
 }
 
 export async function verifyEmailOtp(
   input: VerifyEmailOtpInput,
 ): Promise<VerifyEmailOtpResult> {
-  return delay({ verified: input.code.trim() === MOCK_OTP_CODE });
+  try {
+    const { data } = await http.post<VerifyEmailOtpResult>(
+      "/v1/applications/otp/verify",
+      { email: input.email, code: input.code },
+    );
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 400) {
+      // Wrong code or expired — surface a "not verified" result rather than
+      // throwing so the form UI can show a normal validation message.
+      return { verified: false, otpToken: "", expiresAt: "" };
+    }
+    throw err;
+  }
+}
+
+function readTenantCodeFromUrl(): string {
+  if (typeof window === "undefined") return "";
+  // The seam runs client-side after the wizard renders, so the URL is real.
+  const host = window.location.host;
+  const subdomain = host.split(".")[0];
+  if (subdomain && subdomain !== "localhost" && subdomain !== "127") {
+    return subdomain;
+  }
+  const m = window.location.pathname.match(/^\/t\/([^/]+)/);
+  return m?.[1] ?? "";
+}
+
+/** Simulated network latency for the mock-backed management endpoints below. */
+const MOCK_LATENCY_MS = 250;
+function delay<T>(value: T): Promise<T> {
+  return new Promise((resolve) =>
+    setTimeout(() => resolve(value), MOCK_LATENCY_MS),
+  );
 }
 
 // ---------------------------------------------------------------------------

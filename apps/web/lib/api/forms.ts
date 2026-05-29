@@ -18,7 +18,7 @@ const BASE_FORM_SCHEMA: FormSchema = {
           required: true,
           placeholder: "VD: 79012345678",
           description:
-            "Nhập mã định danh học sinh — hệ thống sẽ tự điền họ tên, ngày sinh và giới tính.",
+            "Nhập mã định danh học sinh.",
         },
       ],
     },
@@ -55,6 +55,15 @@ const ENGLISH_SCORE_FIELD: FormSchema["sections"][number]["fields"][number] = {
   step: 0.1,
 };
 
+const STUDENT_PHOTO_FIELD: FormSchema["sections"][number]["fields"][number] = {
+  type: "file",
+  name: "studentPhoto",
+  label: "Ảnh thẻ thí sinh",
+  required: true,
+  accept: ".jpg,.jpeg,.png",
+  description: "Ảnh chân dung rõ nét, nền đơn sắc (định dạng JPG/PNG).",
+};
+
 export async function getApplicationFormSchema(
   tenantCode: string,
 ): Promise<FormSchema> {
@@ -64,6 +73,16 @@ export async function getApplicationFormSchema(
       sections: BASE_FORM_SCHEMA.sections.map((section) =>
         section.title === "Hồ sơ tuyển sinh"
           ? { ...section, fields: [...section.fields, ENGLISH_SCORE_FIELD] }
+          : section,
+      ),
+    };
+  }
+  // nguyen-gia-thieu collects the student's ID photo alongside the student code.
+  if (tenantCode === "nguyen-gia-thieu") {
+    return {
+      sections: BASE_FORM_SCHEMA.sections.map((section) =>
+        section.title === "Thông tin học sinh"
+          ? { ...section, fields: [...section.fields, STUDENT_PHOTO_FIELD] }
           : section,
       ),
     };

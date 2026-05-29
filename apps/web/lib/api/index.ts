@@ -1,5 +1,4 @@
 export {
-  MOCK_OTP_CODE,
   createApplication,
   getApplicationByCode,
   sendEmailOtp,
@@ -29,3 +28,5 @@ export {
 export { getApplicationFormSchema } from "./forms";
 
 export { getLandingConfig } from "./landing";
+
+export { getApplicantConfig, type ApplicantConfig } from "./applicant-config";

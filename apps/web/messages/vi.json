@@ -76,6 +76,8 @@
     "applicant": {
       "title": "Thông tin người khai",
       "description": "Cho chúng tôi biết ai đang nộp hồ sơ này.",
+      "studentFullName": "Họ và tên học sinh",
+      "studentFullNamePlaceholder": "VD: Nguyễn Văn An",
       "fullName": "Họ và tên",
       "email": "Email",
       "phone": "Số điện thoại",
@@ -85,7 +87,8 @@
         "father": "Bố",
         "mother": "Mẹ",
         "guardian": "Người giám hộ",
-        "self": "Bản thân học sinh"
+        "self": "Bản thân học sinh",
+        "other": "Khác"
       },
       "invalidEmail": "Email không hợp lệ",
       "invalidPhone": "Số điện thoại không hợp lệ"
@@ -440,7 +443,8 @@
         "father": "Bố",
         "mother": "Mẹ",
         "guardian": "Người giám hộ",
-        "self": "Tự đăng ký"
+        "self": "Tự đăng ký",
+        "other": "Khác"
       },
       "transitionSuccess": "Đã cập nhật trạng thái hồ sơ.",
       "viewDetail": "Xem chi tiết"

@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { Control, FieldValues } from "react-hook-form";
 
+import type { ApplicantRelationship } from "@shared/admission";
 import {
   FormControl,
   FormField,
@@ -19,9 +20,15 @@ import {
   SelectValue,
 } from "@ui/components/select";
 
-import { RELATIONSHIPS } from "./register-wizard";
-
-export function ApplicantStep({ control }: { control: Control<FieldValues> }) {
+export function ApplicantStep({
+  control,
+  relationships,
+  showStudentName,
+}: {
+  control: Control<FieldValues>;
+  relationships: ReadonlyArray<ApplicantRelationship>;
+  showStudentName: boolean;
+}) {
   const t = useTranslations("apply.applicant");
 
   return (
@@ -31,6 +38,29 @@ export function ApplicantStep({ control }: { control: Control<FieldValues> }) {
         <p className="text-sm text-muted-foreground">{t("description")}</p>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {showStudentName && (
+          <FormField
+            control={control}
+            name="studentFullName"
+            render={({ field }) => (
+              <FormItem className="sm:col-span-2">
+                <FormLabel>
+                  {t("studentFullName")}
+                  <span className="text-destructive"> *</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    autoComplete="off"
+                    placeholder={t("studentFullNamePlaceholder")}
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={control}
           name="fullName"
@@ -98,7 +128,7 @@ export function ApplicantStep({ control }: { control: Control<FieldValues> }) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {RELATIONSHIPS.map((r) => (
+                  {relationships.map((r) => (
                     <SelectItem key={r} value={r}>
                       {t(`relationships.${r}`)}
                     </SelectItem>

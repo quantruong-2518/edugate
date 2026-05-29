@@ -8,13 +8,20 @@ import type { ApplicationState } from "./states";
  */
 export type ApplicationCode = string;
 
-export type ApplicantRelationship = "father" | "mother" | "guardian" | "self";
+export type ApplicantRelationship =
+  | "father"
+  | "mother"
+  | "guardian"
+  | "self"
+  | "other";
 
 export type Applicant = {
   fullName: string;
   email: string;
   phone: string;
   relationship: ApplicantRelationship;
+  /** Student's full name, collected when the campaign asks for it up-front. */
+  studentFullName?: string;
 };
 
 export type ApplicationHistoryEntry = {

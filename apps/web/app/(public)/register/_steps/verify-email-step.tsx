@@ -110,7 +110,8 @@ export function VerifyEmailStep({
   onSubmit,
 }: {
   email: string;
-  onSubmit: () => Promise<void>;
+  /** Wizard submit: receives the single-use OTP token from /verify. */
+  onSubmit: (otpToken: string) => Promise<void>;
 }) {
   const t = useTranslations("apply.verifyEmail");
   const [code, setCode] = useState("");
@@ -122,7 +123,8 @@ export function VerifyEmailStep({
   const sendMutate = sendOtp.mutateAsync;
   const send = useCallback(async () => {
     const res = await sendMutate({ email });
-    toast.info(t("sentToast", { code: res.devCode }));
+    // devCode only present in dev — production sends a real email.
+    if (res.devCode) toast.info(t("sentToast", { code: res.devCode }));
   }, [email, t, sendMutate]);
 
   // Send once on entering the step.
@@ -137,13 +139,13 @@ export function VerifyEmailStep({
       if (value.length !== OTP_LENGTH) return;
       setSubmitting(true);
       const res = await verifyOtp.mutateAsync({ email, code: value });
-      if (!res.verified) {
+      if (!res.verified || !res.otpToken) {
         setSubmitting(false);
         toast.error(t("invalidOtp"));
         return;
       }
       // Wizard navigates away on success; keep the button disabled meanwhile.
-      await onSubmit();
+      await onSubmit(res.otpToken);
     },
     [email, onSubmit, t, verifyOtp],
   );

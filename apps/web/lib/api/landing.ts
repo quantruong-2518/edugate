@@ -456,10 +456,9 @@ const NGT_CONFIG: LandingConfig = {
   sections: [
     {
       type: "hero",
-      eyebrow: "Tuyển sinh lớp 6 — Năm học 2026 - 2027",
-      headline: "THCS Nguyễn Gia Thiều",
-      subheadline:
-        "Giữ vững truyền thống dạy tốt - học tốt, chắp cánh ước mơ cho bao thế hệ học trò đất Long Biên.",
+      eyebrow: "Tuyển sinh năm học 2026 - 2027",
+      headline: "Trường THCS Nguyễn Gia Thiều",
+      subheadline: "Tâm sáng - Chí bền - Tài năng - Sáng tạo - Hội nhập",
       image: unsplash("1535982330050-f1c2fb79ff78"),
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
@@ -467,47 +466,64 @@ const NGT_CONFIG: LandingConfig = {
     {
       type: "stats",
       items: [
-        { label: "Bề dày truyền thống", value: "70+ năm" },
-        { label: "Tỷ lệ học sinh khá - giỏi", value: "95%" },
-        { label: "Giáo viên đạt chuẩn", value: "100%" },
-        { label: "Giải HSG cấp Quận", value: "150+" },
+        {
+          value: "06 lớp",
+          label: "Lớp chất lượng cao (35 - 40 học sinh)",
+        },
+        {
+          value: "02 lớp",
+          label: "Lớp tích hợp quốc tế Cambridge (25 - 30 học sinh)",
+        },
       ],
     },
     {
-      type: "about",
-      title: "Lời ngỏ của Cô Thúy — Hiệu trưởng",
-      body: "Mang tên danh nhân văn hóa Nguyễn Gia Thiều, ngôi trường tại quận Long Biên, Hà Nội tự hào tiếp nối bề dày truyền thống 'dạy tốt - học tốt' qua nhiều thế hệ. Chúng tôi không ngừng đổi mới phương pháp giảng dạy, vun đắp nền tảng tri thức vững chắc và phẩm chất tốt đẹp để mỗi học sinh tự tin bước vào tương lai.",
-      image: unsplash("1562774053-701939374585", 1200),
-    },
-    {
       type: "process",
-      title: "Quy trình đăng ký tuyển sinh",
+      title: "Hướng dẫn đăng ký tuyển sinh online",
       steps: [
-        { title: "Khai thông tin", description: "Điền thông tin phụ huynh." },
-        { title: "Điền hồ sơ", description: "Hoàn tất biểu mẫu lớp 6." },
-        { title: "Xác thực email", description: "Nhập mã OTP gửi qua email." },
-        { title: "Nộp hồ sơ", description: "Nhận mã hồ sơ để tra cứu." },
-        { title: "Theo dõi", description: "Cập nhật kết quả xét tuyển." },
+        {
+          title: "Khai thông tin",
+          description: "Điền họ tên học sinh và thông tin người khai.",
+        },
+        {
+          title: "Điền hồ sơ",
+          description: "Hoàn tất biểu mẫu và tải lên ảnh thẻ thí sinh.",
+        },
+        {
+          title: "Xác thực email",
+          description: "Nhập mã OTP gửi tới email đã đăng ký.",
+        },
+        {
+          title: "Nộp hồ sơ",
+          description: "Nhận mã hồ sơ để tra cứu trạng thái.",
+        },
+        {
+          title: "Theo dõi",
+          description: "Cập nhật kết quả xét tuyển theo thời gian thực.",
+        },
       ],
     },
     {
       type: "infoTabs",
       title: "Thông tin tuyển sinh",
+      layout: "list",
       tabs: [
         {
           id: "eligibility",
           label: "Đối tượng",
-          body: "Học sinh hoàn thành chương trình tiểu học, có hộ khẩu hoặc cư trú tại quận Long Biên và khu vực lân cận theo phân tuyến.",
+          body: "Học sinh sinh năm 2015 đã hoàn thành chương trình tiểu học, cư trú trên địa bàn Thành phố Hà Nội.",
+          icon: "users",
         },
         {
           id: "schedule",
           label: "Lịch tuyển sinh",
-          body: "Nhận hồ sơ trực tuyến từ 01/07 đến 15/07/2026. Công bố danh sách trúng tuyển dự kiến ngày 25/07/2026.",
+          body: "Nhận hồ sơ trực tuyến từ ngày 05/6/2026 đến hết ngày 08/6/2026. Hỗ trợ nộp hồ sơ online với những trường hợp không nộp được trực tuyến tại nhà, địa điểm hỗ trợ tại Văn phòng trường THCS Nguyễn Gia Thiều (từ 8h00 đến 17h00 ngày 08/6/2026).",
+          icon: "calendar",
         },
         {
           id: "documents",
-          label: "Hồ sơ cần nộp",
-          body: "Giấy khai sinh, học bạ tiểu học, giấy chứng nhận hoàn thành chương trình tiểu học và ảnh thẻ 3x4.",
+          label: "Hồ sơ cần chuẩn bị",
+          body: "File ảnh thẻ của thí sinh.",
+          icon: "fileText",
         },
       ],
     },
@@ -516,39 +532,22 @@ const NGT_CONFIG: LandingConfig = {
       title: "Cảm nhận của phụ huynh",
       items: [
         {
-          name: "Chị Lê Hồng",
-          role: "Phụ huynh lớp 6B",
+          name: "Linh Nguyễn",
+          role: "Phụ huynh",
           quote:
-            "Ngôi trường giàu truyền thống, nề nếp kỷ cương mà vẫn hiện đại. Tôi hoàn toàn yên tâm gửi gắm con ở đây.",
-          avatarUrl: unsplash("1438761681033-6461ffad8d80", 200),
+            "E cho con e học đây và cảm thấy đó là quyết định đúng đắn ah!! Lớp thầy cô bạn bè môi trường quá tuyệt vời luôn.",
         },
         {
-          name: "Anh Phạm Hùng",
-          role: "Cựu học sinh, phụ huynh lớp 8A",
+          name: "Lan Lan Vũ",
+          role: "Phụ huynh lớp 9A1 (2023 - 2026)",
           quote:
-            "Tôi từng học ở đây, nay cho con theo học. Tinh thần 'dạy tốt - học tốt' của trường vẫn vẹn nguyên sau bao năm.",
-          avatarUrl: unsplash("1500648767791-00dcc994a43e", 200),
-        },
-      ],
-    },
-    {
-      type: "faq",
-      title: "Câu hỏi thường gặp",
-      items: [
-        {
-          question: "Trường có lớp chọn / lớp chất lượng cao không?",
-          answer:
-            "Nhà trường tổ chức các lớp mũi nhọn theo định hướng bồi dưỡng học sinh giỏi; tiêu chí xét chọn được công bố đầu mỗi năm học.",
+            "Đã có 2 con học cả CVA và NGT, bạn thứ 2 đang lớp 9 NGT thì mình yêu, trân quý NGT lắm luôn. Đội ngũ có tâm từ BGH tới thầy cô. 12 năm được làm phụ huynh của 2 nhóc, cũng đã được trải nghiệm đủ các môi trường giáo dục khác nhau nhưng chưa từng gặp một môi trường nào mà thầy cô đáng yêu như vậy. Đặc biệt là thầy cô, phụ huynh, học sinh của 9A1 2023 - 2026. Biết ơn và trân trọng lắm lắm. Tiếc là chỉ còn được làm PH của trường được 25 ngày nữa thôi.",
         },
         {
-          question: "Trường có nhận học sinh trái tuyến không?",
-          answer:
-            "Nhà trường ưu tiên học sinh đúng tuyến; chỉ tiêu trái tuyến (nếu có) được thông báo công khai theo từng năm.",
-        },
-        {
-          question: "Học phí và các khoản thu như thế nào?",
-          answer:
-            "Trường công lập thu theo quy định của thành phố Hà Nội; chi tiết được niêm yết tại trường và trên website.",
+          name: "Thư Hoài",
+          role: "Phụ huynh lớp 7",
+          quote:
+            "Bé nhà mình đang học lớp 7 tại trường. Môi trường học sinh ngoan, phụ huynh quan tâm tới con, các thầy cô giáo tận tâm nhiệt tình. Thấy yên tâm không lo lắng gì cho cái tuổi dở ương của chúng nó.",
         },
       ],
     },
@@ -558,23 +557,26 @@ const NGT_CONFIG: LandingConfig = {
         {
           title: "Liên hệ",
           links: [
-            { label: "Địa chỉ: Long Biên, Hà Nội", href: "#" },
-            { label: "Hotline: 024 3827 0000", href: "tel:02438270000" },
             {
-              label: "Email: c2nguyengiathieu@hanoi.edu.vn",
-              href: "mailto:c2nguyengiathieu@hanoi.edu.vn",
+              label: "Địa chỉ: C14 phố Nguyễn Minh Châu, Phường Phúc Lợi, Hà Nội",
+              href: "#",
+            },
+            { label: "Hotline: 0392349383", href: "tel:0392349383" },
+            {
+              label: "Email: c2nguyengiathieu@longbien.edu.vn",
+              href: "mailto:c2nguyengiathieu@longbien.edu.vn",
             },
           ],
         },
         {
           title: "Tuyển sinh",
           links: [
-            { label: "Đăng ký lớp 6", href: "/register" },
+            { label: "Đăng ký", href: "/register" },
             { label: "Tra cứu hồ sơ", href: "/track" },
           ],
         },
       ],
-      copyright: "Trường THCS Nguyễn Gia Thiều — Long Biên, Hà Nội",
+      copyright: "Trường THCS Nguyễn Gia Thiều — Phúc Lợi, Hà Nội",
     },
   ],
 };

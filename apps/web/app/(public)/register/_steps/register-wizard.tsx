@@ -28,6 +28,7 @@ import { Form } from "@ui/components/form";
 import { Stepper } from "@ui/components/stepper";
 import { cn } from "@ui/lib/utils";
 
+import type { ApplicantConfig } from "@/lib/api/applicant-config";
 import { useCreateApplication } from "@/lib/api/queries";
 
 import { ApplicantStep } from "./applicant-step";
@@ -38,6 +39,7 @@ import { VerifyEmailStep } from "./verify-email-step";
 const STEPS = ["applicant", "form", "verify-email", "confirmation"] as const;
 type Step = (typeof STEPS)[number];
 
+/** Legacy export kept for downstream imports; default relationship order. */
 export const RELATIONSHIPS: readonly ApplicantRelationship[] = [
   "father",
   "mother",
@@ -56,9 +58,11 @@ function isEmpty(value: unknown): boolean {
 export function RegisterWizard({
   tenantCode,
   formSchema,
+  applicantConfig,
 }: {
   tenantCode: string;
   formSchema: FormSchema;
+  applicantConfig: ApplicantConfig;
 }) {
   const t = useTranslations("apply");
   const formT = useTranslations("form");
@@ -84,8 +88,16 @@ export function RegisterWizard({
       email: formT("invalidEmail"),
       phone: t("applicant.invalidPhone"),
     };
+    const studentNameShape: z.ZodRawShape = applicantConfig.showStudentName
+      ? { studentFullName: z.string().min(1, formT("required")) }
+      : {};
+    const relationshipValues = applicantConfig.relationships as [
+      ApplicantRelationship,
+      ...ApplicantRelationship[],
+    ];
     return z
       .object({
+        ...studentNameShape,
         fullName: z.string().min(1, formT("required")),
         email: z
           .string()
@@ -95,7 +107,7 @@ export function RegisterWizard({
           .string()
           .min(1, formT("required"))
           .regex(/^(0|\+84)\d{9,10}$/, t("applicant.invalidPhone")),
-        relationship: z.enum(["father", "mother", "guardian", "self"], {
+        relationship: z.enum(relationshipValues, {
           errorMap: () => ({ message: formT("required") }),
         }),
         ...fieldShape(formSchema),
@@ -103,17 +115,18 @@ export function RegisterWizard({
       .superRefine((data, ctx) =>
         refineFields(dynamicFields, data, ctx, messages),
       );
-  }, [formSchema, dynamicFields, t, formT]);
+  }, [formSchema, dynamicFields, t, formT, applicantConfig]);
 
   const defaultValues = useMemo(
     () => ({
+      ...(applicantConfig.showStudentName ? { studentFullName: "" } : {}),
       fullName: "",
       email: "",
       phone: "",
       relationship: "",
       ...defaultValuesFor(formSchema),
     }),
-    [formSchema],
+    [formSchema, applicantConfig],
   );
 
   const form = useForm({
@@ -162,14 +175,22 @@ export function RegisterWizard({
   }, [form, hydrated, draftKey]);
 
   // --- Lightweight per-step validity (for the step guard) ------------------
-  const isApplicantValid = useCallback((v: FieldValues): boolean => {
-    return (
-      !isEmpty(v.fullName) &&
-      /.+@.+\..+/.test(String(v.email ?? "")) &&
-      !isEmpty(v.phone) &&
-      (RELATIONSHIPS as readonly string[]).includes(String(v.relationship))
-    );
-  }, []);
+  const isApplicantValid = useCallback(
+    (v: FieldValues): boolean => {
+      if (applicantConfig.showStudentName && isEmpty(v.studentFullName)) {
+        return false;
+      }
+      return (
+        !isEmpty(v.fullName) &&
+        /.+@.+\..+/.test(String(v.email ?? "")) &&
+        !isEmpty(v.phone) &&
+        (applicantConfig.relationships as readonly string[]).includes(
+          String(v.relationship),
+        )
+      );
+    },
+    [applicantConfig],
+  );
 
   const isFormValid = useCallback(
     (v: FieldValues): boolean =>
@@ -208,9 +229,12 @@ export function RegisterWizard({
     router.push(`${pathname}?step=${next}` as Route);
 
   const goNext = async () => {
+    const applicantFields = applicantConfig.showStudentName
+      ? ["studentFullName", "fullName", "email", "phone", "relationship"]
+      : ["fullName", "email", "phone", "relationship"];
     const fieldsForStep =
       step === "applicant"
-        ? ["fullName", "email", "phone", "relationship"]
+        ? applicantFields
         : step === "form"
           ? dynamicFields.map((f) => f.name)
           : [];
@@ -222,7 +246,7 @@ export function RegisterWizard({
     goTo(STEPS[stepIndex + 1] as Step);
   };
 
-  const submit = async () => {
+  const submit = async (otpToken: string) => {
     const v = form.getValues();
     const dynamicNames = new Set(dynamicFields.map((f) => f.name));
     const formData = Object.fromEntries(
@@ -233,11 +257,15 @@ export function RegisterWizard({
       email: String(v.email),
       phone: String(v.phone),
       relationship: v.relationship as ApplicantRelationship,
+      ...(applicantConfig.showStudentName && v.studentFullName
+        ? { studentFullName: String(v.studentFullName) }
+        : {}),
     };
     const application = await createApplication.mutateAsync({
       tenantCode,
       applicant,
       formData,
+      otpToken,
     });
     try {
       window.localStorage.removeItem(draftKey);
@@ -341,7 +369,13 @@ export function RegisterWizard({
           <Card className="rounded-2xl">
             <CardContent className="p-5 sm:p-7">
               <Form {...form}>
-                {step === "applicant" && <ApplicantStep control={control} />}
+                {step === "applicant" && (
+                  <ApplicantStep
+                    control={control}
+                    relationships={applicantConfig.relationships}
+                    showStudentName={applicantConfig.showStudentName}
+                  />
+                )}
                 {step === "form" && (
                   <FormStep schema={formSchema} control={control} />
                 )}

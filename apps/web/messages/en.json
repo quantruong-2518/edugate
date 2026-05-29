@@ -76,6 +76,8 @@
     "applicant": {
       "title": "Applicant information",
       "description": "Tell us who is submitting this application.",
+      "studentFullName": "Student full name",
+      "studentFullNamePlaceholder": "e.g. Nguyen Van An",
       "fullName": "Full name",
       "email": "Email",
       "phone": "Phone number",
@@ -85,7 +87,8 @@
         "father": "Father",
         "mother": "Mother",
         "guardian": "Guardian",
-        "self": "The student"
+        "self": "The student",
+        "other": "Other"
       },
       "invalidEmail": "Invalid email",
       "invalidPhone": "Invalid phone number"
@@ -440,7 +443,8 @@
         "father": "Father",
         "mother": "Mother",
         "guardian": "Guardian",
-        "self": "Self"
+        "self": "Self",
+        "other": "Other"
       },
       "transitionSuccess": "Application status updated.",
       "viewDetail": "View detail"
