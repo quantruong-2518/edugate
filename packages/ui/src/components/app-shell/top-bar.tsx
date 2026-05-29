@@ -7,8 +7,6 @@ import {
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
-  Settings,
-  UserRound,
 } from "lucide-react";
 
 import { Button } from "@ui/components/button";
@@ -41,6 +39,8 @@ export type TopBarProps = {
   /** Notifications slot (bell button + dropdown). App-owned so this package
    * stays free of data-fetching concerns. */
   notifications?: ReactNode;
+  /** Sign out of the admin session (wired by the app). */
+  onSignOut?: () => void;
 };
 
 function userInitials(name: string): string {
@@ -92,7 +92,13 @@ function TenantSwitcher({
   );
 }
 
-function UserMenu({ user }: { user: AppShellUser }) {
+function UserMenu({
+  user,
+  onSignOut,
+}: {
+  user: AppShellUser;
+  onSignOut?: () => void;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -115,14 +121,10 @@ function UserMenu({ user }: { user: AppShellUser }) {
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <UserRound className="mr-2 size-4" /> Hồ sơ của tôi
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Settings className="mr-2 size-4" /> Cài đặt
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive focus:text-destructive">
+        <DropdownMenuItem
+          onSelect={onSignOut}
+          className="text-destructive focus:text-destructive"
+        >
           <LogOut className="mr-2 size-4" /> Đăng xuất
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -140,6 +142,7 @@ export function TopBar({
   sidebarCollapsed,
   localeSwitcher,
   notifications,
+  onSignOut,
 }: TopBarProps) {
   return (
     <header
@@ -175,7 +178,7 @@ export function TopBar({
         )}
         {notifications}
         {localeSwitcher}
-        <UserMenu user={user} />
+        <UserMenu user={user} onSignOut={onSignOut} />
       </div>
     </header>
   );

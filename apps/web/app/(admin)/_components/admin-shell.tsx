@@ -1,6 +1,7 @@
 "use client";
 
 import { FileText, LayoutDashboard } from "lucide-react";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 import {
@@ -12,6 +13,8 @@ import {
 
 import { NotificationsBell } from "@/components/admin/notifications-bell";
 import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
+
+import { signOutAdmin } from "../_actions/admin-access";
 
 // `"use client"` at the top of this module turns the lucide icon imports
 // into client references — that's how we can ship the NavItem array
@@ -67,10 +70,17 @@ export function AdminShell({
   branding: { code: string; name: string; shortName: string };
   children: ReactNode;
 }) {
+  const router = useRouter();
   const tenantCode =
     branding.code && branding.code !== "default"
       ? branding.code
       : DEFAULT_ADMIN_TENANT;
+
+  async function handleSignOut() {
+    await signOutAdmin();
+    router.refresh();
+  }
+
   return (
     <AppShell
       branding={branding}
@@ -79,6 +89,7 @@ export function AdminShell({
       tenants={MOCK_TENANTS}
       localeSwitcher={<LocaleSwitcher />}
       notifications={<NotificationsBell tenantCode={tenantCode} />}
+      onSignOut={handleSignOut}
     >
       {children}
     </AppShell>

@@ -21,6 +21,8 @@ export type AppShellProps = {
   localeSwitcher?: ReactNode;
   /** Notifications slot (e.g. a bell button), forwarded to the top bar. */
   notifications?: ReactNode;
+  /** Sign out of the admin session (wired by the app). */
+  onSignOut?: () => void;
   children: ReactNode;
 };
 
@@ -36,6 +38,7 @@ export function AppShell({
   tenants,
   localeSwitcher,
   notifications,
+  onSignOut,
   children,
 }: AppShellProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -75,6 +78,7 @@ export function AppShell({
         sidebarCollapsed={collapsed}
         localeSwitcher={localeSwitcher}
         notifications={notifications}
+        onSignOut={onSignOut}
       />
 
       <div className="flex">
