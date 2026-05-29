@@ -4,11 +4,6 @@ export type NavItem = {
   href: string;
   label: string;
   Icon: LucideIcon;
-  /**
-   * Pinned items appear in the mobile bottom nav. Keep pinned items <= 4
-   * for mobile readability — everything else stays in the sidebar / drawer.
-   */
-  pinned?: boolean;
 };
 
 export type AppShellUser = {

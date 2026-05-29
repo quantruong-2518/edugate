@@ -5,7 +5,6 @@ import {
   Check,
   ChevronDown,
   LogOut,
-  Menu,
   PanelLeftClose,
   PanelLeftOpen,
   Settings,
@@ -31,9 +30,7 @@ export type TopBarProps = {
   currentTenantCode: string;
   tenants?: readonly AppShellTenantOption[];
   user: AppShellUser;
-  /** Open the full nav drawer (mobile). */
-  onOpenDrawer: () => void;
-  /** Toggle the desktop sidebar collapse. */
+  /** Toggle the sidebar collapse. */
   onToggleSidebar: () => void;
   sidebarCollapsed: boolean;
   /**
@@ -139,7 +136,6 @@ export function TopBar({
   currentTenantCode,
   tenants,
   user,
-  onOpenDrawer,
   onToggleSidebar,
   sidebarCollapsed,
   localeSwitcher,
@@ -151,24 +147,11 @@ export function TopBar({
         "sticky top-0 z-40 flex h-14 items-center gap-2 border-b bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80",
       )}
     >
-      {/* Mobile: open full nav drawer */}
+      {/* Toggle sidebar collapse */}
       <Button
         type="button"
         variant="ghost"
         size="icon"
-        className="md:hidden"
-        onClick={onOpenDrawer}
-        aria-label="Mở menu"
-      >
-        <Menu className="size-5" />
-      </Button>
-
-      {/* Desktop: toggle sidebar collapse */}
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="hidden md:inline-flex"
         onClick={onToggleSidebar}
         aria-label={sidebarCollapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
       >
@@ -183,9 +166,7 @@ export function TopBar({
         <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
           {brandShortLabel.slice(0, 3).toUpperCase()}
         </span>
-        <span className="hidden truncate text-sm font-semibold sm:inline">
-          {brandLabel}
-        </span>
+        <span className="truncate text-sm font-semibold">{brandLabel}</span>
       </div>
 
       <div className="ml-auto flex items-center gap-1">

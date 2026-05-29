@@ -23,13 +23,11 @@ const ADMIN_NAV: readonly NavItem[] = [
     href: "/admin",
     label: "Bảng điều khiển",
     Icon: LayoutDashboard,
-    pinned: true,
   },
   {
     href: "/admin/applications",
     label: "Hồ sơ",
     Icon: FileText,
-    pinned: true,
   },
 ];
 

@@ -2,16 +2,6 @@
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@ui/components/sheet";
-
-import { BottomNav } from "./bottom-nav";
-import { NavLink } from "./nav-link";
 import { Sidebar } from "./sidebar";
 import { TopBar } from "./top-bar";
 import type { AppShellTenantOption, AppShellUser, NavItem } from "./types";
@@ -34,6 +24,11 @@ export type AppShellProps = {
   children: ReactNode;
 };
 
+/**
+ * Admin shell — desktop web only (no responsive/mobile layout, see ADR-013
+ * scope note). A persistent sidebar + top bar; the sidebar collapses to an
+ * icon rail as a desktop convenience.
+ */
 export function AppShell({
   branding,
   user,
@@ -44,7 +39,6 @@ export function AppShell({
   children,
 }: AppShellProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Hydrate persisted collapse state. Accepting the brief flash on first
   // paint keeps the layout SSR-static; pha 2 may move this to a cookie.
@@ -77,7 +71,6 @@ export function AppShell({
         currentTenantCode={branding.code}
         tenants={tenants}
         user={user}
-        onOpenDrawer={() => setDrawerOpen(true)}
         onToggleSidebar={toggleSidebar}
         sidebarCollapsed={collapsed}
         localeSwitcher={localeSwitcher}
@@ -90,36 +83,8 @@ export function AppShell({
           collapsed={collapsed}
           onToggle={toggleSidebar}
         />
-        <main className="min-w-0 flex-1 pb-20 md:pb-0">{children}</main>
+        <main className="min-w-0 flex-1">{children}</main>
       </div>
-
-      <BottomNav
-        navItems={navItems}
-        onOpenMore={() => setDrawerOpen(true)}
-      />
-
-      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <SheetContent side="left" className="w-72 p-0">
-          <SheetHeader className="border-b p-4 text-left">
-            <SheetTitle className="truncate">{branding.name}</SheetTitle>
-            <SheetDescription className="truncate">
-              {user.name}
-            </SheetDescription>
-          </SheetHeader>
-          <nav className="space-y-1 p-2">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                Icon={item.Icon}
-                variant="drawer"
-                onNavigate={() => setDrawerOpen(false)}
-              />
-            ))}
-          </nav>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
