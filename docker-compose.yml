@@ -1,0 +1,72 @@
+# Local dev stack: Postgres 16 + Redis 7 + MinIO. Production Coolify uses
+# the same image versions behind Caddy. The Postgres init script in
+# packages/db/migrations runs via `pnpm --filter db db:migrate` once the
+# container is up — keep image config minimal here.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: edugate-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: edugate
+      POSTGRES_PASSWORD: edugate
+      POSTGRES_DB: edugate
+    ports:
+      - "5432:5432"
+    volumes:
+      - edugate-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edugate -d edugate"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: edugate-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: edugate-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: edugate
+      MINIO_ROOT_PASSWORD: edugate-secret
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # web console
+    volumes:
+      - edugate-minio:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Create the dev bucket on first start. Exits 0 once the bucket exists.
+  minio-init:
+    image: minio/mc:latest
+    container_name: edugate-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      sh -c "
+      mc alias set local http://minio:9000 edugate edugate-secret &&
+      mc mb --ignore-existing local/edugate-dev &&
+      mc anonymous set download local/edugate-dev || true
+      "
+
+volumes:
+  edugate-pgdata:
+  edugate-minio:
