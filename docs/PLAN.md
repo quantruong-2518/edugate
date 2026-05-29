@@ -253,6 +253,13 @@ Source of truth: [specs/API_SPEC.md](../specs/API_SPEC.md), [specs/DATA_MODEL.md
 - [ ] **P2.8 — Admin admission slice: list applications + transition (state machine guard) + analytics + notifications**
 - [ ] **P2.9 — Audit log endpoint + tenant settings PATCH + landing preview**
 - [ ] **P2.10 — BullMQ workers: email (Resend) + cron-expire (SYSTEM → EXPIRED past deadline)**
+- [ ] **P2.11 — Custom domain per tenant (ADR-012)** — infra + BE; FE seam (`parseTenantFromCustomDomain` + map) đã làm pha 1.
+  - Migration `tenant_domains(id, tenant_id, domain CITEXT UNIQUE, verified bool, verified_at, created_at)`; chỉ row `verified=true` resolve.
+  - Swap FE map fixture (`lib/tenants/custom-domains.ts`) → cached lookup (KV/edge hoặc revalidate-tag), KHÔNG query DB mỗi request trong middleware.
+  - Domain verification flow: sinh TXT token / `/.well-known/edugate-domain-verify`, endpoint check → set `verified`.
+  - Caddy **on-demand TLS** + allowlist (chỉ domain verified) để chống ép xin cert.
+  - Khi tenant set custom domain: subdomain `<code>.<root>` **301 →** custom domain (canonical/SEO).
+  - Admin UI: panel thêm/verify/xoá domain ở `/admin/settings`.
 
 ### Pha 2 — chưa lên lịch (đợi pilot tín hiệu)
 
@@ -269,6 +276,7 @@ Source of truth: [specs/API_SPEC.md](../specs/API_SPEC.md), [specs/DATA_MODEL.md
 
 (Ghi vào đây khi có quyết định nhỏ không xứng ADR riêng.)
 
+- 2026-05-29: Custom domain seam (ADR-012) — thêm tầng 2 vào tenant resolver giữa subdomain và path. `parseTenantFromCustomDomain(host, map)` pure ở `@shared/tenant` (lowercase + port-strip + re-validate code shape). Map `domain→code` ở `apps/web/lib/tenants/custom-domains.ts` (tách khỏi `fixtures.ts` để edge middleware chỉ nạp map nhỏ, không kéo theo branding/theme payload). Middleware chèn bước lookup sau `parseTenantFromHost`, trước path — custom domain **không rewrite path** (như subdomain, chỉ set header). Infra (tenant_domains table, Caddy on-demand TLS, verify flow, subdomain→custom 301, admin UI) = P2.11. Bộ màn KHÔNG nhân bản theo domain.
 - 2026-05-20: Khởi tạo plan. Sử dụng tài liệu `docs/PLAN.md` làm source of truth giữa các conversation.
 - 2026-05-20: Task 2 — `next lint` đã deprecated ở v16, dùng `eslint .` trực tiếp với flat config v9. `next-env.d.ts` add vào `ignores` vì Next auto-inject triple-slash reference cho `typedRoutes`.
 - 2026-05-20: Task 3 — Package name = `ui` (workspace dep `ui: workspace:*`). Path aliases `@ui/components/*` và `@ui/lib/*` (apps/web tsconfig + packages/ui tsconfig). `transpilePackages: ["ui"]` ở `next.config.mjs`. `globals.css` import `tailwindcss` + `tw-animate-css`, `@source "../../../packages/ui/src/**/*.{ts,tsx}"`, full bộ tokens shadcn neutral + dark + `@theme inline`. Smoke test render Card + Button + Badge tại `/`. typecheck/lint/build cả 2 package pass.
