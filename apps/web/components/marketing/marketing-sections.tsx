@@ -270,14 +270,6 @@ export async function Cta() {
             <Button asChild size="lg" variant="secondary">
               <a href={CONTACT_HREF}>{t("primary")}</a>
             </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-            >
-              <Link href={"/login" as Route}>{t("secondary")}</Link>
-            </Button>
           </div>
         </div>
       </Reveal>

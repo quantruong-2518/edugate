@@ -38,14 +38,6 @@ export async function MarketingHeader() {
 
         <div className="flex items-center gap-2">
           <LocaleSwitcher />
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="hidden sm:inline-flex"
-          >
-            <Link href={"/login" as Route}>{t("login")}</Link>
-          </Button>
           <Button asChild size="sm">
             <a href={CONTACT_HREF}>{t("tryFree")}</a>
           </Button>

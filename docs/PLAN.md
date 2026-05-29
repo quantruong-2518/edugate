@@ -149,7 +149,7 @@
   - **#2 (sửa) — `/track/[code]` là CLIENT component**: `getApplicationByCode` đọc localStorage (client-only) → RSC luôn null. Page client lấy `code` từ `params`, gọi trong `useEffect`: loading skeleton → tìm thấy render `<StateBadge state>` + `<StateTimeline history>` (reuse task 8) → not found render empty state. `/track` index = client form nhập mã → `router.push('/track/<code>')`.
   - **Stepper**: dùng `<Stepper steps current>` (P2) hiển thị tiến trình 4 bước ở đầu wizard.
   - Verify: typecheck/lint/build; SSR/dev smoke 1 tenant đi hết flow applicant→confirmation, mã hồ sơ vào store, `/track/[code]` đọc lại được; back/forward + guard không nhảy bước; refresh ở confirmation vẫn giữ mã.
-- [x] **13. Login + forgot/reset/set-password/activate**
+- [~] **13. Login + forgot/reset/set-password/activate** — ⚠️ ĐÃ XOÁ (2026-05-30, ADR-013). Pilot bỏ login user; admin vào qua token/trường. Toàn bộ route group `(auth)` đã remove. Thay bằng task admin token-gate (mục dưới).
   - Dùng tenant theme. `/t/:code/login` + `/login` đều work. Mock API.
   - **5 route** (chốt: giữ đủ + share form): `(auth)/login`, `forgot-password`, `reset-password`, `set-password`, `activate`. 3 route token (`?token=`) share `<CredentialForm variant>` — chỉ khác copy + endpoint.
   - Auth seam `lib/api/auth.ts` (single swap point pha 2 → Better-Auth): `login`/`requestPasswordReset`/`resetPassword`/`setPassword`/`activateAccount`, mock latency 250ms. **Cosmetic** (chốt): login OK → toast + `router.push('/admin')`, KHÔNG persist session giả. `requestPasswordReset` luôn trả `sent:true` (anti-enumeration). Token mock: non-empty = hợp lệ.
@@ -248,8 +248,8 @@ Source of truth: [specs/API_SPEC.md](../specs/API_SPEC.md), [specs/DATA_MODEL.md
 
 ### Tuần 2 — Auth + admin slice (sơ bộ, sẽ chi tiết hóa cuối tuần 1)
 
-- [ ] **P2.6 — Better-Auth wiring: login/logout/refresh + multi-tenant /me/switch-tenant**
-- [ ] **P2.7 — Password reset/set/activate flows (token-driven, 3 endpoint share Better-Auth token API)**
+- [ ] **P2.6 — Admin access token/trường (ADR-013, thay Better-Auth)** — endpoint verify dãy 10 ký tự → set HTTP-only cookie session; super-admin gen/regen token per tenant; rate-limit + (nên) TTL. FE: màn token-gate cho `/admin` + cookie guard. ~~Better-Auth login/refresh/switch-tenant~~ defer (chỉ dựng lại nếu pilot cần multi-user identity).
+- [ ] ~~**P2.7 — Password reset/set/activate flows**~~ — **OBSOLETE** (ADR-013, không còn user account/password).
 - [ ] **P2.8 — Admin admission slice: list applications + transition (state machine guard) + analytics + notifications**
 - [ ] **P2.9 — Audit log endpoint + tenant settings PATCH + landing preview**
 - [ ] **P2.10 — BullMQ workers: email (Resend) + cron-expire (SYSTEM → EXPIRED past deadline)**
@@ -276,6 +276,7 @@ Source of truth: [specs/API_SPEC.md](../specs/API_SPEC.md), [specs/DATA_MODEL.md
 
 (Ghi vào đây khi có quyết định nhỏ không xứng ADR riêng.)
 
+- 2026-05-30: Dọn màn thừa theo luồng pilot (ADR-013). Surface FE thu về đúng luồng: marketing → tenant landing → `/register` → `/track/:code`; admin = `/admin` (dashboard) + `/admin/applications`. **Xoá**: route group `(auth)` (10 file: login/forgot/reset/set-password/activate + components + layout), 3 demo orphaned (`ability-demo`/`state-machine-demo`/`form-builder-demo`), `/admin/settings` (+9 component) + `/admin/audit-log`, lib orphan (`api/auth`, `api/audit`, `api/appearance`, `auth/schemas`). **Sửa**: `ADMIN_NAV` prune về dashboard+applications (bỏ luôn 2 nav stub gãy `/admin/users` + `/admin/campaigns` chưa có page); gỡ `useAuditLog`/`auditKeys`/`getAuditLog` khỏi `queries.ts`; gỡ 3 link `/login` ở marketing (header/footer/CTA band). **Giữ**: permission layer (`lib/auth/ability-provider`, `<Can>`), `lib/api/landing` (landing render), `lib/api/applicant-config` (register), notifications-bell. Verify: typecheck+lint sạch; dev smoke 6 route kept=200, 4 route deleted=404. Còn thiếu (task mới): FE admin token-gate (gắn với P2.6). KHÔNG build vì dev đang chạy (clobber `.next`).
 - 2026-05-29: Custom domain seam (ADR-012) — thêm tầng 2 vào tenant resolver giữa subdomain và path. `parseTenantFromCustomDomain(host, map)` pure ở `@shared/tenant` (lowercase + port-strip + re-validate code shape). Map `domain→code` ở `apps/web/lib/tenants/custom-domains.ts` (tách khỏi `fixtures.ts` để edge middleware chỉ nạp map nhỏ, không kéo theo branding/theme payload). Middleware chèn bước lookup sau `parseTenantFromHost`, trước path — custom domain **không rewrite path** (như subdomain, chỉ set header). Infra (tenant_domains table, Caddy on-demand TLS, verify flow, subdomain→custom 301, admin UI) = P2.11. Bộ màn KHÔNG nhân bản theo domain.
 - 2026-05-20: Khởi tạo plan. Sử dụng tài liệu `docs/PLAN.md` làm source of truth giữa các conversation.
 - 2026-05-20: Task 2 — `next lint` đã deprecated ở v16, dùng `eslint .` trực tiếp với flat config v9. `next-env.d.ts` add vào `ignores` vì Next auto-inject triple-slash reference cho `typedRoutes`.

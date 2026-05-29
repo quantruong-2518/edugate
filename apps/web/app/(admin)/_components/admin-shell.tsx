@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  FileText,
-  LayoutDashboard,
-  Megaphone,
-  ScrollText,
-  Settings,
-  Users,
-} from "lucide-react";
+import { FileText, LayoutDashboard } from "lucide-react";
 import type { ReactNode } from "react";
 
 import {
@@ -38,18 +31,6 @@ const ADMIN_NAV: readonly NavItem[] = [
     Icon: FileText,
     pinned: true,
   },
-  { href: "/admin/users", label: "Người dùng", Icon: Users, pinned: true },
-  {
-    href: "/admin/campaigns",
-    label: "Đợt tuyển sinh",
-    Icon: Megaphone,
-  },
-  {
-    href: "/admin/audit-log",
-    label: "Nhật ký hoạt động",
-    Icon: ScrollText,
-  },
-  { href: "/admin/settings", label: "Cài đặt", Icon: Settings },
 ];
 
 // Pha 1 mock — pha 2 will derive from the authenticated session. Email mirrors
