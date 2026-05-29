@@ -6,6 +6,7 @@ import type { FormSchema } from "@shared/form";
 import { FormBuilder } from "@ui/components/form-builder";
 
 import { lookupStudent } from "@/lib/api/students";
+import { uploadFile } from "@/lib/api/uploads";
 
 export function FormStep({
   schema,
@@ -15,6 +16,11 @@ export function FormStep({
   control: Control<FieldValues>;
 }) {
   return (
-    <FormBuilder schema={schema} control={control} studentResolver={lookupStudent} />
+    <FormBuilder
+      schema={schema}
+      control={control}
+      studentResolver={lookupStudent}
+      fileUploader={uploadFile}
+    />
   );
 }

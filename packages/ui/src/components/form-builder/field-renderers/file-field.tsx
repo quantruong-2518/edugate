@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FileCheck2, UploadCloud, X } from "lucide-react";
+import { FileCheck2, Loader2, UploadCloud, X } from "lucide-react";
 import { toast } from "sonner";
 
 import type { FileField as FileFieldSchema } from "@shared/form";
@@ -16,15 +16,18 @@ import {
 } from "@ui/components/form";
 import { cn } from "@ui/lib/utils";
 
+import { useFormBuilderConfig } from "../context";
 import type { FieldProps } from "./types";
 
 // Domain chrome in VI (default locale `vi`); pha-2 moves these behind intl.
 const COPY = {
   hint: "Kéo thả tệp vào đây, hoặc bấm để chọn",
+  uploading: "Đang tải lên...",
   uploaded: "Đã tải lên hồ sơ",
   replace: "Chọn tệp khác",
   successToast: "Tải hồ sơ thành công",
   invalidToast: "Định dạng tệp không hợp lệ",
+  failedToast: "Tải tệp thất bại",
 } as const;
 
 /** True when `name`'s extension matches the comma-separated `accept` list. */
@@ -38,29 +41,54 @@ function matchesAccept(name: string, accept?: string): boolean {
 }
 
 /**
- * Pha 1 stores only the filename (JSON-serializable for the draft + mock store);
- * the actual upload to R2/MinIO is pha 2. A dashed drop zone accepts drag-drop
- * or click-to-pick, validates the extension against `accept`, then shows a
- * success state. Invalid files raise a toast and are rejected.
+ * Drop zone that uploads picked files via the configured `fileUploader`
+ * (typically presigned PUT to R2 — see `apps/web/lib/api/uploads.ts`).
+ * Stores the opaque storage key as the field value so the API never sees
+ * the bytes. When no uploader is wired (e.g. preview / pha 1 mocks), falls
+ * back to recording only the filename. Invalid extensions raise a toast.
  */
 export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema>) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [displayName, setDisplayName] = useState<string | null>(null);
+  const { fileUploader } = useFormBuilderConfig();
 
   return (
     <FormField
       control={control}
       name={field.name}
       render={({ field: f }) => {
-        const filename = (f.value as string | undefined) ?? "";
+        const stored = (f.value as string | undefined) ?? "";
+        // displayName covers the freshly-picked file; on draft rehydrate we
+        // fall back to the stored value (key or filename) so the user still
+        // sees *something* familiar.
+        const filename = displayName ?? stored;
 
-        const accept = (file: File): void => {
+        const accept = async (file: File): Promise<void> => {
           if (!matchesAccept(file.name, field.accept)) {
             toast.error(COPY.invalidToast, { description: field.accept });
             return;
           }
-          f.onChange(file.name);
-          toast.success(COPY.successToast, { description: file.name });
+          if (!fileUploader) {
+            f.onChange(file.name);
+            setDisplayName(file.name);
+            toast.success(COPY.successToast, { description: file.name });
+            return;
+          }
+          setUploading(true);
+          try {
+            const result = await fileUploader(file, { fieldName: field.name });
+            f.onChange(result.key);
+            setDisplayName(result.filename);
+            toast.success(COPY.successToast, { description: result.filename });
+          } catch (err) {
+            toast.error(COPY.failedToast, {
+              description: (err as Error).message,
+            });
+          } finally {
+            setUploading(false);
+          }
         };
 
         return (
@@ -79,13 +107,23 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
                 onBlur={f.onBlur}
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) accept(file);
+                  if (file) void accept(file);
                   e.target.value = "";
                 }}
               />
             </FormControl>
 
-            {filename ? (
+            {uploading ? (
+              <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                <Loader2
+                  className="size-5 shrink-0 animate-spin text-primary"
+                  aria-hidden
+                />
+                <p className="text-sm font-medium text-foreground">
+                  {COPY.uploading}
+                </p>
+              </div>
+            ) : filename ? (
               <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
                 <FileCheck2 className="size-5 shrink-0 text-primary" aria-hidden />
                 <div className="min-w-0 flex-1">
@@ -106,7 +144,10 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
                 <button
                   type="button"
                   aria-label="Xóa tệp"
-                  onClick={() => f.onChange("")}
+                  onClick={() => {
+                    f.onChange("");
+                    setDisplayName(null);
+                  }}
                   className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
                 >
                   <X className="size-4" aria-hidden />
@@ -125,7 +166,7 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
                   e.preventDefault();
                   setDragging(false);
                   const file = e.dataTransfer.files?.[0];
-                  if (file) accept(file);
+                  if (file) void accept(file);
                 }}
                 className={cn(
                   "flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors",

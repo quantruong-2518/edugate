@@ -13,6 +13,7 @@ import { cn } from "@ui/lib/utils";
 
 import {
   FormBuilderConfigProvider,
+  type FileUploader,
   type StudentResolver,
 } from "./context";
 import { FieldRenderer } from "./field-renderers";
@@ -30,6 +31,8 @@ export type FormBuilderProps = {
   className?: string;
   /** App-injected resolver for `studentLookup` fields (keeps `ui` API-free). */
   studentResolver?: StudentResolver;
+  /** App-injected uploader for `file` fields (presigned PUT, etc.). */
+  fileUploader?: FileUploader;
 };
 
 function colSpanClass(field: FormFieldSchema): string {
@@ -61,9 +64,10 @@ export function FormBuilder({
   control,
   className,
   studentResolver,
+  fileUploader,
 }: FormBuilderProps) {
   return (
-    <FormBuilderConfigProvider value={{ studentResolver }}>
+    <FormBuilderConfigProvider value={{ studentResolver, fileUploader }}>
       <div className={cn("space-y-8", className)}>
         {schema.sections.map((section, index) => (
         <section key={section.title ?? index} className="space-y-4">

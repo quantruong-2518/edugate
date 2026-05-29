@@ -10,6 +10,7 @@ import { TenantTxInterceptor } from "./common/tenant/tenant-tx.interceptor.js";
 import { TenantModule } from "./common/tenant/tenant.module.js";
 import { DebugModule } from "./_debug/debug.module.js";
 import { HealthModule } from "./health/health.module.js";
+import { UploadsModule } from "./uploads/uploads.module.js";
 
 const isProd = process.env["NODE_ENV"] === "production";
 
@@ -24,6 +25,7 @@ const isProd = process.env["NODE_ENV"] === "production";
     TenantModule,
     AuditModule,
     HealthModule,
+    UploadsModule,
     AdmissionModule,
     // Debug controller is dev-only — its endpoints leak the active tenant id.
     ...(isProd ? [] : [DebugModule]),
