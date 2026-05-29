@@ -352,13 +352,24 @@ export type ApplicationAnalytics = {
   byState: Record<ApplicationState, number>;
   todaySubmissions: number;
   weekSubmissions: number;
-  /** Daily submission counts for the trailing window (oldest first). */
+  /** Daily submission counts spanning the resolved range (oldest first). */
   series: AnalyticsPoint[];
+  /** Effective range actually charted (resolved when caller passes none). */
+  range: { from: string; to: string };
   /** Approval funnel (submitted → reviewed → approved → confirmed → enrolled). */
   funnel: FunnelStep[];
 };
 
-const SERIES_DAYS = 14;
+/**
+ * Date window for analytics. Both bounds optional ISO `yyyy-mm-dd`; when a bound
+ * is omitted it resolves to all-time (earliest submission → REFERENCE_DATE).
+ */
+export type AnalyticsRange = {
+  from?: string;
+  to?: string;
+};
+
+const DAY_MS = 86_400_000;
 
 const FUNNEL_ORDER: readonly ApplicationState[] = [
   "SUBMITTED",
@@ -387,32 +398,61 @@ function dateKey(ms: number): string {
   return new Date(ms).toISOString().slice(0, 10);
 }
 
+/** Midnight UTC of an ISO `yyyy-mm-dd` day. */
+function startOfDayMs(key: string): number {
+  return Date.parse(`${key}T00:00:00.000Z`);
+}
+
+/** Last millisecond (UTC) of an ISO `yyyy-mm-dd` day. */
+function endOfDayMs(key: string): number {
+  return Date.parse(`${key}T23:59:59.999Z`);
+}
+
 export async function getApplicationAnalytics(
   tenantCode: string,
+  range: AnalyticsRange = {},
 ): Promise<ApplicationAnalytics> {
-  const rows = datasetFor(tenantCode);
+  const all = datasetFor(tenantCode);
+
+  // Resolve the effective window. Omitted bounds expand to all-time: the
+  // earliest submission on record (lower) and REFERENCE "today" (upper).
+  const createdMsList = all.map((app) => new Date(app.createdAt).getTime());
+  const earliestMs = createdMsList.length
+    ? Math.min(...createdMsList)
+    : REFERENCE_DATE.getTime();
+  const fromMs = range.from ? startOfDayMs(range.from) : startOfDayMs(dateKey(earliestMs));
+  const toMs = range.to ? endOfDayMs(range.to) : endOfDayMs(dateKey(REFERENCE_DATE.getTime()));
+
+  const fromKey = dateKey(fromMs);
+  const toKey = dateKey(toMs);
+
+  const rows = all.filter((app) => {
+    const ms = new Date(app.createdAt).getTime();
+    return ms >= fromMs && ms <= toMs;
+  });
+
   const byState = emptyByState();
 
-  const now = REFERENCE_DATE;
-  const startOfToday = new Date(now);
+  // "Today" / "this week" stay anchored to REFERENCE regardless of range.
+  const startOfToday = new Date(REFERENCE_DATE);
   startOfToday.setHours(0, 0, 0, 0);
-  const startOfWeek = new Date(startOfToday.getTime() - 6 * 86_400_000);
-
+  const startOfWeek = startOfToday.getTime() - 6 * DAY_MS;
   let todaySubmissions = 0;
   let weekSubmissions = 0;
-
-  // Seed the trailing-window buckets so days with no submissions render as 0.
-  const buckets = new Map<string, number>();
-  for (let i = SERIES_DAYS - 1; i >= 0; i -= 1) {
-    buckets.set(dateKey(startOfToday.getTime() - i * 86_400_000), 0);
+  for (const app of all) {
+    const ms = new Date(app.createdAt).getTime();
+    if (ms >= startOfToday.getTime()) todaySubmissions += 1;
+    if (ms >= startOfWeek) weekSubmissions += 1;
   }
 
+  // Seed one bucket per day in the window so empty days render as 0.
+  const buckets = new Map<string, number>();
+  for (let ms = startOfDayMs(fromKey); ms <= toMs; ms += DAY_MS) {
+    buckets.set(dateKey(ms), 0);
+  }
   for (const app of rows) {
     byState[app.state] += 1;
-    const createdMs = new Date(app.createdAt).getTime();
-    if (createdMs >= startOfToday.getTime()) todaySubmissions += 1;
-    if (createdMs >= startOfWeek.getTime()) weekSubmissions += 1;
-    const key = dateKey(createdMs);
+    const key = dateKey(new Date(app.createdAt).getTime());
     if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + 1);
   }
 
@@ -420,8 +460,8 @@ export async function getApplicationAnalytics(
     ([date, count]) => ({ date, count }),
   );
 
-  // Funnel: each step counts applications that reached at least that state
-  // (i.e. passed through it on their way to the current state).
+  // Funnel: each step counts applications (within range) that reached at least
+  // that state on their way to the current state.
   const reachedAtLeast = (target: ApplicationState): number =>
     rows.filter((app) => app.history.some((h) => h.state === target)).length;
 
@@ -436,6 +476,7 @@ export async function getApplicationAnalytics(
     todaySubmissions,
     weekSubmissions,
     series,
+    range: { from: fromKey, to: toKey },
     funnel,
   });
 }

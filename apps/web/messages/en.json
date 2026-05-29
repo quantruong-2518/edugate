@@ -338,35 +338,37 @@
     }
   },
   "admin": {
+    "header": {
+      "nav": {
+        "dashboard": "Application admin",
+        "applications": "View applications"
+      },
+      "searchPlaceholder": "Search applications…",
+      "search": "Search applications",
+      "signOut": "Sign out"
+    },
     "dashboard": {
       "title": "Dashboard",
       "subtitle": "Overview of your school's admissions.",
-      "stats": {
-        "today": "Submitted today",
-        "inReview": "Under review",
-        "needsInfo": "Needs info",
-        "approved": "Approved",
-        "total": "Total applications",
-        "thisWeek": "Last 7 days"
-      },
-      "distribution": {
-        "title": "Status distribution",
-        "description": "Share of applications by processing state."
+      "range": {
+        "label": "Date range",
+        "all": "All time",
+        "last30": "30 days",
+        "last90": "90 days",
+        "from": "From date",
+        "to": "To date"
       },
       "trend": {
-        "title": "Submissions per day",
-        "description": "Last 14 days.",
+        "title": "Applications per day",
+        "description": "Daily intake over the selected range.",
+        "unit": "applications",
         "empty": "No applications in this window yet."
       },
-      "funnel": {
-        "title": "Admission funnel",
-        "description": "Applications that reached each step.",
-        "ofTotal": "{percent}% of total"
-      },
-      "viewAll": "View all applications",
-      "recent": {
-        "title": "Latest applications",
-        "description": "5 most recently submitted."
+      "distribution": {
+        "title": "Status breakdown",
+        "description": "Share of each processing state.",
+        "total": "applications",
+        "empty": "No data."
       }
     },
     "applications": {

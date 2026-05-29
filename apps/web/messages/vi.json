@@ -300,35 +300,37 @@
     }
   },
   "admin": {
+    "header": {
+      "nav": {
+        "dashboard": "Quản trị hồ sơ",
+        "applications": "Xem hồ sơ"
+      },
+      "searchPlaceholder": "Tìm hồ sơ…",
+      "search": "Tìm hồ sơ",
+      "signOut": "Đăng xuất"
+    },
     "dashboard": {
       "title": "Bảng điều khiển",
       "subtitle": "Tổng quan tình hình tuyển sinh của trường.",
-      "stats": {
-        "today": "Hồ sơ nộp hôm nay",
-        "inReview": "Đang duyệt",
-        "needsInfo": "Cần bổ sung",
-        "approved": "Đã duyệt",
-        "total": "Tổng hồ sơ",
-        "thisWeek": "Trong 7 ngày qua"
-      },
-      "distribution": {
-        "title": "Phân bố theo trạng thái",
-        "description": "Tỷ lệ hồ sơ theo từng trạng thái xử lý."
+      "range": {
+        "label": "Khoảng thời gian",
+        "all": "Toàn thời gian",
+        "last30": "30 ngày",
+        "last90": "90 ngày",
+        "from": "Từ ngày",
+        "to": "Đến ngày"
       },
       "trend": {
         "title": "Hồ sơ nộp theo ngày",
-        "description": "14 ngày gần nhất.",
+        "description": "Số lượng tiếp nhận mỗi ngày.",
+        "unit": "hồ sơ",
         "empty": "Chưa có hồ sơ nào trong khoảng này."
       },
-      "funnel": {
-        "title": "Phễu tuyển sinh",
-        "description": "Số hồ sơ đã đi qua từng bước.",
-        "ofTotal": "{percent}% tổng hồ sơ"
-      },
-      "viewAll": "Xem tất cả hồ sơ",
-      "recent": {
-        "title": "Hồ sơ mới nhất",
-        "description": "5 hồ sơ được nộp gần đây."
+      "distribution": {
+        "title": "Phân bố trạng thái",
+        "description": "Tỷ lệ theo từng trạng thái.",
+        "total": "hồ sơ",
+        "empty": "Chưa có dữ liệu."
       }
     },
     "applications": {

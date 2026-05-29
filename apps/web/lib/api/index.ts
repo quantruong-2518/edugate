@@ -19,6 +19,7 @@ export {
   type ListApplicationsResult,
   type ApplicationSort,
   type ApplicationAnalytics,
+  type AnalyticsRange,
   type AnalyticsPoint,
   type FunnelStep,
   type AppNotification,

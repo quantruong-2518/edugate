@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FileX2, Search, X } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -86,9 +87,14 @@ export function ApplicationsView({
   const t = useTranslations("admin.applications");
   const tFilters = useTranslations("admin.applications.filters");
 
+  // Global header search drives the `?q=` param; seed the filter from it and
+  // keep the field in sync when the header navigates here with a new query.
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.get("q") ?? "";
+
   // Filter / query state
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState(urlQuery);
+  const [search, setSearch] = useState(urlQuery);
   const [states, setStates] = useState<ApplicationState[]>([]);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -102,6 +108,11 @@ export function ApplicationsView({
   const [selected, setSelected] = useState<Application | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const queryClient = useQueryClient();
+
+  // Adopt a new query coming from the header search.
+  useEffect(() => {
+    setSearchInput(urlQuery);
+  }, [urlQuery]);
 
   // Debounce search input → reset to page 1 on change.
   useEffect(() => {
