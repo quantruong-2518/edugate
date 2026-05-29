@@ -64,6 +64,38 @@ const STUDENT_PHOTO_FIELD: FormSchema["sections"][number]["fields"][number] = {
   description: "Ảnh chân dung rõ nét, nền đơn sắc (định dạng JPG/PNG).",
 };
 
+/**
+ * Nguyễn Gia Thiều only collects the MOET student code + the student's ID
+ * photo — no học bạ / transcript upload (per docx). Keep the optional note
+ * field so parents can flag special cases (e.g. mã học sinh chưa cấp).
+ */
+const NGT_FORM_SCHEMA: FormSchema = {
+  sections: [
+    {
+      title: "Thông tin học sinh",
+      fields: [
+        {
+          type: "studentLookup",
+          name: "student",
+          label: "Mã học sinh (do Bộ GD&ĐT cấp)",
+          required: true,
+          placeholder: "VD: 79012345678",
+          description: "Nhập mã định danh học sinh.",
+        },
+        STUDENT_PHOTO_FIELD,
+        {
+          type: "text",
+          name: "note",
+          label: "Ghi chú thêm",
+          multiline: true,
+          maxLength: 500,
+          description: "Không bắt buộc.",
+        },
+      ],
+    },
+  ],
+};
+
 export async function getApplicationFormSchema(
   tenantCode: string,
 ): Promise<FormSchema> {
@@ -77,15 +109,8 @@ export async function getApplicationFormSchema(
       ),
     };
   }
-  // nguyen-gia-thieu collects the student's ID photo alongside the student code.
   if (tenantCode === "nguyen-gia-thieu") {
-    return {
-      sections: BASE_FORM_SCHEMA.sections.map((section) =>
-        section.title === "Thông tin học sinh"
-          ? { ...section, fields: [...section.fields, STUDENT_PHOTO_FIELD] }
-          : section,
-      ),
-    };
+    return NGT_FORM_SCHEMA;
   }
   return BASE_FORM_SCHEMA;
 }
