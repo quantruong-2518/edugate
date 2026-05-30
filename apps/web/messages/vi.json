@@ -369,11 +369,11 @@
       },
       "columns": {
         "code": "Mã hồ sơ",
-        "applicant": "Phụ huynh",
-        "student": "Học sinh",
+        "student": "Tên học sinh",
+        "dob": "Ngày sinh",
         "state": "Trạng thái",
-        "submittedAt": "Ngày nộp",
-        "score": "Điểm TB"
+        "applicant": "Người nộp hồ sơ",
+        "submittedAt": "Ngày nộp"
       },
       "pagination": {
         "pageSize": "Số dòng",
@@ -392,15 +392,25 @@
       },
       "detail": {
         "title": "Chi tiết hồ sơ",
-        "applicantInfo": "Thông tin phụ huynh",
+        "submittedAt": "Ngày nộp",
+        "studentInfo": "Thông tin học sinh",
+        "dob": "Ngày sinh",
+        "gender": "Giới tính",
+        "genderMale": "Nam",
+        "genderFemale": "Nữ",
+        "priorityTags": "Đối tượng ưu tiên",
+        "gradeRecord": "Kết quả học tập",
+        "specialAchievements": "Thành tích đặc biệt",
+        "parentWishes": "Nguyện vọng phụ huynh",
+        "documents": "Hồ sơ đính kèm",
+        "applicantInfo": "Thông tin người nộp hồ sơ",
         "fullName": "Họ và tên",
         "email": "Email",
         "phone": "Số điện thoại",
         "relationship": "Quan hệ",
-        "formData": "Thông tin khai báo",
+        "otherInfo": "Thông tin khác",
         "timeline": "Lịch sử trạng thái",
         "actions": "Hành động",
-        "submittedAt": "Ngày nộp",
         "noValue": "—"
       },
       "relationships": {

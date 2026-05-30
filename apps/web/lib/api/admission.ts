@@ -234,7 +234,8 @@ export type ApplicationSort =
   | "createdAt:desc"
   | "createdAt:asc"
   | "score:desc"
-  | "score:asc";
+  | "score:asc"
+  | "name:asc";
 
 export type ListApplicationsInput = {
   tenantCode: string;
@@ -326,6 +327,11 @@ function sortApplications(
     case "score:asc":
       sorted.sort(
         (a, b) => (applicationScore(a) ?? Infinity) - (applicationScore(b) ?? Infinity),
+      );
+      break;
+    case "name:asc":
+      sorted.sort((a, b) =>
+        studentNameOf(a).localeCompare(studentNameOf(b), "vi"),
       );
       break;
     case "createdAt:desc":

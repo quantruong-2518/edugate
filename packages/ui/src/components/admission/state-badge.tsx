@@ -2,21 +2,18 @@ import { APPLICATION_STATES, type ApplicationState } from "@shared/admission";
 
 import { cn } from "@ui/lib/utils";
 
-import { STATE_ICON } from "./state-icon";
-import { TONE_BADGE_CLASS } from "./state-tone";
+import { TONE_BADGE_CLASS, TONE_DOT_CLASS } from "./state-tone";
 
 export type StateBadgeProps = {
   state: ApplicationState;
-  /** Hide the icon (e.g. inside a dense table cell). */
+  /** Show only the dot without the label. */
   iconOnly?: boolean;
   className?: string;
 };
 
 export function StateBadge({ state, iconOnly = false, className }: StateBadgeProps) {
-  // APPLICATION_STATES / STATE_ICON are exhaustive over ApplicationState; the
-  // bang is safe under noUncheckedIndexedAccess.
+  // APPLICATION_STATES is exhaustive over ApplicationState; the bang is safe.
   const meta = APPLICATION_STATES[state]!;
-  const Icon = STATE_ICON[state]!;
   return (
     <span
       className={cn(
@@ -26,7 +23,10 @@ export function StateBadge({ state, iconOnly = false, className }: StateBadgePro
       )}
       title={meta.description}
     >
-      <Icon className="size-3.5" aria-hidden />
+      <span
+        className={cn("size-2 shrink-0 rounded-full", TONE_DOT_CLASS[meta.tone]!)}
+        aria-hidden
+      />
       {!iconOnly && <span>{meta.label}</span>}
     </span>
   );

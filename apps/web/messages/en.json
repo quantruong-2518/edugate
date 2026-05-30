@@ -407,11 +407,11 @@
       },
       "columns": {
         "code": "Code",
-        "applicant": "Parent",
-        "student": "Student",
+        "student": "Student name",
+        "dob": "Date of birth",
         "state": "Status",
-        "submittedAt": "Submitted",
-        "score": "GPA"
+        "applicant": "Submitted by",
+        "submittedAt": "Submitted"
       },
       "pagination": {
         "pageSize": "Rows",
@@ -430,15 +430,25 @@
       },
       "detail": {
         "title": "Application detail",
-        "applicantInfo": "Parent information",
+        "submittedAt": "Submitted",
+        "studentInfo": "Student information",
+        "dob": "Date of birth",
+        "gender": "Gender",
+        "genderMale": "Male",
+        "genderFemale": "Female",
+        "priorityTags": "Priority categories",
+        "gradeRecord": "Academic record",
+        "specialAchievements": "Special achievements",
+        "parentWishes": "Parent wishes",
+        "documents": "Attached documents",
+        "applicantInfo": "Applicant information",
         "fullName": "Full name",
         "email": "Email",
         "phone": "Phone",
         "relationship": "Relationship",
-        "formData": "Submitted information",
+        "otherInfo": "Other information",
         "timeline": "Status history",
         "actions": "Actions",
-        "submittedAt": "Submitted",
         "noValue": "—"
       },
       "relationships": {
