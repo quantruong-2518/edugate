@@ -2,7 +2,7 @@
   "name": "api",
   "version": "0.0.0",
   "private": true,
-  "description": "EduGate NestJS API — Phase 2.",
+  "description": "Ghi Danh NestJS API — Phase 2.",
   "type": "module",
   "scripts": {
     "build": "nest build",

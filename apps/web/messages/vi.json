@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "EduGate",
+    "appName": "Ghi Danh",
     "actions": {
       "next": "Tiếp tục",
       "back": "Quay lại",
@@ -219,7 +219,7 @@
       "ctaSecondary": "Xem cổng tuyển sinh mẫu"
     },
     "proof": {
-      "title": "Các trường đang dùng EduGate",
+      "title": "Các trường đang dùng Ghi Danh",
       "viewDemo": "Xem cổng tuyển sinh"
     },
     "trust": {
@@ -315,7 +315,7 @@
         "privacy": "Chính sách bảo mật",
         "terms": "Điều khoản"
       },
-      "copyright": "EduGate. Bảo lưu mọi quyền."
+      "copyright": "Ghi Danh. Bảo lưu mọi quyền."
     }
   },
   "admin": {

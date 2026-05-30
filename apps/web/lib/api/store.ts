@@ -9,7 +9,7 @@ import type { Application, ApplicationCode } from "@shared/admission";
  * Pha 2 (task 15) deletes this file — the API seam in `admission.ts` swaps to
  * real network calls and persistence moves to Postgres.
  */
-const STORAGE_KEY = "edugate:mock:applications";
+const STORAGE_KEY = "ghidanh:mock:applications";
 
 type Store = Record<ApplicationCode, Application>;
 

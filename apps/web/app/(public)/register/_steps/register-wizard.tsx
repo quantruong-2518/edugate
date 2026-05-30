@@ -76,7 +76,7 @@ export function RegisterWizard({
   const stepIndex = STEPS.indexOf(step);
   const codeParam = searchParams.get("code");
 
-  const draftKey = `edugate:draft:register:${tenantCode || "default"}`;
+  const draftKey = `ghidanh:draft:register:${tenantCode || "default"}`;
 
   const dynamicFields = useMemo(() => allFields(formSchema), [formSchema]);
 

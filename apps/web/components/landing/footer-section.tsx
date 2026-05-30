@@ -1,47 +1,15 @@
-import { GraduationCap } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 
 import type { FooterSection } from "@shared/landing";
 
-import { getTenantBranding, getTenantCode } from "@/lib/tenants/branding";
-
 export async function FooterSection({ section }: { section: FooterSection }) {
   const year = new Date().getFullYear();
-  const branding = await getTenantBranding(await getTenantCode());
 
   return (
     <footer className="border-t border-border/50 bg-gradient-to-b from-muted/30 to-muted/60">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        {/*
-          Brand block on the left, link columns pushed to the right. Schools only
-          carry two link columns, so a fixed 3-col grid always left an empty
-          cell; this fills the width and reads as a modern footer instead.
-        */}
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between md:gap-16">
-          <div className="max-w-sm">
-            <div className="flex items-center gap-2.5">
-              <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary text-primary-foreground">
-                {branding.logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={branding.logoUrl}
-                    alt=""
-                    className="size-full object-cover"
-                  />
-                ) : (
-                  <GraduationCap className="size-5" aria-hidden />
-                )}
-              </span>
-              <span className="text-base font-semibold">
-                {branding.shortName}
-              </span>
-            </div>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              {branding.name}
-            </p>
-          </div>
-
           {section.columns && section.columns.length > 0 && (
             <div className="grid grid-cols-2 gap-8 sm:gap-x-16">
               {section.columns.map((column) => (

@@ -41,10 +41,10 @@ export async function PublicHeader() {
             )}
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold leading-tight">
-              {branding.shortName}
+            <span className="block truncate text-xs text-muted-foreground leading-tight">
+              Trang tuyển sinh chính thức của:
             </span>
-            <span className="hidden truncate text-xs text-muted-foreground sm:block">
+            <span className="block truncate text-sm font-semibold leading-tight">
               {branding.name}
             </span>
           </span>

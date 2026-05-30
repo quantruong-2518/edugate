@@ -595,7 +595,7 @@ const DEFAULT_CONFIG: LandingConfig = {
   sections: [
     {
       type: "hero",
-      headline: "EduGate",
+      headline: "Ghi Danh",
       subheadline: "Nền tảng tuyển sinh đa tenant.",
       image: unsplash("1523050854058-8df90110c9f1"),
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },

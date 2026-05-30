@@ -18,7 +18,7 @@ export async function MarketingHeader() {
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <GraduationCap className="size-5" />
           </span>
-          EduGate
+          Ghi Danh
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">

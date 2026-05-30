@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "EduGate",
+    "appName": "Ghi Danh",
     "actions": {
       "next": "Continue",
       "back": "Back",
@@ -257,7 +257,7 @@
       "ctaSecondary": "See a sample portal"
     },
     "proof": {
-      "title": "Schools running on EduGate",
+      "title": "Schools running on Ghi Danh",
       "viewDemo": "View portal"
     },
     "trust": {
@@ -353,7 +353,7 @@
         "privacy": "Privacy policy",
         "terms": "Terms"
       },
-      "copyright": "EduGate. All rights reserved."
+      "copyright": "Ghi Danh. All rights reserved."
     }
   },
   "admin": {

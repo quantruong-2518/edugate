@@ -32,7 +32,7 @@ function brandMarkCss(theme: TenantTheme): string {
 
 /**
  * Admin <title> follows the authenticated tenant (cookie slug), not the request
- * host — the root layout's metadata is host-driven and falls back to "EduGate"
+ * host — the root layout's metadata is host-driven and falls back to "Ghi Danh"
  * when the admin is served on a host that carries no tenant. Falls back to the
  * host tenant pre-auth (the gate), then to the default.
  */
@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const slug = jar.get(ADMIN_COOKIE)?.value;
   const authedSlug = slug && isValidTenantCode(slug) ? slug : null;
   const branding = await getTenantBranding(authedSlug ?? (await getTenantCode()));
-  // `absolute` ignores the root layout's host-driven "%s · EduGate" template so
+  // `absolute` ignores the root layout's host-driven "%s · Ghi Danh" template so
   // the tab shows just the authenticated school.
   return { title: { absolute: branding.name } };
 }

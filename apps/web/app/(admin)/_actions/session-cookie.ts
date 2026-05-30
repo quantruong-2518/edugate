@@ -5,4 +5,4 @@
  * Pha 1: value = the verified tenant slug (mock). Pha 2: value = an opaque
  * session token returned by the verify endpoint.
  */
-export const ADMIN_COOKIE = "edugate_admin";
+export const ADMIN_COOKIE = "ghidanh_admin";

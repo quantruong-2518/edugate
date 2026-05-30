@@ -41,7 +41,7 @@ export async function MarketingFooter() {
               <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <GraduationCap className="size-5" />
               </span>
-              EduGate
+              Ghi Danh
             </div>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
               {t("tagline")}

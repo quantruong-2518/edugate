@@ -11,6 +11,9 @@ import {
 import type { InfoTabIcon, InfoTabsSection } from "@shared/landing";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 
+import { HighlightedText } from "./highlight-text";
+import { PhotoIdPlaceholder } from "./photo-id-placeholder";
+
 const ICONS: Record<InfoTabIcon, LucideIcon> = {
   users: Users,
   calendar: Calendar,
@@ -20,16 +23,19 @@ const ICONS: Record<InfoTabIcon, LucideIcon> = {
   info: Info,
 };
 
+function hasPhotoContent(body: string) {
+  return body.toLowerCase().includes("ảnh thẻ");
+}
+
 export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
   const firstTab = section.tabs[0];
   if (!firstTab) return null;
 
   const layout = section.layout ?? "tabs";
-  // The card row needs room for three columns; tabs/list stay narrow for reading.
   const maxWidth = layout === "cards" ? "max-w-6xl" : "max-w-3xl";
 
   return (
-    <section className="px-4 py-16 sm:px-6 sm:py-24">
+    <section className="bg-muted/50 px-4 py-16 sm:px-6 sm:py-24">
       <div className={`mx-auto ${maxWidth}`}>
         {section.title && (
           <h2 className="mb-8 text-center text-3xl font-semibold tracking-tight sm:mb-12 sm:text-4xl">
@@ -38,7 +44,6 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
         )}
 
         {layout === "cards" ? (
-          // Three cards; a snap carousel on mobile, an even grid from sm up.
           <div className="-mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
             {section.tabs.map((tab) => {
               const Icon = tab.icon ? ICONS[tab.icon] : Info;
@@ -55,12 +60,13 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
                   </h3>
                   {tab.highlight && (
                     <p className="mt-1 font-semibold text-primary">
-                      {tab.highlight}
+                      <HighlightedText text={tab.highlight} />
                     </p>
                   )}
                   <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
-                    {tab.body}
+                    <HighlightedText text={tab.body} />
                   </p>
+                  {hasPhotoContent(tab.body) && <PhotoIdPlaceholder />}
                 </div>
               );
             })}
@@ -79,49 +85,55 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
                       {tab.label}
                     </h3>
                     {tab.highlight && (
-                      <p className="font-semibold text-primary">{tab.highlight}</p>
+                      <p className="font-semibold text-primary">
+                        <HighlightedText text={tab.highlight} />
+                      </p>
                     )}
                     <p className="text-[15px] leading-relaxed text-muted-foreground">
-                      {tab.body}
+                      <HighlightedText text={tab.body} />
                     </p>
+                    {hasPhotoContent(tab.body) && <PhotoIdPlaceholder />}
                   </div>
                 </li>
               );
             })}
           </ul>
         ) : (
-          // One panel at a time, so uneven content lengths never break the layout.
-          // The key fact leads in bold; the body fills in the detail.
-          <Tabs defaultValue={firstTab.id} className="gap-5">
-            <TabsList className="mx-auto h-auto w-full max-w-md flex-wrap bg-muted/60 sm:w-fit sm:flex-nowrap">
+          <Tabs defaultValue={firstTab.id} className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+            <TabsList className="flex h-auto flex-row gap-1 overflow-x-auto rounded-2xl bg-muted/60 p-1.5 sm:w-52 sm:shrink-0 sm:flex-col sm:overflow-visible">
               {section.tabs.map((tab) => {
                 const Icon = tab.icon ? ICONS[tab.icon] : Info;
                 return (
-                  <TabsTrigger key={tab.id} value={tab.id} className="gap-1.5">
-                    <Icon className="size-4" aria-hidden />
+                  <TabsTrigger
+                    key={tab.id}
+                    value={tab.id}
+                    className="flex w-full min-w-max shrink-0 items-center justify-start gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium sm:min-w-0"
+                  >
+                    <Icon className="size-4 shrink-0" aria-hidden />
                     {tab.label}
                   </TabsTrigger>
                 );
               })}
             </TabsList>
-            {section.tabs.map((tab) => (
-              <TabsContent
-                key={tab.id}
-                value={tab.id}
-                className="rounded-3xl bg-gradient-to-br from-card to-muted/30 p-6 shadow-sm sm:p-8"
-              >
-                {tab.highlight && (
-                  <p className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-                    {tab.highlight}
-                  </p>
-                )}
-                <p
-                  className={`text-[15px] leading-relaxed text-muted-foreground${tab.highlight ? " mt-2" : ""}`}
+            <div className="min-w-0 flex-1">
+              {section.tabs.map((tab) => (
+                <TabsContent
+                  key={tab.id}
+                  value={tab.id}
+                  className="mt-0 rounded-2xl border border-border/50 bg-card p-6 sm:p-8"
                 >
-                  {tab.body}
-                </p>
-              </TabsContent>
-            ))}
+                  {tab.highlight && (
+                    <p className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+                      <HighlightedText text={tab.highlight} />
+                    </p>
+                  )}
+                  <p className={`text-[15px] leading-relaxed text-muted-foreground${tab.highlight ? " mt-2" : ""}`}>
+                    <HighlightedText text={tab.body} />
+                  </p>
+                  {hasPhotoContent(tab.body) && <PhotoIdPlaceholder />}
+                </TabsContent>
+              ))}
+            </div>
           </Tabs>
         )}
       </div>

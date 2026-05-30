@@ -2,7 +2,7 @@ import type { StatsSection } from '@shared/landing';
 
 export function StatsSection({ section }: { section: StatsSection }) {
   return (
-    <section className="px-4 py-10 sm:px-6 sm:py-12">
+    <section className="bg-muted/50 px-4 py-10 sm:px-6 sm:py-12">
       {/*
         Big-typography stat: the number leads at display size with the label set
         right beside it. Borderless soft surfaces (gradient card → muted) keep the
