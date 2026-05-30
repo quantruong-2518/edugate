@@ -58,7 +58,7 @@ export function AdminGate({ slug }: { slug: string }) {
     <div className="grid min-h-dvh place-items-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          <span className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+          <span className="flex size-11 items-center justify-center rounded-xl bg-[var(--brand-mark)] text-[var(--brand-mark-foreground)]">
             <GraduationCap className="size-6" aria-hidden />
           </span>
           <div className="space-y-1.5">

@@ -76,12 +76,23 @@
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
   --ring: oklch(0.708 0 0);
+  /*
+   * Per-school accent, scoped to the brand mark (the logo square) only — the
+   * one branded element in an otherwise neutral admin. Defaults to the neutral
+   * primary; the admin layout injects a <style> overriding these from the
+   * authenticated tenant's brand color (driven by the cookie slug, not the
+   * host) so the mark stays branded on any host the admin is served on.
+   */
+  --brand-mark: oklch(0.205 0 0);
+  --brand-mark-foreground: oklch(0.985 0 0);
 }
 
 .dark .admin-neutral {
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
   --ring: oklch(0.556 0 0);
+  --brand-mark: oklch(0.922 0 0);
+  --brand-mark-foreground: oklch(0.205 0 0);
 }
 
 @theme inline {
