@@ -3,7 +3,7 @@ import { DEFAULT_TENANT_THEME, type TenantTheme } from "@shared/theme";
 
 /**
  * Hardcoded tenant registry for pha 1. Swap to a `tenants` table query in
- * pha 2 — the returned shape stays `TenantBranding`. Codes here must match
+ * pha 2, the returned shape stays `TenantBranding`. Codes here must match
  * the subdomain / path pattern accepted by the middleware (`[a-z0-9-]`).
  *
  * Each tenant overrides only the brand-defining tokens (primary, ring,
@@ -57,7 +57,7 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
     shortName: "TĐN",
     logoUrl: null,
     theme: tenantTheme({
-      // Tailwind rose-700 / rose-400 in oklch — warm burgundy.
+      // Tailwind rose-700 / rose-400 in oklch, warm burgundy.
       light: {
         primary: "oklch(0.514 0.222 16.935)",
         primaryForeground: "oklch(0.985 0 0)",
@@ -70,11 +70,11 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
   },
   "nguyen-huy-tuong": {
     code: "nguyen-huy-tuong",
-    name: "Trường THCS Nguyễn Huy Tưởng — Đông Anh",
+    name: "Trường THCS Nguyễn Huy Tưởng, Đông Anh",
     shortName: "NHT",
     logoUrl: null,
     theme: tenantTheme({
-      // Tailwind emerald-600 / emerald-400 in oklch — fresh green.
+      // Tailwind emerald-600 / emerald-400 in oklch, fresh green.
       light: {
         primary: "oklch(0.596 0.145 163.225)",
         primaryForeground: "oklch(0.985 0 0)",
@@ -87,11 +87,11 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
   },
   "nguyen-van-huyen": {
     code: "nguyen-van-huyen",
-    name: "Trường THCS Nguyễn Văn Huyên — Hoài Đức, Hà Nội",
+    name: "Trường THCS Nguyễn Văn Huyên, Hoài Đức, Hà Nội",
     shortName: "NVH",
     logoUrl: null,
     theme: tenantTheme({
-      // Tailwind violet-600 / violet-400 in oklch — "trường học hạnh phúc".
+      // Tailwind violet-600 / violet-400 in oklch, "trường học hạnh phúc".
       light: {
         primary: "oklch(0.541 0.281 293.009)",
         primaryForeground: "oklch(0.985 0 0)",
@@ -104,11 +104,11 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
   },
   "nguyen-gia-thieu": {
     code: "nguyen-gia-thieu",
-    name: "Trường THCS Nguyễn Gia Thiều — Long Biên, Hà Nội",
+    name: "Trường THCS Nguyễn Gia Thiều, Long Biên, Hà Nội",
     shortName: "NGT",
     logoUrl: null,
     theme: tenantTheme({
-      // Tailwind amber-700 / amber-400 in oklch — gold for a heritage school.
+      // Tailwind amber-700 / amber-400 in oklch, gold for a heritage school.
       light: {
         primary: "oklch(0.555 0.163 48.998)",
         primaryForeground: "oklch(0.985 0 0)",
@@ -123,8 +123,8 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
 
 export const DEFAULT_BRANDING: TenantBranding = {
   code: "default",
-  name: "EduGate",
-  shortName: "EduGate",
+  name: "Ghi Danh",
+  shortName: "Ghi Danh",
   logoUrl: null,
   theme: DEFAULT_TENANT_THEME,
 };

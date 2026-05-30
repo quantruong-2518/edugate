@@ -4,7 +4,7 @@ import { getApplicantConfig } from "@/lib/api/applicant-config";
 import { getApplicationFormSchema } from "@/lib/api/forms";
 import { getTenantCode } from "@/lib/tenants/branding";
 
-import { NoticeMarquee } from "./_steps/notice-marquee";
+import { NoticeBanner } from "./_steps/notice-banner";
 import { RegisterWizard } from "./_steps/register-wizard";
 
 export default async function RegisterPage() {
@@ -17,7 +17,7 @@ export default async function RegisterPage() {
   return (
     <>
       {applicantConfig.noticeBanner && (
-        <NoticeMarquee text={applicantConfig.noticeBanner} />
+        <NoticeBanner text={applicantConfig.noticeBanner} />
       )}
       <main className="container mx-auto px-4 py-12 sm:px-6 sm:py-16">
         <Suspense>

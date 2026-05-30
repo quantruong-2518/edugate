@@ -56,14 +56,19 @@ export type InfoTabIcon = (typeof INFO_TABS_ICONS)[number];
 export const infoTabsSectionSchema = z.object({
   type: z.literal("infoTabs"),
   title: z.string().optional(),
-  /** "tabs" (default) shows a tab strip; "list" stacks all items as a guide. */
-  layout: z.enum(["tabs", "list"]).optional(),
+  /**
+   * "tabs" (default) shows a tab strip; "list" stacks all items as a guide;
+   * "cards" lays them out as a card row (carousel on small screens).
+   */
+  layout: z.enum(["tabs", "list", "cards"]).optional(),
   tabs: z.array(
     z.object({
       id: z.string(),
       label: z.string(),
       body: z.string(),
-      /** Optional leading icon — only rendered in the "list" layout. */
+      /** Short key fact (date, place, count) surfaced in bold above the body. */
+      highlight: z.string().optional(),
+      /** Optional leading icon. */
       icon: z.enum(INFO_TABS_ICONS).optional(),
     }),
   ),

@@ -205,6 +205,29 @@ const STATE_PATH: Readonly<Record<ApplicationState, readonly ApplicationState[]>
   EXPIRED: ["SUBMITTED", "UNDER_REVIEW", "EXPIRED"],
 };
 
+const PRIORITY_CATEGORIES = [
+  "remote_area",
+  "policy_family",
+  "ethnic_minority",
+  "single_parent",
+] as const;
+
+const SPECIAL_ACHIEVEMENTS = [
+  "Giải Nhì môn Toán cấp quận năm học 2024-2025.",
+  "Giải Ba Tiếng Anh cấp thành phố; Học sinh giỏi 4 năm liền.",
+  "Học sinh tiêu biểu cấp trường; Giải Nhất Toán cấp trường.",
+  "Đạt danh hiệu Cháu ngoan Bác Hồ 3 năm liên tiếp.",
+  "Giải Khuyến khích Khoa học kỹ thuật cấp quận.",
+] as const;
+
+const PARENT_WISHES = [
+  "Gia đình mong muốn cho con học lớp chọn, được thầy cô quan tâm sát sao.",
+  "Phụ huynh mong con được xếp lớp gần nhà để thuận tiện đưa đón.",
+  "Gia đình hi vọng nhà trường tạo điều kiện cho con phát triển năng khiếu âm nhạc.",
+  "Ba mẹ mong con được học cùng bạn bè cũ từ tiểu học.",
+  "Phụ huynh mong được nhà trường hỗ trợ tư vấn tâm lý học sinh.",
+] as const;
+
 const REJECT_REASONS = [
   "Hồ sơ không đạt điểm chuẩn đầu vào.",
   "Thiếu giấy tờ bắt buộc sau thời hạn bổ sung.",
@@ -237,29 +260,90 @@ function buildHistory(
   });
 }
 
+// NV1 weighted higher — most applicants list a school as their first choice.
+const ADMISSION_PRIORITIES = ["nv1", "nv1", "nv2", "nv3"] as const;
+
 // --- Form data ---------------------------------------------------------------
+
+type FormVariant = { isThpt: boolean; hasPhoto: boolean };
+
+function randomPriorities(rng: Rng): string[] {
+  // 30% chance of belonging to 1–2 priority categories.
+  const out: string[] = [];
+  if (rng() < 0.3) {
+    out.push(pick(rng, PRIORITY_CATEGORIES));
+    if (rng() < 0.3) {
+      const second = pick(rng, PRIORITY_CATEGORIES);
+      if (!out.includes(second)) out.push(second);
+    }
+  }
+  return out;
+}
 
 function buildFormData(
   rng: Rng,
   studentName: string,
   gender: Gender,
-  hasEnglishScore: boolean,
+  variant: FormVariant,
 ): Record<string, unknown> {
-  const birthYear = intBetween(rng, 2013, 2014);
+  const priorityCategory = randomPriorities(rng);
+  const slug = slugifyName(studentName);
   const month = String(intBetween(rng, 1, 12)).padStart(2, "0");
   const day = String(intBetween(rng, 1, 28)).padStart(2, "0");
-  const hasSibling = rng() < 0.25;
+
+  if (variant.isThpt) {
+    // Lớp 10 intake: ~15 y/o, THCS grades 6–9 + entrance-exam subject scores.
+    const birthYear = intBetween(rng, 2010, 2011);
+    const grade6 = round1(intBetween(rng, 65, 100) / 10);
+    const grade7 = round1(intBetween(rng, 65, 100) / 10);
+    const grade8 = round1(intBetween(rng, 68, 100) / 10);
+    const grade9 = round1(intBetween(rng, 68, 100) / 10);
+    const data: Record<string, unknown> = {
+      studentName,
+      dateOfBirth: `${birthYear}-${month}-${day}`,
+      gender,
+      priorityCategory,
+      grade6,
+      grade7,
+      grade8,
+      grade9,
+      gpa: round1((grade6 + grade7 + grade8 + grade9) / 4),
+      // Entrance-exam scores spread lower than school GPA.
+      examMath: round1(intBetween(rng, 45, 95) / 10),
+      examLiterature: round1(intBetween(rng, 45, 90) / 10),
+      examEnglish: round1(intBetween(rng, 40, 98) / 10),
+      admissionPriority: pick(rng, ADMISSION_PRIORITIES),
+      transcript: `hoc-ba-thcs-${slug}.pdf`,
+      graduationCert: `gcn-tot-nghiep-${slug}.pdf`,
+    };
+    if (rng() < 0.25) data.specialAchievements = pick(rng, SPECIAL_ACHIEVEMENTS);
+    if (rng() < 0.35) data.parentWishes = pick(rng, PARENT_WISHES);
+    return data;
+  }
+
+  // Lớp 6 intake (THCS): ~11 y/o, primary grades 1–5 (realistic GPA 6.0–10.0).
+  const birthYear = intBetween(rng, 2013, 2014);
+  const grade1 = round1(intBetween(rng, 62, 100) / 10);
+  const grade2 = round1(intBetween(rng, 62, 100) / 10);
+  const grade3 = round1(intBetween(rng, 62, 100) / 10);
+  const grade4 = round1(intBetween(rng, 65, 100) / 10);
+  const grade5 = round1(intBetween(rng, 65, 100) / 10);
   const data: Record<string, unknown> = {
     studentName,
     dateOfBirth: `${birthYear}-${month}-${day}`,
     gender,
-    hasSibling: hasSibling ? "yes" : "no",
-    gpa: round1(intBetween(rng, 65, 98) / 10),
-    transcript: `hoc-ba-${slugifyName(studentName)}.pdf`,
+    priorityCategory,
+    grade1,
+    grade2,
+    grade3,
+    grade4,
+    grade5,
+    gpa: round1((grade1 + grade2 + grade3 + grade4 + grade5) / 5),
+    transcript: `hoc-ba-${slug}.pdf`,
   };
-  if (hasSibling) data.siblingName = makeName(rng, rng() < 0.5 ? "male" : "female");
-  if (rng() < 0.3) data.note = "Gia đình mong muốn cho con học lớp chọn.";
-  if (hasEnglishScore) data.englishScore = round1(intBetween(rng, 55, 99) / 10);
+  if (rng() < 0.2) data.specialAchievements = pick(rng, SPECIAL_ACHIEVEMENTS);
+  if (rng() < 0.35) data.parentWishes = pick(rng, PARENT_WISHES);
+  if (variant.hasPhoto) data.studentPhoto = `anh-the-${slug}.jpg`;
   return data;
 }
 
@@ -286,7 +370,11 @@ const ROW_COUNT_RANGE = 56; // → 64..120 rows
 export function generateApplications(tenantCode: string): Application[] {
   const rng = mulberry32(hashSeed(tenantCode || "default"));
   const count = ROW_COUNT_MIN + Math.floor(rng() * ROW_COUNT_RANGE);
-  const hasEnglishScore = tenantCode === "tran-dai-nghia";
+  // Trần Đại Nghĩa is a THPT (lớp 10 intake); nguyen-gia-thieu also takes a photo.
+  const variant: FormVariant = {
+    isThpt: tenantCode === "tran-dai-nghia",
+    hasPhoto: tenantCode === "nguyen-gia-thieu",
+  };
   const year = String(REFERENCE_DATE.getFullYear()).slice(2);
   const seen = new Set<string>();
 
@@ -327,7 +415,7 @@ export function generateApplications(tenantCode: string): Application[] {
       campaignId: "2026",
       state,
       applicant,
-      formData: buildFormData(rng, studentName, gender, hasEnglishScore),
+      formData: buildFormData(rng, studentName, gender, variant),
       history,
       createdAt: createdAt.toISOString(),
       updatedAt: lastEntry.at,

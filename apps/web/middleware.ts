@@ -2,10 +2,13 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import {
   TENANT_HEADER,
+  parseTenantFromCustomDomain,
   parseTenantFromHost,
   parseTenantFromPath,
   resolveRootHosts,
 } from "@shared/tenant";
+
+import { CUSTOM_DOMAIN_TENANTS } from "@/lib/tenants/custom-domains";
 
 const ROOT_HOSTS = resolveRootHosts(process.env.TENANT_ROOT_HOSTS);
 
@@ -15,6 +18,13 @@ export function middleware(req: NextRequest) {
 
   let tenantCode = parseTenantFromHost(host, ROOT_HOSTS);
   let rewritten = false;
+
+  // Custom domain a school owns (e.g. a-tuyen-sinh.vn) → its tenant code.
+  // No parseable label, so it's an explicit map lookup (ADR-012). Like a
+  // subdomain, the path is served as-is — no rewrite.
+  if (!tenantCode) {
+    tenantCode = parseTenantFromCustomDomain(host, CUSTOM_DOMAIN_TENANTS);
+  }
 
   if (!tenantCode) {
     const fromPath = parseTenantFromPath(url.pathname);

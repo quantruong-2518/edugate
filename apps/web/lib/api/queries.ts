@@ -9,7 +9,6 @@ import {
 } from "@tanstack/react-query";
 
 import type { Application, ApplicationCode } from "@shared/admission";
-import type { AuditLogEntry, AuditLogFilters } from "@shared/audit";
 
 import {
   createApplication,
@@ -29,9 +28,9 @@ import {
   type ListApplicationsInput,
   type ListApplicationsResult,
   type ApplicationAnalytics,
+  type AnalyticsRange,
   type AppNotification,
 } from "./admission";
-import { getAuditLog } from "./audit";
 
 /**
  * TanStack Query hooks for the admission seam. They wrap the data functions in
@@ -47,16 +46,10 @@ export const admissionKeys = {
     [...admissionKeys.all, "application", code] as const,
   list: (input: ListApplicationsInput) =>
     [...admissionKeys.all, "list", input] as const,
-  analytics: (tenantCode: string) =>
-    [...admissionKeys.all, "analytics", tenantCode] as const,
+  analytics: (tenantCode: string, range: AnalyticsRange = {}) =>
+    [...admissionKeys.all, "analytics", tenantCode, range] as const,
   notifications: (tenantCode: string) =>
     [...admissionKeys.all, "notifications", tenantCode] as const,
-};
-
-export const auditKeys = {
-  all: ["audit"] as const,
-  list: (tenantCode: string, filters: AuditLogFilters) =>
-    [...auditKeys.all, "list", tenantCode, filters] as const,
 };
 
 export function useApplication(
@@ -88,15 +81,6 @@ export function useCreateApplication(): UseMutationResult<
   });
 }
 
-export function useAuditLog(
-  tenantCode: string,
-  filters: AuditLogFilters,
-): UseQueryResult<AuditLogEntry[]> {
-  return useQuery({
-    queryKey: auditKeys.list(tenantCode, filters),
-    queryFn: () => getAuditLog(tenantCode, filters),
-  });
-}
 
 export function useApplications(
   input: ListApplicationsInput,
@@ -110,10 +94,12 @@ export function useApplications(
 
 export function useApplicationAnalytics(
   tenantCode: string,
+  range: AnalyticsRange = {},
 ): UseQueryResult<ApplicationAnalytics> {
   return useQuery({
-    queryKey: admissionKeys.analytics(tenantCode),
-    queryFn: () => getApplicationAnalytics(tenantCode),
+    queryKey: admissionKeys.analytics(tenantCode, range),
+    queryFn: () => getApplicationAnalytics(tenantCode, range),
+    placeholderData: (prev) => prev,
   });
 }
 

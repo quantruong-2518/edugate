@@ -5,9 +5,11 @@
  * (no Next imports) so the same rules can be reused by the future NestJS
  * backend, tests, and any tooling that needs to normalize a tenant code.
  *
- * Resolution order (see ADR-005):
+ * Resolution order (see ADR-005 + ADR-012):
  *   1. Subdomain — canonical for prod (cva-edu.app.com)
- *   2. Path prefix `/t/:code` — fallback for dev/staging without wildcard SSL
+ *   2. Custom domain — a host the school owns (a-tuyen-sinh.vn), mapped to a
+ *      tenant code via an explicit domain map (data, not parseable)
+ *   3. Path prefix `/t/:code` — fallback for dev/staging without wildcard SSL
  */
 
 export const TENANT_HEADER = "x-tenant-code";
@@ -67,6 +69,38 @@ export function parseTenantFromHost(
   }
 
   return null;
+}
+
+/**
+ * Resolve a tenant code from a custom domain the school owns (CNAME/A →
+ * platform, e.g. "a-tuyen-sinh.vn"), via an explicit `domain → code` map.
+ *
+ * Unlike a subdomain, a custom domain carries no parseable tenant label —
+ * the mapping is data, not derivable from the string. Pha 1 the map is a
+ * static fixture; pha 2 it becomes a cached `tenant_domains` lookup where
+ * only `verified` rows are present (see ADR-012). The host is lowercased and
+ * port-stripped before matching; map keys must be exact hostnames (include
+ * the `www.` variant explicitly if the school uses it).
+ *
+ * Examples (domainMap = { "a-tuyen-sinh.vn": "cva-edu" }):
+ *   a-tuyen-sinh.vn       → "cva-edu"
+ *   a-tuyen-sinh.vn:443   → "cva-edu"
+ *   www.a-tuyen-sinh.vn   → null   (not in the map unless added)
+ *   other.vn              → null
+ */
+export function parseTenantFromCustomDomain(
+  host: string | null | undefined,
+  domainMap: Readonly<Record<string, string>>,
+): string | null {
+  if (!host) return null;
+  const hostname = (host.split(":")[0] ?? "").toLowerCase();
+  if (!hostname) return null;
+
+  const code = domainMap[hostname];
+  if (!code) return null;
+  // Defense in depth: a misconfigured map row must not inject a bad code.
+  if (!TENANT_CODE_RE.test(code)) return null;
+  return code;
 }
 
 /**

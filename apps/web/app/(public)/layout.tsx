@@ -1,24 +1,17 @@
 import type { ReactNode } from "react";
 
-import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
-import { getTenantCode } from "@/lib/tenants/branding";
+import { PublicHeader } from "@/components/public/public-header";
 
-export default async function PublicLayout({ children }: { children: ReactNode }) {
-  const tenantCode = await getTenantCode();
-
+export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="relative">
+    <div className="relative min-h-dvh">
       {/*
-        Tenant pages (landing/register/track) have no AppShell, so the locale
-        switcher overlays the top-right corner. Absolute (not a layout bar) so
-        the landing hero can run full-bleed underneath it. The root marketing
-        site has its own header switcher, so skip the overlay there.
+        The per-tenant header renders only when a tenant is resolved (landing /
+        register / track). The root marketing site resolves no tenant, so it
+        falls through to its own <MarketingHeader>. The applicant surfaces are
+        VI-only, so the header carries no locale switcher.
       */}
-      {tenantCode && (
-        <div className="absolute right-4 top-3 z-50 print:hidden">
-          <LocaleSwitcher />
-        </div>
-      )}
+      <PublicHeader />
       {children}
     </div>
   );

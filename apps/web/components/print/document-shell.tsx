@@ -54,7 +54,7 @@ export function DocumentShell({
             <p className="text-xs text-neutral-500">{title}</p>
           </div>
         </div>
-        <p className="shrink-0 font-mono text-sm font-bold tracking-wider text-primary">
+        <p className="shrink-0 text-sm font-bold tracking-wider text-primary">
           {code}
         </p>
       </header>

@@ -1,21 +1,25 @@
 "use client";
 
-import {
-  CheckCircle2,
-  ClipboardList,
-  Clock,
-  FileWarning,
-  type LucideIcon,
-} from "lucide-react";
-import Link from "next/link";
-import type { Route } from "next";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import {
   APPLICATION_STATES,
   APPLICATION_STATE_CODES,
 } from "@shared/admission";
-import { StateBadge, TONE_DOT_CLASS } from "@ui/components/admission";
+import { TONE_DOT_CLASS, TONE_HEX } from "@ui/components/admission";
 import { Button } from "@ui/components/button";
 import {
   Card,
@@ -24,268 +28,393 @@ import {
   CardHeader,
   CardTitle,
 } from "@ui/components/card";
+import { Input } from "@ui/components/input";
 import { Skeleton } from "@ui/components/skeleton";
 import { cn } from "@ui/lib/utils";
 
-import { studentNameOf } from "@/lib/api";
-import {
-  useApplicationAnalytics,
-  useApplications,
-} from "@/lib/api/queries";
+import type { AnalyticsRange } from "@/lib/api";
+import { useApplicationAnalytics } from "@/lib/api/queries";
 
-const SHORT_DATE = new Intl.DateTimeFormat("vi-VN", {
-  day: "2-digit",
-  month: "2-digit",
-});
+const DAY_MS = 86_400_000;
 
-function StatCard({
+type Preset = "all" | "30" | "90" | "custom";
+
+const PRESET_DAYS: Record<Exclude<Preset, "all" | "custom">, number> = {
+  "30": 30,
+  "90": 90,
+};
+
+/** Today (UTC `yyyy-mm-dd`) — fallback anchor before analytics resolves. */
+function todayKey(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/** Shift an ISO day key by N days (tz-safe via UTC). */
+function shiftKey(key: string, days: number): string {
+  return new Date(Date.parse(`${key}T00:00:00.000Z`) + days * DAY_MS)
+    .toISOString()
+    .slice(0, 10);
+}
+
+/** Format `yyyy-mm-dd` → `dd/mm` (or `dd/mm/yyyy`) without tz drift. */
+function formatDay(key: string, withYear = false): string {
+  const [y, m, d] = key.split("-");
+  return withYear ? `${d}/${m}/${y}` : `${d}/${m}`;
+}
+
+// --- Submissions-per-day area chart ----------------------------------------
+
+/** Minimal shape of the props recharts hands to a custom Tooltip content. */
+type TooltipContentProps = {
+  active?: boolean;
+  label?: string | number;
+  payload?: { value?: number; payload?: unknown }[];
+};
+
+function SubmissionsTooltip({
+  active,
+  payload,
   label,
-  value,
-  Icon,
-  loading,
-}: {
-  label: string;
-  value: number;
-  Icon: LucideIcon;
-  loading: boolean;
-}) {
+  unit,
+}: TooltipContentProps & { unit: string }) {
+  if (!active || !payload?.length) return null;
+  const count = payload[0]?.value ?? 0;
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0 pb-2">
-        <CardDescription>{label}</CardDescription>
-        <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Icon className="size-[18px]" aria-hidden />
-        </span>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <Skeleton className="h-9 w-16" />
-        ) : (
-          <p className="text-3xl font-semibold tracking-tight">{value}</p>
-        )}
-      </CardContent>
-    </Card>
+    <div className="rounded-lg border bg-popover px-3 py-2 text-xs shadow-md">
+      <p className="font-medium text-popover-foreground">
+        {formatDay(String(label), true)}
+      </p>
+      <p className="tabular-nums text-muted-foreground">
+        {count} {unit}
+      </p>
+    </div>
   );
 }
 
-export function DashboardOverview({ tenantCode }: { tenantCode: string }) {
-  const t = useTranslations("admin.dashboard");
-  const { data, isPending } = useApplicationAnalytics(tenantCode);
-  const recent = useApplications({
-    tenantCode,
-    sort: "createdAt:desc",
-    page: 1,
-    pageSize: 5,
-  });
+function SubmissionsChart({
+  data,
+  unit,
+}: {
+  data: { date: string; count: number }[];
+  unit: string;
+}) {
+  return (
+    <ResponsiveContainer width="100%" height="100%" minHeight={220}>
+      <AreaChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+        <defs>
+          <linearGradient id="submissionsFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.18} />
+            <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid
+          vertical={false}
+          stroke="var(--border)"
+          strokeDasharray="3 3"
+        />
+        <XAxis
+          dataKey="date"
+          tickFormatter={(v: string) => formatDay(v)}
+          tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+          tickLine={false}
+          axisLine={false}
+          minTickGap={28}
+        />
+        <YAxis
+          allowDecimals={false}
+          width={40}
+          tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+          tickLine={false}
+          axisLine={false}
+        />
+        <Tooltip
+          cursor={{ stroke: "var(--border)", strokeWidth: 1 }}
+          content={<SubmissionsTooltip unit={unit} />}
+        />
+        <Area
+          type="monotone"
+          dataKey="count"
+          stroke="var(--foreground)"
+          strokeWidth={2}
+          fill="url(#submissionsFill)"
+          dot={false}
+          activeDot={{
+            r: 3,
+            fill: "var(--foreground)",
+            stroke: "var(--background)",
+            strokeWidth: 2,
+          }}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+}
 
-  const byState = data?.byState;
-  const total = data?.total ?? 0;
-  const maxSeries = Math.max(1, ...(data?.series.map((p) => p.count) ?? [0]));
-  const maxFunnel = data?.funnel[0]?.count ?? 1;
+// --- Status distribution donut ---------------------------------------------
 
-  // States that actually occur, ordered by the canonical state list, for the
-  // distribution breakdown.
-  const distribution = APPLICATION_STATE_CODES.map((code) => ({
-    code,
-    count: byState?.[code] ?? 0,
-  })).filter((d) => d.count > 0);
+type DistEntry = {
+  code: (typeof APPLICATION_STATE_CODES)[number];
+  label: string;
+  tone: keyof typeof TONE_HEX;
+  count: number;
+  pct: number;
+};
+
+function StatusDonut({
+  distribution,
+  total,
+  totalLabel,
+}: {
+  distribution: DistEntry[];
+  total: number;
+  totalLabel: string;
+}) {
+  return (
+    <div className="relative h-full w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Tooltip
+            content={({ active, payload }) => {
+              if (!active || !payload?.length) return null;
+              const d = payload[0]?.payload as DistEntry | undefined;
+              if (!d) return null;
+              return (
+                <div className="rounded-lg border bg-popover px-3 py-2 text-xs shadow-md">
+                  <p className="font-medium text-popover-foreground">{d.label}</p>
+                  <p className="tabular-nums text-muted-foreground">
+                    {d.count} · {d.pct}%
+                  </p>
+                </div>
+              );
+            }}
+          />
+          <Pie
+            data={distribution}
+            dataKey="count"
+            nameKey="label"
+            innerRadius="62%"
+            outerRadius="92%"
+            paddingAngle={2}
+            stroke="var(--card)"
+            strokeWidth={2}
+          >
+            {distribution.map((d) => (
+              <Cell key={d.code} fill={TONE_HEX[d.tone]} />
+            ))}
+          </Pie>
+        </PieChart>
+      </ResponsiveContainer>
+      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-3xl font-semibold tabular-nums tracking-tight">
+          {total}
+        </span>
+        <span className="text-xs text-muted-foreground">{totalLabel}</span>
+      </div>
+    </div>
+  );
+}
+
+// --- Date range controls ----------------------------------------------------
+
+function RangeControls({
+  preset,
+  range,
+  resolved,
+  onPreset,
+  onCustom,
+}: {
+  preset: Preset;
+  range: AnalyticsRange;
+  resolved: { from: string; to: string } | undefined;
+  onPreset: (p: Exclude<Preset, "custom">) => void;
+  onCustom: (next: AnalyticsRange) => void;
+}) {
+  const t = useTranslations("admin.dashboard.range");
+
+  const PRESETS: { id: Exclude<Preset, "custom">; label: string }[] = [
+    { id: "all", label: t("all") },
+    { id: "30", label: t("last30") },
+    { id: "90", label: t("last90") },
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label={t("stats.today")}
-          value={data?.todaySubmissions ?? 0}
-          Icon={ClipboardList}
-          loading={isPending}
-        />
-        <StatCard
-          label={t("stats.inReview")}
-          value={byState?.UNDER_REVIEW ?? 0}
-          Icon={Clock}
-          loading={isPending}
-        />
-        <StatCard
-          label={t("stats.needsInfo")}
-          value={byState?.NEEDS_INFO ?? 0}
-          Icon={FileWarning}
-          loading={isPending}
-        />
-        <StatCard
-          label={t("stats.approved")}
-          value={byState?.APPROVED ?? 0}
-          Icon={CheckCircle2}
-          loading={isPending}
-        />
+    <div className="flex shrink-0 flex-col gap-3 rounded-xl border bg-card p-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-0.5">
+        <span className="text-sm font-medium">{t("label")}</span>
+        {resolved && (
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {formatDay(resolved.from, true)} → {formatDay(resolved.to, true)}
+          </span>
+        )}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* Submissions-over-time mini chart */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>{t("trend.title")}</CardTitle>
-            <CardDescription>{t("trend.description")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isPending ? (
-              <Skeleton className="h-40 w-full" />
-            ) : data && data.series.some((p) => p.count > 0) ? (
-              <div
-                className="flex h-40 items-end gap-1"
-                role="img"
-                aria-label={t("trend.title")}
-              >
-                {data.series.map((point) => (
-                  <div
-                    key={point.date}
-                    className="group flex flex-1 flex-col items-center justify-end gap-1"
-                  >
-                    <span className="text-[10px] font-medium text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
-                      {point.count}
-                    </span>
-                    <div
-                      className="w-full rounded-t bg-primary/80 transition-colors group-hover:bg-primary"
-                      style={{
-                        height: `${Math.max(4, (point.count / maxSeries) * 100)}%`,
-                      }}
-                      title={`${point.date}: ${point.count}`}
-                    />
-                    <span className="text-[9px] text-muted-foreground">
-                      {SHORT_DATE.format(new Date(point.date))}
-                    </span>
-                  </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex rounded-lg border p-0.5">
+          {PRESETS.map((p) => (
+            <Button
+              key={p.id}
+              type="button"
+              size="sm"
+              variant={preset === p.id ? "secondary" : "ghost"}
+              className="h-7 px-3 text-xs"
+              onClick={() => onPreset(p.id)}
+            >
+              {p.label}
+            </Button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <Input
+            type="date"
+            aria-label={t("from")}
+            value={range.from ?? ""}
+            max={range.to ?? resolved?.to}
+            onChange={(e) =>
+              onCustom({ ...range, from: e.target.value || undefined })
+            }
+            className="h-8 w-[9.5rem] text-xs"
+          />
+          <span className="text-xs text-muted-foreground">→</span>
+          <Input
+            type="date"
+            aria-label={t("to")}
+            value={range.to ?? ""}
+            min={range.from}
+            onChange={(e) =>
+              onCustom({ ...range, to: e.target.value || undefined })
+            }
+            className="h-8 w-[9.5rem] text-xs"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Dashboard --------------------------------------------------------------
+
+export function DashboardOverview({ tenantCode }: { tenantCode: string }) {
+  const t = useTranslations("admin.dashboard");
+  const [preset, setPreset] = useState<Preset>("all");
+  const [range, setRange] = useState<AnalyticsRange>({});
+
+  const { data, isPending } = useApplicationAnalytics(tenantCode, range);
+
+  const total = data?.total ?? 0;
+  const hasSubmissions = data?.series.some((p) => p.count > 0) ?? false;
+
+  const distribution: DistEntry[] = APPLICATION_STATE_CODES.map((code) => {
+    const meta = APPLICATION_STATES[code]!;
+    const count = data?.byState[code] ?? 0;
+    return {
+      code,
+      label: meta.label,
+      tone: meta.tone,
+      count,
+      pct: total > 0 ? Math.round((count / total) * 100) : 0,
+    };
+  }).filter((d) => d.count > 0);
+
+  function applyPreset(p: Exclude<Preset, "custom">) {
+    setPreset(p);
+    if (p === "all") {
+      setRange({});
+      return;
+    }
+    const anchor = data?.range.to ?? todayKey();
+    setRange({ from: shiftKey(anchor, -(PRESET_DAYS[p] - 1)), to: anchor });
+  }
+
+  function applyCustom(next: AnalyticsRange) {
+    setPreset("custom");
+    setRange(next);
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <RangeControls
+        preset={preset}
+        range={range}
+        resolved={data?.range}
+        onPreset={applyPreset}
+        onCustom={applyCustom}
+      />
+
+      {/* Row 1 — submissions per day, 16:9 */}
+      <Card className="flex aspect-[16/9] flex-col">
+        <CardHeader className="shrink-0 pb-3">
+          <CardTitle className="text-base">{t("trend.title")}</CardTitle>
+          <CardDescription>{t("trend.description")}</CardDescription>
+        </CardHeader>
+        <CardContent className="min-h-0 flex-1 pb-5">
+          {isPending ? (
+            <Skeleton className="size-full" />
+          ) : hasSubmissions && data ? (
+            <SubmissionsChart data={data.series} unit={t("trend.unit")} />
+          ) : (
+            <div className="flex h-full items-center justify-center text-center text-sm text-muted-foreground">
+              {t("trend.empty")}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Row 2 — status breakdown (donut + two legend columns), 16:9 */}
+      <Card className="flex aspect-[16/9] flex-col">
+        <CardHeader className="shrink-0 pb-3">
+          <CardTitle className="text-base">{t("distribution.title")}</CardTitle>
+          <CardDescription>{t("distribution.description")}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex min-h-0 flex-1 items-center justify-center gap-8 pb-6 lg:gap-12">
+          {isPending ? (
+            <>
+              <Skeleton className="aspect-square h-full max-h-[260px] shrink-0 rounded-full" />
+              <div className="grid w-full max-w-xl flex-1 grid-cols-2 gap-x-10 gap-y-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={`legend-skeleton-${i}`} className="h-4 w-full" />
                 ))}
               </div>
-            ) : (
-              <p className="py-12 text-center text-sm text-muted-foreground">
-                {t("trend.empty")}
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Status distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("distribution.title")}</CardTitle>
-            <CardDescription>{t("distribution.description")}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {isPending &&
-              Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={`dist-skeleton-${i}`} className="h-4 w-full" />
-              ))}
-            {!isPending &&
-              distribution.map(({ code, count }) => {
-                const meta = APPLICATION_STATES[code]!;
-                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-                return (
-                  <div key={code} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="flex items-center gap-1.5 text-foreground">
-                        <span
-                          className={cn(
-                            "size-2 rounded-full",
-                            TONE_DOT_CLASS[meta.tone]!,
-                          )}
-                          aria-hidden
-                        />
-                        {meta.label}
-                      </span>
-                      <span className="tabular-nums text-muted-foreground">
-                        {count} · {pct}%
-                      </span>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                      <div
-                        className={cn("h-full rounded-full", TONE_DOT_CLASS[meta.tone]!)}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* Funnel */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("funnel.title")}</CardTitle>
-            <CardDescription>{t("funnel.description")}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {isPending &&
-              Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={`funnel-skeleton-${i}`} className="h-6 w-full" />
-              ))}
-            {!isPending &&
-              data?.funnel.map((step) => {
-                const meta = APPLICATION_STATES[step.state]!;
-                const width =
-                  maxFunnel > 0 ? Math.round((step.count / maxFunnel) * 100) : 0;
-                return (
-                  <div key={step.state} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-foreground">{meta.label}</span>
-                      <span className="tabular-nums text-muted-foreground">
-                        {step.count}
-                      </span>
-                    </div>
-                    <div className="h-2.5 w-full overflow-hidden rounded-md bg-muted">
-                      <div
-                        className="h-full rounded-md bg-primary"
-                        style={{ width: `${Math.max(4, width)}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-          </CardContent>
-        </Card>
-
-        {/* Recent applications */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex-row items-start justify-between gap-2 space-y-0">
-            <div className="space-y-1.5">
-              <CardTitle>{t("recent.title")}</CardTitle>
-              <CardDescription>{t("recent.description")}</CardDescription>
-            </div>
-            <Button asChild variant="outline" size="sm">
-              <Link href={"/admin/applications" as Route}>{t("viewAll")}</Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <ul className="divide-y">
-              {recent.isPending &&
-                Array.from({ length: 5 }).map((_, i) => (
-                  <li key={`recent-skeleton-${i}`} className="py-2.5">
-                    <Skeleton className="h-5 w-full" />
-                  </li>
-                ))}
-              {!recent.isPending &&
-                recent.data?.items.map((app) => (
+            </>
+          ) : total > 0 ? (
+            <>
+              <div className="aspect-square h-full max-h-[280px] shrink-0">
+                <StatusDonut
+                  distribution={distribution}
+                  total={total}
+                  totalLabel={t("distribution.total")}
+                />
+              </div>
+              <ul className="grid w-full max-w-xl flex-1 grid-cols-2 gap-x-10 gap-y-3 self-center">
+                {distribution.map((d) => (
                   <li
-                    key={app.code}
-                    className="flex items-center justify-between gap-3 py-2.5"
+                    key={d.code}
+                    className="flex items-center justify-between gap-3 text-sm"
                   >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">
-                        {studentNameOf(app)}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {app.code} · {app.applicant.fullName}
-                      </p>
-                    </div>
-                    <StateBadge state={app.state} />
+                    <span className="flex min-w-0 items-center gap-2.5">
+                      <span
+                        className={cn(
+                          "size-2.5 shrink-0 rounded-full",
+                          TONE_DOT_CLASS[d.tone],
+                        )}
+                        aria-hidden
+                      />
+                      <span className="truncate text-foreground">{d.label}</span>
+                    </span>
+                    <span className="shrink-0 tabular-nums text-muted-foreground">
+                      {d.count} · {d.pct}%
+                    </span>
                   </li>
                 ))}
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
+              </ul>
+            </>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-center text-sm text-muted-foreground">
+              {t("distribution.empty")}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

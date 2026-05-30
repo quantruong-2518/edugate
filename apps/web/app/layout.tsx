@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -16,6 +16,13 @@ const fontSans = Inter({
   subsets: ["latin", "vietnamese"],
   display: "swap",
   variable: "--font-sans",
+});
+
+// Modern display grotesk, reserved for prominent names on the applicant surfaces.
+const fontDisplay = Space_Grotesk({
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
+  variable: "--font-display",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -35,7 +42,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const locale = await getLocale();
 
   return (
-    <html lang={locale} suppressHydrationWarning className={fontSans.variable}>
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      className={`${fontSans.variable} ${fontDisplay.variable}`}
+    >
       <body className="min-h-dvh font-sans antialiased">
         {/*
           Per-tenant token override. React 19 hoists this <style> into <head>

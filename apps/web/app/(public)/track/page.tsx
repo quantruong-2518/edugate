@@ -6,12 +6,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@ui/components/card";
+import { Card, CardContent } from "@ui/components/card";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 
@@ -27,12 +22,17 @@ export default function TrackIndexPage() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-12 sm:px-6 sm:py-16">
-      <Card className="mx-auto w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{t("title")}</CardTitle>
-        </CardHeader>
-        <CardContent>
+    <main className="mx-auto max-w-md px-4 py-16 sm:py-24">
+      <div className="text-center">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          {t("title")}
+        </h1>
+        <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
+          {t("subtitle")}
+        </p>
+      </div>
+      <Card className="mt-8">
+        <CardContent className="p-6">
           <form onSubmit={submit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="code">{t("codeLabel")}</Label>
@@ -42,6 +42,7 @@ export default function TrackIndexPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 autoComplete="off"
+                className="text-center text-base font-medium uppercase tracking-wider"
               />
             </div>
             <Button type="submit" className="w-full" disabled={!code.trim()}>

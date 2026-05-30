@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "EduGate",
+    "appName": "Ghi Danh",
     "actions": {
       "next": "Tiếp tục",
       "back": "Quay lại",
@@ -118,6 +118,7 @@
   },
   "track": {
     "title": "Tra cứu hồ sơ",
+    "subtitle": "Nhập mã hồ sơ để xem trạng thái xét duyệt theo thời gian thực.",
     "codeLabel": "Mã hồ sơ",
     "codePlaceholder": "Nhập mã hồ sơ",
     "search": "Tra cứu",
@@ -130,59 +131,21 @@
     }
   },
   "auth": {
+    "gate": {
+      "title": "Quản trị tuyển sinh",
+      "description": "Nhập mã trường và mã truy cập được cấp để tiếp tục.",
+      "slug": "Mã trường",
+      "slugPlaceholder": "vd: cva-edu",
+      "code": "Mã truy cập",
+      "codePlaceholder": "Dãy 10 ký tự",
+      "submit": "Vào quản trị",
+      "error": "Mã trường hoặc mã truy cập không đúng.",
+      "hint": "Mã truy cập do quản trị hệ thống cấp riêng cho từng trường. Mất mã hoặc cần cấp lại? Liên hệ quản trị hệ thống.",
+      "signOut": "Đăng xuất"
+    },
     "validation": {
-      "required": "Trường này là bắt buộc",
-      "invalidEmail": "Email không hợp lệ",
-      "passwordMin": "Mật khẩu tối thiểu {min} ký tự",
-      "passwordMismatch": "Mật khẩu nhập lại không khớp"
-    },
-    "login": {
-      "title": "Đăng nhập",
-      "description": "Đăng nhập vào hệ thống tuyển sinh",
-      "email": "Email",
-      "password": "Mật khẩu",
-      "submit": "Đăng nhập",
-      "forgotLink": "Quên mật khẩu?",
-      "successToast": "Đăng nhập thành công"
-    },
-    "forgot": {
-      "title": "Quên mật khẩu",
-      "description": "Nhập email để nhận liên kết đặt lại mật khẩu",
-      "email": "Email",
-      "submit": "Gửi liên kết",
-      "sentTitle": "Đã gửi liên kết",
-      "sentDescription": "Nếu email tồn tại trong hệ thống, bạn sẽ nhận được liên kết đặt lại mật khẩu.",
-      "backToLogin": "Về trang đăng nhập"
-    },
-    "credential": {
-      "password": "Mật khẩu mới",
-      "confirmPassword": "Nhập lại mật khẩu",
-      "toLogin": "Đến trang đăng nhập",
-      "invalidToken": {
-        "title": "Liên kết không hợp lệ",
-        "description": "Liên kết đã hết hạn hoặc không đúng. Vui lòng yêu cầu liên kết mới."
-      },
-      "reset": {
-        "title": "Đặt lại mật khẩu",
-        "description": "Tạo mật khẩu mới cho tài khoản của bạn",
-        "submit": "Đặt lại mật khẩu",
-        "successTitle": "Đã đổi mật khẩu",
-        "successDescription": "Mật khẩu của bạn đã được cập nhật. Hãy đăng nhập lại."
-      },
-      "set": {
-        "title": "Đặt mật khẩu",
-        "description": "Tạo mật khẩu cho tài khoản của bạn",
-        "submit": "Lưu mật khẩu",
-        "successTitle": "Đã đặt mật khẩu",
-        "successDescription": "Mật khẩu đã được thiết lập. Hãy đăng nhập."
-      },
-      "activate": {
-        "title": "Kích hoạt tài khoản",
-        "description": "Đặt mật khẩu để kích hoạt tài khoản của bạn",
-        "submit": "Kích hoạt",
-        "successTitle": "Tài khoản đã kích hoạt",
-        "successDescription": "Tài khoản của bạn đã sẵn sàng. Hãy đăng nhập."
-      }
+      "slugRequired": "Vui lòng nhập mã trường",
+      "codeRequired": "Vui lòng nhập mã truy cập"
     }
   },
   "errors": {
@@ -251,17 +214,35 @@
     "hero": {
       "eyebrow": "Nền tảng SaaS cho trường học",
       "headline": "Số hóa tuyển sinh & quản lý cho trường học",
-      "subheadline": "EduGate cho mỗi trường một cổng tuyển sinh trực tuyến riêng — thương hiệu riêng, dữ liệu cách ly, triển khai trong một ngày. Mở rộng dần sang nhân sự, học phí, học tập khi cần.",
+      "subheadline": "Trao mỗi trường một cổng tuyển sinh riêng: thương hiệu riêng, dữ liệu cách ly, lên sóng trong ngày.",
       "ctaPrimary": "Đặt lịch demo",
       "ctaSecondary": "Xem cổng tuyển sinh mẫu"
     },
     "proof": {
-      "title": "Các trường đang dùng EduGate",
+      "title": "Các trường đang dùng Ghi Danh",
       "viewDemo": "Xem cổng tuyển sinh"
+    },
+    "trust": {
+      "title": "Dữ liệu trường bạn, đặt tại Việt Nam",
+      "body": "Mọi hồ sơ học sinh được lưu và xử lý trên hạ tầng đặt tại Việt Nam, cách ly theo từng trường ngay ở tầng cơ sở dữ liệu. Không chia sẻ chéo, không lưu ngoài lãnh thổ.",
+      "items": {
+        "residency": {
+          "title": "Lưu trữ tại Việt Nam",
+          "desc": "Toàn bộ dữ liệu nằm trong nước, đúng yêu cầu chủ quyền dữ liệu."
+        },
+        "isolation": {
+          "title": "Cách ly theo trường",
+          "desc": "Postgres Row-Level Security tách dữ liệu từng tenant ở tầng thấp nhất."
+        },
+        "audit": {
+          "title": "Ghi vết kiểm toán",
+          "desc": "Mọi thao tác quản trị đều được lưu nhật ký, truy vết được."
+        }
+      }
     },
     "features": {
       "title": "Mọi thứ một trường cần để tuyển sinh trực tuyến",
-      "subtitle": "Hạ tầng đa tenant sẵn sàng vận hành — bạn chỉ việc cấu hình.",
+      "subtitle": "Hạ tầng đa tenant sẵn sàng vận hành, bạn chỉ việc cấu hình.",
       "items": {
         "multiTenant": {
           "title": "Đa trường, một nền tảng",
@@ -277,14 +258,14 @@
         },
         "theming": {
           "title": "Thương hiệu riêng từng trường",
-          "desc": "Logo, màu sắc, nội dung landing — đổi tức thì, không cần deploy lại."
+          "desc": "Logo, màu sắc, nội dung landing, đổi tức thì, không cần deploy lại."
         },
         "tracking": {
           "title": "Theo dõi hồ sơ thời gian thực",
           "desc": "Phụ huynh tra cứu trạng thái mọi lúc; nhà trường duyệt theo quy trình."
         },
         "i18n": {
-          "title": "Song ngữ Việt – Anh",
+          "title": "Song ngữ Việt - Anh",
           "desc": "Giao diện đa ngôn ngữ sẵn sàng cho cả trường quốc tế."
         }
       }
@@ -334,39 +315,41 @@
         "privacy": "Chính sách bảo mật",
         "terms": "Điều khoản"
       },
-      "copyright": "EduGate. Bảo lưu mọi quyền."
+      "copyright": "Ghi Danh. Bảo lưu mọi quyền."
     }
   },
   "admin": {
+    "header": {
+      "nav": {
+        "dashboard": "Quản trị hồ sơ",
+        "applications": "Xem hồ sơ"
+      },
+      "searchPlaceholder": "Tìm hồ sơ…",
+      "search": "Tìm hồ sơ",
+      "signOut": "Đăng xuất"
+    },
     "dashboard": {
       "title": "Bảng điều khiển",
       "subtitle": "Tổng quan tình hình tuyển sinh của trường.",
-      "stats": {
-        "today": "Hồ sơ nộp hôm nay",
-        "inReview": "Đang duyệt",
-        "needsInfo": "Cần bổ sung",
-        "approved": "Đã duyệt",
-        "total": "Tổng hồ sơ",
-        "thisWeek": "Trong 7 ngày qua"
-      },
-      "distribution": {
-        "title": "Phân bố theo trạng thái",
-        "description": "Tỷ lệ hồ sơ theo từng trạng thái xử lý."
+      "range": {
+        "label": "Khoảng thời gian",
+        "all": "Toàn thời gian",
+        "last30": "30 ngày",
+        "last90": "90 ngày",
+        "from": "Từ ngày",
+        "to": "Đến ngày"
       },
       "trend": {
         "title": "Hồ sơ nộp theo ngày",
-        "description": "14 ngày gần nhất.",
+        "description": "Số lượng tiếp nhận mỗi ngày.",
+        "unit": "hồ sơ",
         "empty": "Chưa có hồ sơ nào trong khoảng này."
       },
-      "funnel": {
-        "title": "Phễu tuyển sinh",
-        "description": "Số hồ sơ đã đi qua từng bước.",
-        "ofTotal": "{percent}% tổng hồ sơ"
-      },
-      "viewAll": "Xem tất cả hồ sơ",
-      "recent": {
-        "title": "Hồ sơ mới nhất",
-        "description": "5 hồ sơ được nộp gần đây."
+      "distribution": {
+        "title": "Phân bố trạng thái",
+        "description": "Tỷ lệ theo từng trạng thái.",
+        "total": "hồ sơ",
+        "empty": "Chưa có dữ liệu."
       }
     },
     "applications": {
@@ -405,17 +388,17 @@
       },
       "columns": {
         "code": "Mã hồ sơ",
-        "applicant": "Phụ huynh",
-        "student": "Học sinh",
+        "student": "Tên học sinh",
+        "dob": "Ngày sinh",
         "state": "Trạng thái",
-        "submittedAt": "Ngày nộp",
-        "score": "Điểm TB"
+        "applicant": "Người nộp hồ sơ",
+        "submittedAt": "Ngày nộp"
       },
       "pagination": {
         "pageSize": "Số dòng",
         "prev": "Trước",
         "next": "Sau",
-        "range": "{from}–{to} trên {total}",
+        "range": "{from}-{to} trên {total}",
         "page": "Trang {page}"
       },
       "empty": {
@@ -428,17 +411,26 @@
       },
       "detail": {
         "title": "Chi tiết hồ sơ",
-        "applicantInfo": "Thông tin phụ huynh",
-        "studentFullName": "Họ và tên học sinh",
-        "fullName": "Họ và tên người khai",
+        "submittedAt": "Ngày nộp",
+        "studentInfo": "Thông tin học sinh",
+        "dob": "Ngày sinh",
+        "gender": "Giới tính",
+        "genderMale": "Nam",
+        "genderFemale": "Nữ",
+        "priorityTags": "Đối tượng ưu tiên",
+        "gradeRecord": "Kết quả học tập",
+        "specialAchievements": "Thành tích đặc biệt",
+        "parentWishes": "Nguyện vọng phụ huynh",
+        "documents": "Hồ sơ đính kèm",
+        "applicantInfo": "Thông tin người nộp hồ sơ",
+        "fullName": "Họ và tên",
         "email": "Email",
         "phone": "Số điện thoại",
         "relationship": "Quan hệ",
-        "formData": "Thông tin khai báo",
+        "otherInfo": "Thông tin khác",
         "timeline": "Lịch sử trạng thái",
         "actions": "Hành động",
-        "submittedAt": "Ngày nộp",
-        "noValue": "—"
+        "noValue": "-"
       },
       "relationships": {
         "father": "Bố",

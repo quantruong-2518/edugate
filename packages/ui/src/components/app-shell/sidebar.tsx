@@ -20,8 +20,8 @@ export function Sidebar({ navItems, collapsed, onToggle }: SidebarProps) {
     <aside
       data-collapsed={collapsed}
       className={cn(
-        "hidden border-r bg-card transition-[width] duration-200 md:sticky md:top-14 md:block md:h-[calc(100dvh-3.5rem)] md:shrink-0",
-        collapsed ? "md:w-16" : "md:w-64",
+        "sticky top-14 block h-[calc(100dvh-3.5rem)] shrink-0 border-r bg-card transition-[width] duration-200",
+        collapsed ? "w-16" : "w-64",
       )}
       aria-label="Sidebar navigation"
     >
@@ -33,7 +33,6 @@ export function Sidebar({ navItems, collapsed, onToggle }: SidebarProps) {
               href={item.href}
               label={item.label}
               Icon={item.Icon}
-              variant="sidebar"
               collapsed={collapsed}
             />
           ))}

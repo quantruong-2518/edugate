@@ -23,6 +23,23 @@ export const TONE_BADGE_CLASS: Readonly<Record<ApplicationStateTone, string>> = 
     "bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-800/60 dark:text-slate-200 dark:ring-slate-700",
 };
 
+/**
+ * Concrete hex per tone — mirrors the `*-500` (gray/slate use `*-400`) shade of
+ * {@link TONE_DOT_CLASS}. SVG `fill` needs a literal color string, so charts
+ * (e.g. the dashboard status donut) read these instead of Tailwind classes.
+ */
+export const TONE_HEX: Readonly<Record<ApplicationStateTone, string>> = {
+  gray: "#9ca3af",
+  blue: "#3b82f6",
+  amber: "#f59e0b",
+  orange: "#f97316",
+  green: "#22c55e",
+  red: "#ef4444",
+  emerald: "#10b981",
+  violet: "#8b5cf6",
+  slate: "#94a3b8",
+};
+
 export const TONE_DOT_CLASS: Readonly<Record<ApplicationStateTone, string>> = {
   gray: "bg-gray-400 dark:bg-gray-500",
   blue: "bg-blue-500",

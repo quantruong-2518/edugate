@@ -3,7 +3,7 @@ import type { LandingConfig, LandingSection } from "@shared/landing";
 /**
  * Per-tenant landing page configuration. Pha 1 returns static fixtures; task 15
  * swaps the body for a real fetch keeping this signature. Section content is
- * data (editable per tenant via task 17), so it is plain VI text here — not
+ * data (editable per tenant via task 17), so it is plain VI text here, not
  * next-intl keys. Render order follows the array order.
  *
  * Images are Unsplash URLs (mock content). Pha 2 tenants upload their own.
@@ -21,7 +21,7 @@ const CVA_CONFIG: LandingConfig = {
       eyebrow: "Tuyển sinh năm học 2026 - 2027",
       headline: "Đăng ký tuyển sinh trực tuyến",
       subheadline:
-        "Nộp hồ sơ và theo dõi kết quả mọi lúc, mọi nơi — không cần đến trường. Quy trình minh bạch, kết quả thời gian thực.",
+        "Nộp và theo dõi hồ sơ trực tuyến mọi lúc, mọi nơi. Minh bạch, kết quả thời gian thực.",
       image: unsplash("1503676260728-1c00da094a0b"),
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
@@ -167,7 +167,7 @@ const TDN_CONFIG: LandingConfig = {
       image: unsplash("1541339907198-e08756dedf3f", 1200),
     },
     {
-      // Unknown to this FE build — renderer must skip + warn, not crash.
+      // Unknown to this FE build, renderer must skip + warn, not crash.
       type: "gallery",
       images: [],
     } as unknown as LandingSection,
@@ -202,10 +202,10 @@ const NHT_CONFIG: LandingConfig = {
   sections: [
     {
       type: "hero",
-      eyebrow: "Tuyển sinh lớp 6 — Năm học 2026 - 2027",
+      eyebrow: "Tuyển sinh lớp 6, Năm học 2026 - 2027",
       headline: "THCS Nguyễn Huy Tưởng",
       subheadline:
-        "Ngôi trường giàu truyền thống tại Đông Anh, Hà Nội — nơi ươm mầm tri thức và nuôi dưỡng nhân cách cho thế hệ tương lai.",
+        "Ngôi trường giàu truyền thống tại Đông Anh, Hà Nội, ươm mầm tri thức và nuôi dưỡng nhân cách.",
       image: unsplash("1509062522246-3755977927d7"),
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
@@ -320,7 +320,7 @@ const NHT_CONFIG: LandingConfig = {
           ],
         },
       ],
-      copyright: "Trường THCS Nguyễn Huy Tưởng — Đông Anh, Hà Nội",
+      copyright: "Trường THCS Nguyễn Huy Tưởng, Đông Anh, Hà Nội",
     },
   ],
 };
@@ -329,10 +329,10 @@ const NVH_CONFIG: LandingConfig = {
   sections: [
     {
       type: "hero",
-      eyebrow: "Tuyển sinh lớp 6 — Năm học 2026 - 2027",
+      eyebrow: "Tuyển sinh lớp 6, Năm học 2026 - 2027",
       headline: "THCS Nguyễn Văn Huyên",
       subheadline:
-        "Trường học hạnh phúc — nơi mỗi học sinh được yêu thương, tôn trọng và phát triển trọn vẹn cả tài lẫn đức.",
+        "Trường học hạnh phúc, nơi mỗi học sinh được yêu thương, tôn trọng và phát triển trọn vẹn.",
       image: unsplash("1580582932707-520aed937b7b"),
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
@@ -348,8 +348,8 @@ const NVH_CONFIG: LandingConfig = {
     },
     {
       type: "about",
-      title: "Lời ngỏ của Cô Hương — Hiệu trưởng",
-      body: "Tại Trường THCS Nguyễn Văn Huyên (Hoài Đức, Hà Nội), chúng tôi xây dựng một 'Trường học Hạnh phúc' — nơi học sinh đến trường mỗi ngày là một niềm vui. Với đội ngũ 38 giáo viên đều đạt trình độ đại học, tận tâm và giàu chuyên môn, nhà trường cam kết đồng hành cùng từng em trên hành trình trưởng thành về cả trí tuệ lẫn nhân cách.",
+      title: "Lời ngỏ của Cô Hương, Hiệu trưởng",
+      body: "Tại Trường THCS Nguyễn Văn Huyên (Hoài Đức, Hà Nội), chúng tôi xây dựng một 'Trường học Hạnh phúc', nơi học sinh đến trường mỗi ngày là một niềm vui. Với đội ngũ 38 giáo viên đều đạt trình độ đại học, tận tâm và giàu chuyên môn, nhà trường cam kết đồng hành cùng từng em trên hành trình trưởng thành về cả trí tuệ lẫn nhân cách.",
       image: unsplash("1577896851231-70ef18881754", 1200),
     },
     {
@@ -411,7 +411,7 @@ const NVH_CONFIG: LandingConfig = {
         {
           question: "'Trường học hạnh phúc' nghĩa là gì?",
           answer:
-            "Là mô hình giáo dục lấy học sinh làm trung tâm, đề cao sự an toàn, yêu thương và tôn trọng — giúp các em chủ động, tự tin và hạnh phúc khi đến trường.",
+            "Là mô hình giáo dục lấy học sinh làm trung tâm, đề cao sự an toàn, yêu thương và tôn trọng, giúp các em chủ động, tự tin và hạnh phúc khi đến trường.",
         },
         {
           question: "Trường có nhận học sinh trái tuyến không?",
@@ -447,7 +447,7 @@ const NVH_CONFIG: LandingConfig = {
           ],
         },
       ],
-      copyright: "Trường THCS Nguyễn Văn Huyên — Hoài Đức, Hà Nội",
+      copyright: "Trường THCS Nguyễn Văn Huyên, Hoài Đức, Hà Nội",
     },
   ],
 };
@@ -459,7 +459,8 @@ const NGT_CONFIG: LandingConfig = {
       eyebrow: "Tuyển sinh năm học 2026 - 2027",
       headline: "Trường THCS Nguyễn Gia Thiều",
       subheadline: "Tâm sáng - Chí bền - Tài năng - Sáng tạo - Hội nhập",
-      image: unsplash("1535982330050-f1c2fb79ff78"),
+      // School building photo provided by NGT (content/ngt docx, image1).
+      image: "/tenants/nguyen-gia-thieu/hero.jpg",
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
     },
@@ -467,25 +468,27 @@ const NGT_CONFIG: LandingConfig = {
       type: "stats",
       items: [
         {
-          value: "06 lớp",
+          value: "6",
           label: "Lớp chất lượng cao (35 - 40 học sinh)",
         },
         {
-          value: "02 lớp",
+          value: "2",
           label: "Lớp tích hợp quốc tế Cambridge (25 - 30 học sinh)",
         },
       ],
     },
     {
       type: "process",
-      title: "Hướng dẫn đăng ký tuyển sinh online",
+      title: "Các bước tuyển sinh online",
+      // Mirrors the real registration wizard (applicant → form → verify → done);
+      // tracking is a separate action afterwards, not a registration step.
       steps: [
         {
-          title: "Khai thông tin",
+          title: "Người khai",
           description: "Điền họ tên học sinh và thông tin người khai.",
         },
         {
-          title: "Điền hồ sơ",
+          title: "Hồ sơ",
           description: "Hoàn tất biểu mẫu và tải lên ảnh thẻ thí sinh.",
         },
         {
@@ -493,36 +496,35 @@ const NGT_CONFIG: LandingConfig = {
           description: "Nhập mã OTP gửi tới email đã đăng ký.",
         },
         {
-          title: "Nộp hồ sơ",
-          description: "Nhận mã hồ sơ để tra cứu trạng thái.",
-        },
-        {
-          title: "Theo dõi",
-          description: "Cập nhật kết quả xét tuyển theo thời gian thực.",
+          title: "Hoàn tất",
+          description: "Nhận mã hồ sơ để tra cứu trạng thái hồ sơ.",
         },
       ],
     },
     {
       type: "infoTabs",
       title: "Thông tin tuyển sinh",
-      layout: "list",
+      layout: "tabs",
       tabs: [
         {
           id: "eligibility",
           label: "Đối tượng",
+          highlight: "Sinh năm 2015 · Cư trú tại Hà Nội",
           body: "Học sinh sinh năm 2015 đã hoàn thành chương trình tiểu học, cư trú trên địa bàn Thành phố Hà Nội.",
           icon: "users",
         },
         {
           id: "schedule",
           label: "Lịch tuyển sinh",
+          highlight: "Nhận hồ sơ 05/6 → 08/6/2026",
           body: "Nhận hồ sơ trực tuyến từ ngày 05/6/2026 đến hết ngày 08/6/2026. Hỗ trợ nộp hồ sơ online với những trường hợp không nộp được trực tuyến tại nhà, địa điểm hỗ trợ tại Văn phòng trường THCS Nguyễn Gia Thiều (từ 8h00 đến 17h00 ngày 08/6/2026).",
           icon: "calendar",
         },
         {
           id: "documents",
           label: "Hồ sơ cần chuẩn bị",
-          body: "File ảnh thẻ của thí sinh.",
+          highlight: "Ảnh thẻ của thí sinh",
+          body: "Chuẩn bị sẵn file ảnh thẻ của thí sinh, tải lên khi điền hồ sơ trực tuyến.",
           icon: "fileText",
         },
       ],
@@ -576,7 +578,7 @@ const NGT_CONFIG: LandingConfig = {
           ],
         },
       ],
-      copyright: "Trường THCS Nguyễn Gia Thiều — Phúc Lợi, Hà Nội",
+      copyright: "Trường THCS Nguyễn Gia Thiều, Phúc Lợi, Hà Nội",
     },
   ],
 };
@@ -593,7 +595,7 @@ const DEFAULT_CONFIG: LandingConfig = {
   sections: [
     {
       type: "hero",
-      headline: "EduGate",
+      headline: "Ghi Danh",
       subheadline: "Nền tảng tuyển sinh đa tenant.",
       image: unsplash("1523050854058-8df90110c9f1"),
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },

@@ -54,7 +54,7 @@ async function bootstrap(): Promise<void> {
 
   if (process.env["NODE_ENV"] !== "production") {
     const swagger = new DocumentBuilder()
-      .setTitle("EduGate API")
+      .setTitle("Ghi Danh API")
       .setDescription("Multi-tenant admission platform — see specs/API_SPEC.md")
       .setVersion("v1")
       .addBearerAuth()
