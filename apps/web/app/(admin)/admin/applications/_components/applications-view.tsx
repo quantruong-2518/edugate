@@ -52,7 +52,7 @@ const PAGE_SIZES = [10, 20, 50] as const;
 
 function studentDobOf(app: Application): string {
   const dob = app.formData["dateOfBirth"];
-  if (typeof dob !== "string" || !dob) return "—";
+  if (typeof dob !== "string" || !dob) return "-";
   const d = new Date(dob);
   if (isNaN(d.getTime())) return dob;
   return DATE_FORMATTER.format(d);
@@ -340,7 +340,7 @@ export function ApplicationsView({
                       className="cursor-pointer"
                       onClick={() => openDetail(app)}
                     >
-                      <TableCell className="font-mono text-xs font-medium">
+                      <TableCell className="text-xs font-medium tabular-nums tracking-tight">
                         {app.code}
                       </TableCell>
                       <TableCell className="font-medium">

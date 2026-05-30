@@ -50,10 +50,10 @@ const DEDICATED_FIELDS = new Set([
 ]);
 
 function formatValue(value: unknown): string {
-  if (value === null || value === undefined || value === "") return "—";
+  if (value === null || value === undefined || value === "") return "-";
   if (typeof value === "number") return String(value);
   if (typeof value === "boolean") return value ? "Có" : "Không";
-  if (Array.isArray(value)) return value.length > 0 ? value.join(", ") : "—";
+  if (Array.isArray(value)) return value.length > 0 ? value.join(", ") : "-";
   return String(value);
 }
 
@@ -62,7 +62,7 @@ function formatFieldValue(
   field: FormFieldSchema | undefined,
   value: unknown,
 ): string {
-  if (value === null || value === undefined || value === "") return "—";
+  if (value === null || value === undefined || value === "") return "-";
   if (field?.type === "select" || field?.type === "radio") {
     return field.options.find((o) => o.value === value)?.label ?? String(value);
   }
@@ -71,7 +71,7 @@ function formatFieldValue(
       ? value
           .map((v) => field.options.find((o) => o.value === v)?.label ?? String(v))
           .join(", ")
-      : "—";
+      : "-";
   }
   return formatValue(value);
 }
@@ -115,7 +115,7 @@ function ScoreCell({ label, value }: { label: string; value: unknown }) {
     <div className="rounded-md bg-muted/40 px-2.5 py-2 text-center">
       <div className="text-[11px] leading-tight text-muted-foreground">{label}</div>
       <div className="mt-0.5 font-semibold tabular-nums">
-        {typeof value === "number" ? value.toFixed(1) : "—"}
+        {typeof value === "number" ? value.toFixed(1) : "-"}
       </div>
     </div>
   );
@@ -179,7 +179,7 @@ export function ApplicationDetailSheet({
 
   // Student basics
   const studentName =
-    typeof fd["studentName"] === "string" ? fd["studentName"] : "—";
+    typeof fd["studentName"] === "string" ? fd["studentName"] : "-";
   const dob =
     typeof fd["dateOfBirth"] === "string" && fd["dateOfBirth"]
       ? (() => {
@@ -188,7 +188,7 @@ export function ApplicationDetailSheet({
             ? (fd["dateOfBirth"] as string)
             : DOB_FORMATTER.format(d);
         })()
-      : "—";
+      : "-";
   const gender = fd["gender"];
   const genderLabel =
     gender === "male"
@@ -197,7 +197,7 @@ export function ApplicationDetailSheet({
         ? t("genderFemale")
         : typeof gender === "string"
           ? gender
-          : "—";
+          : "-";
 
   // Priority categories
   const priorities = Array.isArray(fd["priorityCategory"])
@@ -242,7 +242,9 @@ export function ApplicationDetailSheet({
         {/* Header */}
         <SheetHeader className="space-y-2 px-5 py-4 text-left">
           <div className="flex flex-wrap items-center gap-2">
-            <SheetTitle className="font-mono text-sm">{application.code}</SheetTitle>
+            <SheetTitle className="text-sm tabular-nums tracking-tight">
+              {application.code}
+            </SheetTitle>
             <StateBadge state={application.state} />
           </div>
           <SheetDescription className="text-xs">

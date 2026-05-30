@@ -243,7 +243,7 @@ function RangeControls({
         <span className="text-sm font-medium">{t("label")}</span>
         {resolved && (
           <span className="text-xs text-muted-foreground tabular-nums">
-            {formatDay(resolved.from, true)} – {formatDay(resolved.to, true)}
+            {formatDay(resolved.from, true)} → {formatDay(resolved.to, true)}
           </span>
         )}
       </div>
@@ -275,7 +275,7 @@ function RangeControls({
             }
             className="h-8 w-[9.5rem] text-xs"
           />
-          <span className="text-xs text-muted-foreground">–</span>
+          <span className="text-xs text-muted-foreground">→</span>
           <Input
             type="date"
             aria-label={t("to")}

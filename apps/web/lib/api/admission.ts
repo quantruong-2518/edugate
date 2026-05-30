@@ -227,7 +227,7 @@ export function applicationScore(application: Application): number | null {
 /** Student name pulled from the dynamic form data, with a safe fallback. */
 export function studentNameOf(application: Application): string {
   const name = application.formData["studentName"];
-  return typeof name === "string" ? name : "—";
+  return typeof name === "string" ? name : "-";
 }
 
 export type ApplicationSort =

@@ -59,7 +59,7 @@ export function AdminHeader({
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 border-b bg-background px-4">
       <div className="flex items-center gap-1">
         <span className="mr-2 flex size-8 shrink-0 select-none items-center justify-center rounded-md bg-[var(--brand-mark)] text-xs font-semibold text-[var(--brand-mark-foreground)]">
           {brandShort.slice(0, 3).toUpperCase()}

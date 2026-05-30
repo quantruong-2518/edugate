@@ -213,7 +213,7 @@ const PRIORITY_CATEGORIES = [
 ] as const;
 
 const SPECIAL_ACHIEVEMENTS = [
-  "Giải Nhì môn Toán cấp quận năm học 2024–2025.",
+  "Giải Nhì môn Toán cấp quận năm học 2024-2025.",
   "Giải Ba Tiếng Anh cấp thành phố; Học sinh giỏi 4 năm liền.",
   "Học sinh tiêu biểu cấp trường; Giải Nhất Toán cấp trường.",
   "Đạt danh hiệu Cháu ngoan Bác Hồ 3 năm liên tiếp.",
