@@ -13,9 +13,9 @@ export function StatsSection({ section }: { section: StatsSection }) {
         {section.items.map((item) => (
           <div
             key={item.label}
-            className="flex items-center gap-5 rounded-3xl bg-gradient-to-br from-card to-muted/40 p-6 sm:p-7"
+            className="flex items-center gap-5 rounded-3xl bg-linear-to-br from-card to-muted/40 p-6 sm:p-7"
           >
-            <span className="shrink-0 bg-gradient-to-br from-primary to-primary/50 bg-clip-text text-5xl font-bold leading-none tracking-tight text-transparent sm:text-6xl">
+            <span className="shrink-0 bg-linear-to-br from-primary to-primary/50 bg-clip-text text-5xl font-bold leading-none tracking-tight text-transparent sm:text-6xl">
               {item.value}
             </span>
             <span className="text-sm font-medium leading-snug text-muted-foreground sm:text-base">
