@@ -3,7 +3,7 @@ import type { LandingConfig, LandingSection } from "@shared/landing";
 /**
  * Per-tenant landing page configuration. Pha 1 returns static fixtures; task 15
  * swaps the body for a real fetch keeping this signature. Section content is
- * data (editable per tenant via task 17), so it is plain VI text here — not
+ * data (editable per tenant via task 17), so it is plain VI text here, not
  * next-intl keys. Render order follows the array order.
  *
  * Images are Unsplash URLs (mock content). Pha 2 tenants upload their own.
@@ -21,7 +21,7 @@ const CVA_CONFIG: LandingConfig = {
       eyebrow: "Tuyển sinh năm học 2026 - 2027",
       headline: "Đăng ký tuyển sinh trực tuyến",
       subheadline:
-        "Nộp hồ sơ và theo dõi kết quả mọi lúc, mọi nơi — không cần đến trường. Quy trình minh bạch, kết quả thời gian thực.",
+        "Nộp và theo dõi hồ sơ trực tuyến mọi lúc, mọi nơi. Minh bạch, kết quả thời gian thực.",
       image: unsplash("1503676260728-1c00da094a0b"),
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
@@ -167,7 +167,7 @@ const TDN_CONFIG: LandingConfig = {
       image: unsplash("1541339907198-e08756dedf3f", 1200),
     },
     {
-      // Unknown to this FE build — renderer must skip + warn, not crash.
+      // Unknown to this FE build, renderer must skip + warn, not crash.
       type: "gallery",
       images: [],
     } as unknown as LandingSection,
@@ -202,10 +202,10 @@ const NHT_CONFIG: LandingConfig = {
   sections: [
     {
       type: "hero",
-      eyebrow: "Tuyển sinh lớp 6 — Năm học 2026 - 2027",
+      eyebrow: "Tuyển sinh lớp 6, Năm học 2026 - 2027",
       headline: "THCS Nguyễn Huy Tưởng",
       subheadline:
-        "Ngôi trường giàu truyền thống tại Đông Anh, Hà Nội — nơi ươm mầm tri thức và nuôi dưỡng nhân cách cho thế hệ tương lai.",
+        "Ngôi trường giàu truyền thống tại Đông Anh, Hà Nội, ươm mầm tri thức và nuôi dưỡng nhân cách.",
       image: unsplash("1509062522246-3755977927d7"),
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
@@ -320,7 +320,7 @@ const NHT_CONFIG: LandingConfig = {
           ],
         },
       ],
-      copyright: "Trường THCS Nguyễn Huy Tưởng — Đông Anh, Hà Nội",
+      copyright: "Trường THCS Nguyễn Huy Tưởng, Đông Anh, Hà Nội",
     },
   ],
 };
@@ -329,10 +329,10 @@ const NVH_CONFIG: LandingConfig = {
   sections: [
     {
       type: "hero",
-      eyebrow: "Tuyển sinh lớp 6 — Năm học 2026 - 2027",
+      eyebrow: "Tuyển sinh lớp 6, Năm học 2026 - 2027",
       headline: "THCS Nguyễn Văn Huyên",
       subheadline:
-        "Trường học hạnh phúc — nơi mỗi học sinh được yêu thương, tôn trọng và phát triển trọn vẹn cả tài lẫn đức.",
+        "Trường học hạnh phúc, nơi mỗi học sinh được yêu thương, tôn trọng và phát triển trọn vẹn.",
       image: unsplash("1580582932707-520aed937b7b"),
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
@@ -348,8 +348,8 @@ const NVH_CONFIG: LandingConfig = {
     },
     {
       type: "about",
-      title: "Lời ngỏ của Cô Hương — Hiệu trưởng",
-      body: "Tại Trường THCS Nguyễn Văn Huyên (Hoài Đức, Hà Nội), chúng tôi xây dựng một 'Trường học Hạnh phúc' — nơi học sinh đến trường mỗi ngày là một niềm vui. Với đội ngũ 38 giáo viên đều đạt trình độ đại học, tận tâm và giàu chuyên môn, nhà trường cam kết đồng hành cùng từng em trên hành trình trưởng thành về cả trí tuệ lẫn nhân cách.",
+      title: "Lời ngỏ của Cô Hương, Hiệu trưởng",
+      body: "Tại Trường THCS Nguyễn Văn Huyên (Hoài Đức, Hà Nội), chúng tôi xây dựng một 'Trường học Hạnh phúc', nơi học sinh đến trường mỗi ngày là một niềm vui. Với đội ngũ 38 giáo viên đều đạt trình độ đại học, tận tâm và giàu chuyên môn, nhà trường cam kết đồng hành cùng từng em trên hành trình trưởng thành về cả trí tuệ lẫn nhân cách.",
       image: unsplash("1577896851231-70ef18881754", 1200),
     },
     {
@@ -411,7 +411,7 @@ const NVH_CONFIG: LandingConfig = {
         {
           question: "'Trường học hạnh phúc' nghĩa là gì?",
           answer:
-            "Là mô hình giáo dục lấy học sinh làm trung tâm, đề cao sự an toàn, yêu thương và tôn trọng — giúp các em chủ động, tự tin và hạnh phúc khi đến trường.",
+            "Là mô hình giáo dục lấy học sinh làm trung tâm, đề cao sự an toàn, yêu thương và tôn trọng, giúp các em chủ động, tự tin và hạnh phúc khi đến trường.",
         },
         {
           question: "Trường có nhận học sinh trái tuyến không?",
@@ -447,7 +447,7 @@ const NVH_CONFIG: LandingConfig = {
           ],
         },
       ],
-      copyright: "Trường THCS Nguyễn Văn Huyên — Hoài Đức, Hà Nội",
+      copyright: "Trường THCS Nguyễn Văn Huyên, Hoài Đức, Hà Nội",
     },
   ],
 };
@@ -576,7 +576,7 @@ const NGT_CONFIG: LandingConfig = {
           ],
         },
       ],
-      copyright: "Trường THCS Nguyễn Gia Thiều — Phúc Lợi, Hà Nội",
+      copyright: "Trường THCS Nguyễn Gia Thiều, Phúc Lợi, Hà Nội",
     },
   ],
 };

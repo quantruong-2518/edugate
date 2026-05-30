@@ -11,8 +11,6 @@ import {
 import type { InfoTabIcon, InfoTabsSection } from "@shared/landing";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 
-import { Reveal } from "./reveal";
-
 const ICONS: Record<InfoTabIcon, LucideIcon> = {
   users: Users,
   calendar: Calendar,
@@ -29,23 +27,19 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
   const layout = section.layout ?? "tabs";
 
   return (
-    <section className="relative isolate overflow-hidden px-4 py-16 sm:px-6 sm:py-24">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[120px]" />
-      <Reveal className="mx-auto max-w-3xl">
+    <section className="px-4 py-16 sm:px-6 sm:py-24">
+      <div className="mx-auto max-w-3xl">
         {section.title && (
           <h2 className="mb-8 text-center text-3xl font-semibold tracking-tight sm:mb-10 sm:text-4xl">
             {section.title}
           </h2>
         )}
         {layout === "list" ? (
-          <ul className="divide-y divide-border/60 overflow-hidden rounded-3xl bg-card/70 shadow-sm ring-1 ring-border/40 backdrop-blur">
+          <ul className="divide-y divide-border overflow-hidden rounded-3xl border border-border bg-card">
             {section.tabs.map((tab) => {
               const Icon = tab.icon ? ICONS[tab.icon] : Info;
               return (
-                <li
-                  key={tab.id}
-                  className="flex gap-4 p-6 sm:gap-5 sm:p-7"
-                >
+                <li key={tab.id} className="flex gap-4 p-6 sm:gap-5 sm:p-7">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                     <Icon className="size-5" aria-hidden />
                   </span>
@@ -63,7 +57,7 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
           </ul>
         ) : (
           <Tabs defaultValue={firstTab.id} className="gap-5">
-            <TabsList className="mx-auto h-auto w-full max-w-md flex-wrap bg-card/70 shadow-sm ring-1 ring-border/40 backdrop-blur sm:w-fit sm:flex-nowrap">
+            <TabsList className="mx-auto h-auto w-full max-w-md flex-wrap border border-border bg-card sm:w-fit sm:flex-nowrap">
               {section.tabs.map((tab) => (
                 <TabsTrigger key={tab.id} value={tab.id}>
                   {tab.label}
@@ -74,14 +68,14 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
               <TabsContent
                 key={tab.id}
                 value={tab.id}
-                className="rounded-3xl bg-card/70 p-6 text-[15px] leading-relaxed text-muted-foreground shadow-sm ring-1 ring-border/40 backdrop-blur sm:p-8"
+                className="rounded-3xl border border-border bg-card p-6 text-[15px] leading-relaxed text-muted-foreground sm:p-8"
               >
                 {tab.body}
               </TabsContent>
             ))}
           </Tabs>
         )}
-      </Reveal>
+      </div>
     </section>
   );
 }

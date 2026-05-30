@@ -118,6 +118,7 @@
   },
   "track": {
     "title": "Track application",
+    "subtitle": "Enter your application code to see review status in real time.",
     "codeLabel": "Application code",
     "codePlaceholder": "Enter application code",
     "search": "Track",
@@ -251,7 +252,7 @@
     "hero": {
       "eyebrow": "SaaS platform for schools",
       "headline": "Digitise admissions & operations for your school",
-      "subheadline": "EduGate gives every school its own online admissions portal — own branding, isolated data, live in a day. Grow into HR, fees and learning when you need them.",
+      "subheadline": "Give every school its own admissions portal: own branding, isolated data, live in a day.",
       "ctaPrimary": "Book a demo",
       "ctaSecondary": "See a sample portal"
     },
@@ -259,9 +260,27 @@
       "title": "Schools running on EduGate",
       "viewDemo": "View portal"
     },
+    "trust": {
+      "title": "Your school's data, hosted in Vietnam",
+      "body": "Every student record is stored and processed on infrastructure located in Vietnam, isolated per school at the database layer. No cross-sharing, nothing stored offshore.",
+      "items": {
+        "residency": {
+          "title": "Hosted in Vietnam",
+          "desc": "All data stays in-country, meeting data-sovereignty requirements."
+        },
+        "isolation": {
+          "title": "Per-school isolation",
+          "desc": "Postgres Row-Level Security separates each tenant at the lowest layer."
+        },
+        "audit": {
+          "title": "Audit trail",
+          "desc": "Every admin action is logged and traceable."
+        }
+      }
+    },
     "features": {
       "title": "Everything a school needs to enrol online",
-      "subtitle": "A production-ready multi-tenant platform — you just configure it.",
+      "subtitle": "A production-ready multi-tenant platform, you just configure it.",
       "items": {
         "multiTenant": {
           "title": "Many schools, one platform",
@@ -273,18 +292,18 @@
         },
         "formBuilder": {
           "title": "Customisable forms",
-          "desc": "Build admission forms from a JSON schema — no coding required."
+          "desc": "Build admission forms from a JSON schema, no coding required."
         },
         "theming": {
           "title": "Per-school branding",
-          "desc": "Logo, colours, landing content — changed instantly, no redeploy."
+          "desc": "Logo, colours, landing content, changed instantly, no redeploy."
         },
         "tracking": {
           "title": "Real-time application tracking",
           "desc": "Parents check status anytime; schools review along a clear workflow."
         },
         "i18n": {
-          "title": "Vietnamese – English",
+          "title": "Vietnamese - English",
           "desc": "A bilingual interface ready for international schools too."
         }
       }
@@ -417,7 +436,7 @@
         "pageSize": "Rows",
         "prev": "Prev",
         "next": "Next",
-        "range": "{from}–{to} of {total}",
+        "range": "{from}-{to} of {total}",
         "page": "Page {page}"
       },
       "empty": {
@@ -449,7 +468,7 @@
         "otherInfo": "Other information",
         "timeline": "Status history",
         "actions": "Actions",
-        "noValue": "—"
+        "noValue": "-"
       },
       "relationships": {
         "father": "Father",
@@ -512,7 +531,7 @@
       "reset": "Reset to default",
       "saved": "Changes saved.",
       "resetDone": "Reverted to the original configuration.",
-      "invalid": "Configuration is invalid — please check the required fields.",
+      "invalid": "Configuration is invalid, please check the required fields.",
       "previewTitle": "Preview",
       "previewNote": "Updates live · Pha 1 stores locally in your browser",
       "tabs": {

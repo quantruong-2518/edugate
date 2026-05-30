@@ -8,8 +8,10 @@ import {
   HeartHandshake,
   Languages,
   ListChecks,
+  MapPin,
   Palette,
   Receipt,
+  ScrollText,
   ShieldCheck,
   Users,
   type LucideIcon,
@@ -18,7 +20,6 @@ import type { Route } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
-import { Reveal } from "@/components/landing/reveal";
 import { TENANT_FIXTURES } from "@/lib/tenants/fixtures";
 import { Button } from "@ui/components/button";
 import { cn } from "@ui/lib/utils";
@@ -30,23 +31,19 @@ export async function Hero() {
 
   return (
     <section className="relative isolate overflow-hidden">
-      <div className="pointer-events-none absolute -left-24 top-0 -z-10 size-72 rounded-full bg-primary/25 blur-[100px]" />
-      <div className="pointer-events-none absolute -right-20 top-10 -z-10 size-80 rounded-full bg-primary/15 blur-[110px]" />
-      <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-20 text-center sm:px-6 sm:py-28 lg:py-36">
-        <Reveal>
-          <p className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary ring-1 ring-primary/15">
-            <span className="size-1.5 rounded-full bg-primary" />
-            {t("eyebrow")}
-          </p>
-          <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl">
-            {t("headline")}
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            {t("subheadline")}
-          </p>
-        </Reveal>
-        <Reveal delay={120} className="mt-10 flex flex-wrap justify-center gap-3">
-          <Button asChild size="lg" className="group gap-2 shadow-lg shadow-primary/20">
+      <div className="pointer-events-none absolute -left-24 top-0 -z-10 size-72 rounded-full bg-primary/20 blur-[110px]" />
+      <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-16 text-center sm:px-6 sm:py-20 lg:py-24">
+        <p className="mb-6 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-medium text-primary">
+          {t("eyebrow")}
+        </p>
+        <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl">
+          {t("headline")}
+        </h1>
+        <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
+          {t("subheadline")}
+        </p>
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
+          <Button asChild size="lg" className="group gap-2">
             <a href={CONTACT_HREF}>
               {t("ctaPrimary")}
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -55,7 +52,7 @@ export async function Hero() {
           <Button asChild size="lg" variant="outline">
             <Link href={DEMO_PATH as Route}>{t("ctaSecondary")}</Link>
           </Button>
-        </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -68,40 +65,79 @@ export async function Proof() {
   return (
     <section className="px-4 py-12 sm:px-6 sm:py-16">
       <div className="mx-auto max-w-5xl">
-        <Reveal>
-          <p className="text-center text-sm font-medium uppercase tracking-wide text-muted-foreground">
-            {t("title")}
-          </p>
-        </Reveal>
+        <p className="text-center text-sm font-medium text-muted-foreground">
+          {t("title")}
+        </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          {schools.map((school, index) => (
-            <Reveal key={school.code} delay={index * 80}>
-              <Link
-                href={`/t/${school.code}` as Route}
-                className="group flex h-full items-center gap-3 rounded-2xl bg-card/70 p-4 ring-1 ring-border/40 backdrop-blur transition-all hover:-translate-y-0.5 hover:ring-primary/30"
+          {schools.map((school) => (
+            <Link
+              key={school.code}
+              href={`/t/${school.code}` as Route}
+              className="group flex h-full items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
+            >
+              <span
+                className="flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold"
+                // Each school's own brand colour — a live demonstration of the
+                // per-tenant theming the platform sells.
+                style={{
+                  backgroundColor: school.theme.light.primary,
+                  color: school.theme.light.primaryForeground,
+                }}
               >
-                <span
-                  className="flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold"
-                  // Each school's own brand colour — a live demonstration of the
-                  // per-tenant theming the platform sells.
-                  style={{
-                    backgroundColor: school.theme.light.primary,
-                    color: school.theme.light.primaryForeground,
-                  }}
-                >
-                  {school.shortName.slice(0, 3)}
+                {school.shortName.slice(0, 3)}
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-medium">
+                  {school.name}
                 </span>
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-medium">
-                    {school.name}
-                  </span>
-                  <span className="block text-xs text-muted-foreground transition-colors group-hover:text-primary">
-                    {t("viewDemo")} →
-                  </span>
+                <span className="block text-xs text-muted-foreground transition-colors group-hover:text-primary">
+                  {t("viewDemo")} →
                 </span>
-              </Link>
-            </Reveal>
+              </span>
+            </Link>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const TRUST_ITEMS: readonly { key: string; Icon: LucideIcon }[] = [
+  { key: "residency", Icon: MapPin },
+  { key: "isolation", Icon: ShieldCheck },
+  { key: "audit", Icon: ScrollText },
+];
+
+export async function Trust() {
+  const t = await getTranslations("marketing.trust");
+
+  return (
+    <section className="px-4 py-16 sm:px-6 sm:py-24">
+      <div className="mx-auto max-w-6xl rounded-[2rem] border border-border bg-card p-8 sm:p-12">
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="lg:py-2">
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              {t("title")}
+            </h2>
+            <p className="mt-5 text-pretty leading-relaxed text-muted-foreground">
+              {t("body")}
+            </p>
+          </div>
+          <ul className="space-y-5">
+            {TRUST_ITEMS.map(({ key, Icon }) => (
+              <li key={key} className="flex gap-4">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <Icon className="size-5" aria-hidden />
+                </span>
+                <div>
+                  <h3 className="font-semibold">{t(`items.${key}.title`)}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    {t(`items.${key}.desc`)}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
@@ -122,30 +158,29 @@ export async function Features() {
 
   return (
     <section id="features" className="scroll-mt-20 px-4 py-16 sm:px-6 sm:py-24">
-      <div className="mx-auto max-w-6xl">
-        <Reveal>
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              {t("title")}
-            </h2>
-            <p className="mt-4 text-pretty text-muted-foreground">
-              {t("subtitle")}
-            </p>
-          </div>
-        </Reveal>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURE_ITEMS.map(({ key, Icon }, index) => (
-            <Reveal key={key} delay={index * 70}>
-              <div className="h-full rounded-3xl bg-card/70 p-6 ring-1 ring-border/40 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:ring-primary/30">
-                <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <Icon className="size-5" />
-                </span>
-                <h3 className="mt-4 font-semibold">{t(`items.${key}.title`)}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                  {t(`items.${key}.desc`)}
-                </p>
-              </div>
-            </Reveal>
+      <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            {t("title")}
+          </h2>
+          <p className="mt-4 text-pretty text-muted-foreground">
+            {t("subtitle")}
+          </p>
+        </div>
+        <div className="mt-12 grid gap-5 sm:grid-cols-2">
+          {FEATURE_ITEMS.map(({ key, Icon }) => (
+            <div
+              key={key}
+              className="h-full rounded-3xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
+            >
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Icon className="size-5" />
+              </span>
+              <h3 className="mt-4 font-semibold">{t(`items.${key}.title`)}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                {t(`items.${key}.desc`)}
+              </p>
+            </div>
           ))}
         </div>
       </div>
@@ -169,27 +204,31 @@ export async function Modules() {
   return (
     <section
       id="modules"
-      className="scroll-mt-20 bg-muted/30 px-4 py-16 sm:px-6 sm:py-24"
+      className="scroll-mt-20 bg-muted/40 px-4 py-16 sm:px-6 sm:py-24"
     >
-      <div className="mx-auto max-w-6xl">
-        <Reveal>
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              {t("title")}
-            </h2>
-            <p className="mt-4 text-pretty text-muted-foreground">
-              {t("subtitle")}
-            </p>
-          </div>
-        </Reveal>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {MODULE_ITEMS.map(({ key, Icon, live }, index) => (
-            <Reveal key={key} delay={index * 70}>
-              <div className="h-full rounded-3xl bg-card/70 p-6 ring-1 ring-border/40 backdrop-blur">
-                <div className="flex items-center justify-between">
-                  <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                    <Icon className="size-5" />
-                  </span>
+      <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            {t("title")}
+          </h2>
+          <p className="mt-4 text-pretty text-muted-foreground">
+            {t("subtitle")}
+          </p>
+        </div>
+        {/* 2-col card grid, not a long <ul> divide-y: tasteskill bans the
+            divide-y list pattern for lists over 5 items, and Modules has 6. */}
+        <ul className="mt-10 grid gap-5 sm:grid-cols-2">
+          {MODULE_ITEMS.map(({ key, Icon, live }) => (
+            <li
+              key={key}
+              className="flex items-start gap-4 rounded-3xl border border-border bg-card p-5 sm:p-6"
+            >
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Icon className="size-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                  <h3 className="font-semibold">{t(`items.${key}.name`)}</h3>
                   <span
                     className={cn(
                       "rounded-full px-2.5 py-0.5 text-xs font-medium",
@@ -201,14 +240,13 @@ export async function Modules() {
                     {live ? t("live") : t("comingSoon")}
                   </span>
                 </div>
-                <h3 className="mt-4 font-semibold">{t(`items.${key}.name`)}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">
                   {t(`items.${key}.desc`)}
                 </p>
               </div>
-            </Reveal>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
@@ -222,31 +260,34 @@ export async function Steps() {
   return (
     <section className="px-4 py-16 sm:px-6 sm:py-24">
       <div className="mx-auto max-w-5xl">
-        <Reveal>
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              {t("title")}
-            </h2>
-            <p className="mt-4 text-pretty text-muted-foreground">
-              {t("subtitle")}
-            </p>
-          </div>
-        </Reveal>
-        <ol className="mt-12 grid gap-5 sm:grid-cols-3">
-          {STEP_KEYS.map((key, index) => (
-            <Reveal key={key} delay={index * 80}>
-              <li className="h-full rounded-3xl bg-card/70 p-6 ring-1 ring-border/40 backdrop-blur">
-                <span className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-base font-bold text-primary-foreground shadow-md shadow-primary/20">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            {t("title")}
+          </h2>
+          <p className="mt-4 text-pretty text-muted-foreground">
+            {t("subtitle")}
+          </p>
+        </div>
+        {/* Horizontal connected timeline — a third distinct layout family. */}
+        <div className="relative mt-14">
+          <div
+            className="absolute inset-x-0 top-7 hidden h-px bg-border sm:block"
+            aria-hidden
+          />
+          <ol className="relative grid gap-10 sm:grid-cols-3 sm:gap-8">
+            {STEP_KEYS.map((key, index) => (
+              <li key={key} className="text-center">
+                <span className="mx-auto flex size-14 items-center justify-center rounded-full border border-border bg-background text-lg font-bold text-primary">
                   {index + 1}
                 </span>
                 <h3 className="mt-4 font-semibold">{t(`items.${key}.title`)}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                <p className="mx-auto mt-1.5 max-w-xs text-sm leading-relaxed text-muted-foreground">
                   {t(`items.${key}.desc`)}
                 </p>
               </li>
-            </Reveal>
-          ))}
-        </ol>
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
   );
@@ -257,9 +298,8 @@ export async function Cta() {
 
   return (
     <section id="cta" className="px-4 py-16 sm:px-6 sm:py-24">
-      <Reveal className="mx-auto max-w-5xl">
-        <div className="relative isolate overflow-hidden rounded-[2rem] bg-primary px-6 py-16 text-center text-primary-foreground sm:px-12 sm:py-20">
-          <div className="pointer-events-none absolute -right-10 -top-10 -z-10 size-60 rounded-full bg-primary-foreground/10 blur-3xl" />
+      <div className="mx-auto max-w-5xl">
+        <div className="rounded-[2rem] bg-primary px-6 py-16 text-center text-primary-foreground sm:px-12 sm:py-20">
           <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
             {t("title")}
           </h2>
@@ -272,7 +312,7 @@ export async function Cta() {
             </Button>
           </div>
         </div>
-      </Reveal>
+      </div>
     </section>
   );
 }

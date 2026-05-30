@@ -2,7 +2,15 @@ import type { CSSProperties } from "react";
 
 import { MarketingFooter } from "./marketing-footer";
 import { MarketingHeader } from "./marketing-header";
-import { Cta, Features, Hero, Modules, Proof, Steps } from "./marketing-sections";
+import {
+  Cta,
+  Features,
+  Hero,
+  Modules,
+  Proof,
+  Steps,
+  Trust,
+} from "./marketing-sections";
 
 /**
  * The EduGate product marketing site — served at the root host (no tenant
@@ -27,6 +35,7 @@ export function MarketingHome() {
       <main>
         <Hero />
         <Proof />
+        <Trust />
         <Features />
         <Modules />
         <Steps />

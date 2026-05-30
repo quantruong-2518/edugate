@@ -118,6 +118,7 @@
   },
   "track": {
     "title": "Tra cứu hồ sơ",
+    "subtitle": "Nhập mã hồ sơ để xem trạng thái xét duyệt theo thời gian thực.",
     "codeLabel": "Mã hồ sơ",
     "codePlaceholder": "Nhập mã hồ sơ",
     "search": "Tra cứu",
@@ -213,7 +214,7 @@
     "hero": {
       "eyebrow": "Nền tảng SaaS cho trường học",
       "headline": "Số hóa tuyển sinh & quản lý cho trường học",
-      "subheadline": "EduGate cho mỗi trường một cổng tuyển sinh trực tuyến riêng — thương hiệu riêng, dữ liệu cách ly, triển khai trong một ngày. Mở rộng dần sang nhân sự, học phí, học tập khi cần.",
+      "subheadline": "Trao mỗi trường một cổng tuyển sinh riêng: thương hiệu riêng, dữ liệu cách ly, lên sóng trong ngày.",
       "ctaPrimary": "Đặt lịch demo",
       "ctaSecondary": "Xem cổng tuyển sinh mẫu"
     },
@@ -221,9 +222,27 @@
       "title": "Các trường đang dùng EduGate",
       "viewDemo": "Xem cổng tuyển sinh"
     },
+    "trust": {
+      "title": "Dữ liệu trường bạn, đặt tại Việt Nam",
+      "body": "Mọi hồ sơ học sinh được lưu và xử lý trên hạ tầng đặt tại Việt Nam, cách ly theo từng trường ngay ở tầng cơ sở dữ liệu. Không chia sẻ chéo, không lưu ngoài lãnh thổ.",
+      "items": {
+        "residency": {
+          "title": "Lưu trữ tại Việt Nam",
+          "desc": "Toàn bộ dữ liệu nằm trong nước, đúng yêu cầu chủ quyền dữ liệu."
+        },
+        "isolation": {
+          "title": "Cách ly theo trường",
+          "desc": "Postgres Row-Level Security tách dữ liệu từng tenant ở tầng thấp nhất."
+        },
+        "audit": {
+          "title": "Ghi vết kiểm toán",
+          "desc": "Mọi thao tác quản trị đều được lưu nhật ký, truy vết được."
+        }
+      }
+    },
     "features": {
       "title": "Mọi thứ một trường cần để tuyển sinh trực tuyến",
-      "subtitle": "Hạ tầng đa tenant sẵn sàng vận hành — bạn chỉ việc cấu hình.",
+      "subtitle": "Hạ tầng đa tenant sẵn sàng vận hành, bạn chỉ việc cấu hình.",
       "items": {
         "multiTenant": {
           "title": "Đa trường, một nền tảng",
@@ -239,14 +258,14 @@
         },
         "theming": {
           "title": "Thương hiệu riêng từng trường",
-          "desc": "Logo, màu sắc, nội dung landing — đổi tức thì, không cần deploy lại."
+          "desc": "Logo, màu sắc, nội dung landing, đổi tức thì, không cần deploy lại."
         },
         "tracking": {
           "title": "Theo dõi hồ sơ thời gian thực",
           "desc": "Phụ huynh tra cứu trạng thái mọi lúc; nhà trường duyệt theo quy trình."
         },
         "i18n": {
-          "title": "Song ngữ Việt – Anh",
+          "title": "Song ngữ Việt - Anh",
           "desc": "Giao diện đa ngôn ngữ sẵn sàng cho cả trường quốc tế."
         }
       }
@@ -379,7 +398,7 @@
         "pageSize": "Số dòng",
         "prev": "Trước",
         "next": "Sau",
-        "range": "{from}–{to} trên {total}",
+        "range": "{from}-{to} trên {total}",
         "page": "Trang {page}"
       },
       "empty": {
@@ -411,7 +430,7 @@
         "otherInfo": "Thông tin khác",
         "timeline": "Lịch sử trạng thái",
         "actions": "Hành động",
-        "noValue": "—"
+        "noValue": "-"
       },
       "relationships": {
         "father": "Bố",
