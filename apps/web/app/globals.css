@@ -68,14 +68,16 @@
 
 /*
  * Admin console palette — neutral/minimal, independent of the per-tenant brand
- * color. The tenant theme is injected on :root; scoping these vars on the
- * .admin-neutral subtree overrides primary/ring back to neutral so the admin
- * stays a quiet work tool (ADR-013 scope). Public/applicant pages keep brand.
+ * color. The tenant theme is injected on :root in the <body> (after this file)
+ * so it would win at equal specificity; `!important` pins primary/ring neutral
+ * regardless, keeping the admin a quiet work tool (ADR-013) on ANY host —
+ * including a tenant subdomain. Public/applicant pages keep the brand. The
+ * brand mark is the one exception, via its own --brand-mark token below.
  */
 .admin-neutral {
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --ring: oklch(0.708 0 0);
+  --primary: oklch(0.205 0 0) !important;
+  --primary-foreground: oklch(0.985 0 0) !important;
+  --ring: oklch(0.708 0 0) !important;
   /*
    * Per-school accent, scoped to the brand mark (the logo square) only — the
    * one branded element in an otherwise neutral admin. Defaults to the neutral
@@ -88,9 +90,9 @@
 }
 
 .dark .admin-neutral {
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --ring: oklch(0.556 0 0);
+  --primary: oklch(0.922 0 0) !important;
+  --primary-foreground: oklch(0.205 0 0) !important;
+  --ring: oklch(0.556 0 0) !important;
   --brand-mark: oklch(0.922 0 0);
   --brand-mark-foreground: oklch(0.205 0 0);
 }

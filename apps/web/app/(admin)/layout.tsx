@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
 
@@ -27,6 +28,22 @@ function brandMarkCss(theme: TenantTheme): string {
     `.dark .admin-neutral{--brand-mark:${theme.dark.primary};`,
     `--brand-mark-foreground:${theme.dark.primaryForeground};}`,
   ].join("");
+}
+
+/**
+ * Admin <title> follows the authenticated tenant (cookie slug), not the request
+ * host — the root layout's metadata is host-driven and falls back to "EduGate"
+ * when the admin is served on a host that carries no tenant. Falls back to the
+ * host tenant pre-auth (the gate), then to the default.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const jar = await cookies();
+  const slug = jar.get(ADMIN_COOKIE)?.value;
+  const authedSlug = slug && isValidTenantCode(slug) ? slug : null;
+  const branding = await getTenantBranding(authedSlug ?? (await getTenantCode()));
+  // `absolute` ignores the root layout's host-driven "%s · EduGate" template so
+  // the tab shows just the authenticated school.
+  return { title: { absolute: branding.name } };
 }
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
