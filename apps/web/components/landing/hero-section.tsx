@@ -29,7 +29,7 @@ export function HeroSection({ section }: { section: HeroSection }) {
 
       <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-16 text-center sm:px-6 sm:py-20 lg:py-24">
         {section.eyebrow && (
-          <p className="mb-6 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-medium text-primary">
+          <p className="mb-6 rounded-full bg-gradient-to-r from-primary/15 to-primary/5 px-4 py-1.5 text-sm font-medium text-primary">
             {section.eyebrow}
           </p>
         )}
@@ -37,7 +37,7 @@ export function HeroSection({ section }: { section: HeroSection }) {
           {section.headline}
         </h1>
         {section.subheadline && (
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
+          <p className="mx-auto mt-6 max-w-2xl text-pretty bg-gradient-to-r from-primary via-foreground to-foreground bg-clip-text text-xl font-semibold leading-snug tracking-tight text-transparent sm:text-2xl">
             {section.subheadline}
           </p>
         )}

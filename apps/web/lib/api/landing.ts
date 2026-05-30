@@ -459,7 +459,8 @@ const NGT_CONFIG: LandingConfig = {
       eyebrow: "Tuyển sinh năm học 2026 - 2027",
       headline: "Trường THCS Nguyễn Gia Thiều",
       subheadline: "Tâm sáng - Chí bền - Tài năng - Sáng tạo - Hội nhập",
-      image: unsplash("1535982330050-f1c2fb79ff78"),
+      // School building photo provided by NGT (content/ngt docx, image1).
+      image: "/tenants/nguyen-gia-thieu/hero.jpg",
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
     },
@@ -467,25 +468,27 @@ const NGT_CONFIG: LandingConfig = {
       type: "stats",
       items: [
         {
-          value: "06 lớp",
+          value: "6",
           label: "Lớp chất lượng cao (35 - 40 học sinh)",
         },
         {
-          value: "02 lớp",
+          value: "2",
           label: "Lớp tích hợp quốc tế Cambridge (25 - 30 học sinh)",
         },
       ],
     },
     {
       type: "process",
-      title: "Hướng dẫn đăng ký tuyển sinh online",
+      title: "Các bước tuyển sinh online",
+      // Mirrors the real registration wizard (applicant → form → verify → done);
+      // tracking is a separate action afterwards, not a registration step.
       steps: [
         {
-          title: "Khai thông tin",
+          title: "Người khai",
           description: "Điền họ tên học sinh và thông tin người khai.",
         },
         {
-          title: "Điền hồ sơ",
+          title: "Hồ sơ",
           description: "Hoàn tất biểu mẫu và tải lên ảnh thẻ thí sinh.",
         },
         {
@@ -493,36 +496,35 @@ const NGT_CONFIG: LandingConfig = {
           description: "Nhập mã OTP gửi tới email đã đăng ký.",
         },
         {
-          title: "Nộp hồ sơ",
-          description: "Nhận mã hồ sơ để tra cứu trạng thái.",
-        },
-        {
-          title: "Theo dõi",
-          description: "Cập nhật kết quả xét tuyển theo thời gian thực.",
+          title: "Hoàn tất",
+          description: "Nhận mã hồ sơ để tra cứu trạng thái hồ sơ.",
         },
       ],
     },
     {
       type: "infoTabs",
       title: "Thông tin tuyển sinh",
-      layout: "list",
+      layout: "tabs",
       tabs: [
         {
           id: "eligibility",
           label: "Đối tượng",
+          highlight: "Sinh năm 2015 · Cư trú tại Hà Nội",
           body: "Học sinh sinh năm 2015 đã hoàn thành chương trình tiểu học, cư trú trên địa bàn Thành phố Hà Nội.",
           icon: "users",
         },
         {
           id: "schedule",
           label: "Lịch tuyển sinh",
+          highlight: "Nhận hồ sơ 05/6 → 08/6/2026",
           body: "Nhận hồ sơ trực tuyến từ ngày 05/6/2026 đến hết ngày 08/6/2026. Hỗ trợ nộp hồ sơ online với những trường hợp không nộp được trực tuyến tại nhà, địa điểm hỗ trợ tại Văn phòng trường THCS Nguyễn Gia Thiều (từ 8h00 đến 17h00 ngày 08/6/2026).",
           icon: "calendar",
         },
         {
           id: "documents",
           label: "Hồ sơ cần chuẩn bị",
-          body: "File ảnh thẻ của thí sinh.",
+          highlight: "Ảnh thẻ của thí sinh",
+          body: "Chuẩn bị sẵn file ảnh thẻ của thí sinh, tải lên khi điền hồ sơ trực tuyến.",
           icon: "fileText",
         },
       ],

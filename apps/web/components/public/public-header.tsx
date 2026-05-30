@@ -3,7 +3,6 @@ import type { Route } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
-import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
 import { getTenantBranding, getTenantCode } from "@/lib/tenants/branding";
 
 /**
@@ -51,23 +50,20 @@ export async function PublicHeader() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          <nav className="flex items-center">
-            <Link
-              href={"/register" as Route}
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:px-3"
-            >
-              {t("register")}
-            </Link>
-            <Link
-              href={"/track" as Route}
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:px-3"
-            >
-              {t("track")}
-            </Link>
-          </nav>
-          <LocaleSwitcher />
-        </div>
+        <nav className="flex items-center gap-1 sm:gap-2">
+          <Link
+            href={"/register" as Route}
+            className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:px-3"
+          >
+            {t("register")}
+          </Link>
+          <Link
+            href={"/track" as Route}
+            className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:px-3"
+          >
+            {t("track")}
+          </Link>
+        </nav>
       </div>
     </header>
   );

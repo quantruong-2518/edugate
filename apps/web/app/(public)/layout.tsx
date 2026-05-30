@@ -8,9 +8,8 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       {/*
         The per-tenant header renders only when a tenant is resolved (landing /
         register / track). The root marketing site resolves no tenant, so it
-        falls through to its own <MarketingHeader>. This also replaces the old
-        floating locale switcher (a "locale strip"), folding language selection
-        into a real one-line header.
+        falls through to its own <MarketingHeader>. The applicant surfaces are
+        VI-only, so the header carries no locale switcher.
       */}
       <PublicHeader />
       {children}
