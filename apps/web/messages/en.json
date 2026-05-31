@@ -108,8 +108,12 @@
     },
     "confirmation": {
       "title": "Application submitted",
-      "greeting": "Thank you, {name}, for your application!",
+      "greeting": "Thank you, <hl>{name}</hl>, for your application!",
       "greetingNoName": "Thank you for your application!",
+      "honorific": {
+        "male": "Mr.",
+        "female": "Ms."
+      },
       "await": "The school will review your application and respond as soon as possible. Please watch your email and use the code below to track its status.",
       "codeLabel": "Your application code",
       "trackHint": "Use this code to track your application status",
@@ -215,35 +219,6 @@
     "selectPlaceholder": "Select an option",
     "filePlaceholder": "Choose a file",
     "optional": "(optional)"
-  },
-  "print": {
-    "actions": {
-      "print": "Print / Save PDF",
-      "back": "Back"
-    },
-    "download": {
-      "profile": "Download profile",
-      "receipt": "Download receipt"
-    },
-    "printedAt": "Printed at {date}",
-    "notFound": "Application {code} not found.",
-    "profile": {
-      "title": "Admission application",
-      "declarant": "Declarant information",
-      "formData": "Application details",
-      "history": "Status history"
-    },
-    "receipt": {
-      "title": "Submission receipt",
-      "received": "Your application has been received",
-      "sequence": "Application no. {seq} / {total}",
-      "note": "Please keep this code to track your application status."
-    },
-    "fields": {
-      "code": "Application code",
-      "status": "Status",
-      "submittedAt": "Submitted on"
-    }
   },
   "marketing": {
     "nav": {

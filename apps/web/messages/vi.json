@@ -108,8 +108,12 @@
     },
     "confirmation": {
       "title": "Nộp hồ sơ thành công",
-      "greeting": "Cảm ơn {name} đã nộp hồ sơ!",
+      "greeting": "Cảm ơn <hl>{name}</hl> đã nộp hồ sơ!",
       "greetingNoName": "Cảm ơn bạn đã nộp hồ sơ!",
+      "honorific": {
+        "male": "Ông",
+        "female": "Bà"
+      },
       "await": "Nhà trường sẽ xem xét hồ sơ và phản hồi tới bạn trong thời gian sớm nhất. Vui lòng theo dõi email và dùng mã hồ sơ bên dưới để tra cứu trạng thái.",
       "codeLabel": "Mã hồ sơ của bạn",
       "trackHint": "Dùng mã này để tra cứu trạng thái hồ sơ",
@@ -177,35 +181,6 @@
     "selectPlaceholder": "Chọn một mục",
     "filePlaceholder": "Chọn tệp",
     "optional": "(không bắt buộc)"
-  },
-  "print": {
-    "actions": {
-      "print": "In / Lưu PDF",
-      "back": "Quay lại"
-    },
-    "download": {
-      "profile": "Tải hồ sơ",
-      "receipt": "Tải biên lai"
-    },
-    "printedAt": "In lúc {date}",
-    "notFound": "Không tìm thấy hồ sơ {code}.",
-    "profile": {
-      "title": "Hồ sơ tuyển sinh",
-      "declarant": "Thông tin người khai",
-      "formData": "Thông tin hồ sơ",
-      "history": "Lịch sử trạng thái"
-    },
-    "receipt": {
-      "title": "Biên lai nộp hồ sơ",
-      "received": "Hồ sơ của bạn đã được tiếp nhận",
-      "sequence": "Hồ sơ số {seq} / {total}",
-      "note": "Vui lòng giữ mã hồ sơ để tra cứu trạng thái hồ sơ."
-    },
-    "fields": {
-      "code": "Mã hồ sơ",
-      "status": "Trạng thái",
-      "submittedAt": "Ngày nộp"
-    }
   },
   "marketing": {
     "nav": {

@@ -1,65 +1,62 @@
-"use client";
+'use client';
 
-import type { Route } from "next";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { CheckCircle2, Clock, Receipt } from "lucide-react";
+import type { Route } from 'next';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { CheckCircle2 } from 'lucide-react';
 
-import { Button } from "@ui/components/button";
+import { Button } from '@ui/components/button';
 
-import { useApplication } from "@/lib/api/queries";
+import { useApplication } from '@/lib/api/queries';
 
 export function ConfirmationStep({ code }: { code: string }) {
-  const t = useTranslations("apply.confirmation");
-  const tPrint = useTranslations("print");
+  const t = useTranslations('apply.confirmation');
   const { data: application } = useApplication(code);
-  const parentName = application?.applicant.fullName;
+  const applicant = application?.applicant;
+  const parentName = applicant?.fullName;
+  // Honorific from the declarant relationship: bố → Ông, mẹ → Bà. Other
+  // relationships (guardian/self) carry no inferable gender, so omit it.
+  const honorific =
+    applicant?.relationship === 'father'
+      ? t('honorific.male')
+      : applicant?.relationship === 'mother'
+        ? t('honorific.female')
+        : '';
+  const displayName = parentName
+    ? [honorific, parentName].filter(Boolean).join(' ')
+    : '';
 
   return (
-    <div className="flex flex-col items-center gap-5 py-2 text-center">
+    <div className="flex flex-col items-center gap-6 py-4 text-center">
       <span className="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary">
         <CheckCircle2 className="size-9" aria-hidden />
       </span>
 
       <div className="space-y-2">
         <h2 className="text-xl font-semibold tracking-tight">
-          {parentName
-            ? t("greeting", { name: parentName })
-            : t("greetingNoName")}
+          {displayName
+            ? t.rich('greeting', {
+                name: displayName,
+                hl: (chunks) => (
+                  <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text font-semibold text-transparent">
+                    {chunks}
+                  </span>
+                ),
+              })
+            : t('greetingNoName')}
         </h2>
-        <p className="mx-auto max-w-md text-sm text-muted-foreground">
-          {t("await")}
-        </p>
+        <p className="mx-auto max-w-md text-sm text-muted-foreground">{t('await')}</p>
       </div>
 
-      <div className="w-full max-w-xs rounded-xl border bg-muted/40 p-4">
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">
-          {t("codeLabel")}
-        </p>
-        <p className="mt-1 text-3xl font-bold tracking-[0.2em] text-primary">
+      <div className="space-y-1.5">
+        <p className="bg-gradient-to-r from-primary via-primary to-primary/55 bg-clip-text font-display text-4xl font-bold tracking-tight text-transparent sm:text-6xl">
           {code}
         </p>
       </div>
 
-      <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Clock className="size-3.5" aria-hidden />
-        {t("trackHint")}
-      </p>
-
-      <div className="flex w-full max-w-xs flex-col gap-2 sm:max-w-md sm:flex-row sm:justify-center">
-        <Button size="lg" className="sm:flex-1" asChild>
-          <Link href={`/track/${code}` as Route}>{t("trackCta")}</Link>
-        </Button>
-        <Button size="lg" variant="outline" className="sm:flex-1" asChild>
-          <Link
-            href={`/track/${code}/print?doc=receipt` as Route}
-            target="_blank"
-          >
-            <Receipt className="size-4" aria-hidden />
-            {tPrint("download.receipt")}
-          </Link>
-        </Button>
-      </div>
+      <Button size="lg" className="w-full max-w-xs" asChild>
+        <Link href={`/track/${code}` as Route}>{t('trackCta')}</Link>
+      </Button>
     </div>
   );
 }

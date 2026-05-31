@@ -27,7 +27,7 @@ pnpm codegen:api   # openapi-typescript → lib/api/generated/schema.d.ts (pha 2
 
 | Group | Path | Notes |
 |---|---|---|
-| `(public)` | `/`, `/register`, `/track/[code]`, `/track/[code]/print` | Mobile-first, tenant-branded |
+| `(public)` | `/`, `/register`, `/track/[code]` | Mobile-first, tenant-branded |
 | `(admin)` | `/admin`, `/admin/applications`, `/admin/settings`, `/admin/audit-log` | Desktop-only, neutral palette |
 
 `(auth)` route group was removed (ADR-013); admin access is token-gated instead.
@@ -49,7 +49,7 @@ FE layer:
 
 Cookie-based locale (`EDUGATE_LOCALE`), no URL prefix — see `i18n/request.ts`. No locale routing so middleware stays untouched. Default `vi`. `i18n/locale-actions.ts` is `"use server"` to write the cookie.
 
-All UI strings go through `next-intl` (`getTranslations` in RSC, `useTranslations` in client). Namespaces: `common`, `landing`, `apply`, `track`, `form`, `print`, `admin.*`, `marketing`, `errors`.
+All UI strings go through `next-intl` (`getTranslations` in RSC, `useTranslations` in client). Namespaces: `common`, `landing`, `apply`, `track`, `form`, `admin.*`, `marketing`, `errors`.
 
 ## Data seam pattern
 

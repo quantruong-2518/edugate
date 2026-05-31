@@ -52,6 +52,7 @@
 
 ## ADR-009: PDF export qua print-CSS + dedicated route (KHÔNG @react-pdf, KHÔNG client PDF lib)
 
+- **Status**: ⚠️ OBSOLETE (2026-05-31). User bỏ tính năng biên lai + in PDF ở pilot — route print, `components/print/`, namespace `print`, nút download, và print-CSS đã xoá (xem PLAN task 18). Quyết định dưới giữ làm tham chiếu nếu pha 2 cần dựng lại export.
 - **Context**: Task 18 cần xuất hồ sơ + biên lai PDF, "template trước, hook BE pha 2". Document phải mang brand từng tenant và trông giống web. Yêu cầu data residency VN (self-host).
 - **Decision**: Template = React + Tailwind thường, render ở route riêng `(public)/track/[code]/print` (`?doc=profile|receipt`). Pha 1: download = `window.print()` (browser → Save as PDF). Pha 2: NestJS worker dùng Puppeteer navigate headless đúng route này → PDF lưu/đính email — template là single source of truth, không viết lại. Màu paper hardcode neutral (white bg + neutral ink) như precedent state-tone (task 8) vì document phải in được bất kể theme light/dark; brand accent vẫn qua token `text-primary`. Zero dep mới (kể cả QR — để pha 2 BE sinh).
 - **Consequences**: + Reuse token + branding + `StateBadge`/`StateTimeline`, không hệ style thứ 2. + Seam BE sạch (chỉ là 1 URL). + Pha 1 không thêm bundle. − Pha 1 qua print dialog browser (chưa file thật/silent download). − Pha 2 cần chromium trên BE (chấp nhận với self-host). − Export từ admin (cần applications list) để pha 2.
