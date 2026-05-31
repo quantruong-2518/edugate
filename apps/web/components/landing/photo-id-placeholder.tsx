@@ -1,10 +1,8 @@
-import { User } from "lucide-react";
+import { User } from 'lucide-react';
 
 const SIZES = [
-  { label: "3×4 cm", note: "Phổ biến nhất — CMND, học bạ, hồ sơ tuyển sinh" },
-  { label: "4×6 cm", note: "Hộ chiếu, một số hồ sơ đặc biệt" },
-  { label: "3.5×4.5 cm", note: "Tiêu chuẩn quốc tế (ICAO)" },
-  { label: "2×3 cm", note: "Một số giấy tờ nhỏ" },
+  { label: '3×4 cm', note: 'Phổ biến nhất — CMND, học bạ, hồ sơ tuyển sinh' },
+  { label: '4×6 cm', note: 'Hộ chiếu, một số hồ sơ đặc biệt' },
 ];
 
 export function PhotoIdPlaceholder() {
@@ -20,7 +18,9 @@ export function PhotoIdPlaceholder() {
           <User className="size-8 text-primary/40" />
         </div>
         <span className="text-center text-xs text-muted-foreground">
-          Ảnh thẻ<br />nền trắng / xanh nhạt
+          Ảnh thẻ
+          <br />
+          nền trắng / xanh nhạt
         </span>
       </div>
 

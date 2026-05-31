@@ -205,12 +205,8 @@ const STATE_PATH: Readonly<Record<ApplicationState, readonly ApplicationState[]>
   EXPIRED: ["SUBMITTED", "UNDER_REVIEW", "EXPIRED"],
 };
 
-const PRIORITY_CATEGORIES = [
-  "remote_area",
-  "policy_family",
-  "ethnic_minority",
-  "single_parent",
-] as const;
+// Only one priority option remains in the form; mock still uses a 25% hit rate.
+const PRIORITY_CATEGORIES = ["policy_family"] as const;
 
 const SPECIAL_ACHIEVEMENTS = [
   "Giải Nhì môn Toán cấp quận năm học 2024-2025.",
@@ -265,7 +261,15 @@ const ADMISSION_PRIORITIES = ["nv1", "nv1", "nv2", "nv3"] as const;
 
 // --- Form data ---------------------------------------------------------------
 
-type FormVariant = { isThpt: boolean; hasPhoto: boolean };
+// Weighted performance levels matching the form's gradeTable options.
+const GRADE_LEVELS = [
+  "excellent", "excellent",
+  "good", "good", "good", "good",
+  "average", "average",
+  "below_average",
+] as const;
+
+type FormVariant = { isThpt: boolean; hasPhoto: boolean; hasStudentCode: boolean };
 
 function randomPriorities(rng: Rng): string[] {
   // 30% chance of belonging to 1–2 priority categories.
@@ -321,29 +325,31 @@ function buildFormData(
     return data;
   }
 
-  // Lớp 6 intake (THCS): ~11 y/o, primary grades 1–5 (realistic GPA 6.0–10.0).
+  // Lớp 6 intake (THCS): ~11 y/o, academic results as performance levels.
   const birthYear = intBetween(rng, 2013, 2014);
-  const grade1 = round1(intBetween(rng, 62, 100) / 10);
-  const grade2 = round1(intBetween(rng, 62, 100) / 10);
-  const grade3 = round1(intBetween(rng, 62, 100) / 10);
-  const grade4 = round1(intBetween(rng, 65, 100) / 10);
-  const grade5 = round1(intBetween(rng, 65, 100) / 10);
+  const academicResults: Record<string, string> = {
+    grade1: pick(rng, GRADE_LEVELS),
+    grade2: pick(rng, GRADE_LEVELS),
+    grade3: pick(rng, GRADE_LEVELS),
+    grade4: pick(rng, GRADE_LEVELS),
+    grade5: pick(rng, GRADE_LEVELS),
+  };
+  let studentCode = "";
+  for (let i = 0; i < 11; i += 1) studentCode += String(intBetween(rng, 0, 9));
   const data: Record<string, unknown> = {
     studentName,
     dateOfBirth: `${birthYear}-${month}-${day}`,
     gender,
     priorityCategory,
-    grade1,
-    grade2,
-    grade3,
-    grade4,
-    grade5,
-    gpa: round1((grade1 + grade2 + grade3 + grade4 + grade5) / 5),
-    transcript: `hoc-ba-${slug}.pdf`,
+    studentCode,
+    academicResults,
+    studentPhoto: `anh-the-${slug}.jpg`,
   };
-  if (rng() < 0.2) data.specialAchievements = pick(rng, SPECIAL_ACHIEVEMENTS);
+  if (rng() < 0.2) {
+    data.hasSpecialAchievements = ["yes"];
+    data.specialAchievements = pick(rng, SPECIAL_ACHIEVEMENTS);
+  }
   if (rng() < 0.35) data.parentWishes = pick(rng, PARENT_WISHES);
-  if (variant.hasPhoto) data.studentPhoto = `anh-the-${slug}.jpg`;
   return data;
 }
 
@@ -371,9 +377,12 @@ export function generateApplications(tenantCode: string): Application[] {
   const rng = mulberry32(hashSeed(tenantCode || "default"));
   const count = ROW_COUNT_MIN + Math.floor(rng() * ROW_COUNT_RANGE);
   // Trần Đại Nghĩa is a THPT (lớp 10 intake); nguyen-gia-thieu also takes a photo.
+  const isThpt = tenantCode === "tran-dai-nghia";
   const variant: FormVariant = {
-    isThpt: tenantCode === "tran-dai-nghia",
-    hasPhoto: tenantCode === "nguyen-gia-thieu",
+    isThpt,
+    // All THCS tenants now have photo + studentCode in their form schema.
+    hasPhoto: !isThpt,
+    hasStudentCode: !isThpt,
   };
   const year = String(REFERENCE_DATE.getFullYear()).slice(2);
   const seen = new Set<string>();

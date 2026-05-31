@@ -91,7 +91,11 @@
         "other": "Other"
       },
       "invalidEmail": "Invalid email",
-      "invalidPhone": "Invalid phone number"
+      "invalidPhone": "Invalid phone number",
+      "emailPlaceholder": "e.g. parent@email.com",
+      "emailHint": "Receives application confirmation.",
+      "phonePlaceholder": "e.g. 0912345678",
+      "phoneHint": "Receives admission result notifications."
     },
     "verifyEmail": {
       "title": "Verify email",
@@ -314,21 +318,48 @@
       "live": "Live",
       "comingSoon": "Coming soon",
       "items": {
-        "admission": { "name": "Admissions", "desc": "Application portal, review, status lookup." },
-        "hrms": { "name": "HR", "desc": "Teacher records, attendance, contracts." },
-        "fee": { "name": "Fees", "desc": "Billing, invoices, payment reminders." },
-        "lms": { "name": "Learning", "desc": "Classes, lessons, grades." },
-        "survey": { "name": "Surveys", "desc": "Collect parent and student feedback." },
-        "crm": { "name": "CRM", "desc": "Manage interactions and admissions advisory." }
+        "admission": {
+          "name": "Admissions",
+          "desc": "Application portal, review, status lookup."
+        },
+        "hrms": {
+          "name": "HR",
+          "desc": "Teacher records, attendance, contracts."
+        },
+        "fee": {
+          "name": "Fees",
+          "desc": "Billing, invoices, payment reminders."
+        },
+        "lms": {
+          "name": "Learning",
+          "desc": "Classes, lessons, grades."
+        },
+        "survey": {
+          "name": "Surveys",
+          "desc": "Collect parent and student feedback."
+        },
+        "crm": {
+          "name": "CRM",
+          "desc": "Manage interactions and admissions advisory."
+        }
       }
     },
     "steps": {
       "title": "Live in a day",
       "subtitle": "No technical team needed.",
       "items": {
-        "one": { "title": "Create the school", "desc": "We provision the tenant and a dedicated domain." },
-        "two": { "title": "Customise branding & forms", "desc": "Change logo, colours and build admission forms in the admin." },
-        "three": { "title": "Open the portal", "desc": "Share the link with parents and start receiving applications." }
+        "one": {
+          "title": "Create the school",
+          "desc": "We provision the tenant and a dedicated domain."
+        },
+        "two": {
+          "title": "Customise branding & forms",
+          "desc": "Change logo, colours and build admission forms in the admin."
+        },
+        "three": {
+          "title": "Open the portal",
+          "desc": "Share the link with parents and start receiving applications."
+        }
       }
     },
     "cta": {
@@ -468,7 +499,8 @@
         "otherInfo": "Other information",
         "timeline": "Status history",
         "actions": "Actions",
-        "noValue": "-"
+        "noValue": "-",
+        "studentCode": "Student ID"
       },
       "relationships": {
         "father": "Father",

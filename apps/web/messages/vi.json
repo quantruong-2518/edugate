@@ -91,7 +91,11 @@
         "other": "Khác"
       },
       "invalidEmail": "Email không hợp lệ",
-      "invalidPhone": "Số điện thoại không hợp lệ"
+      "invalidPhone": "Số điện thoại không hợp lệ",
+      "emailPlaceholder": "VD: phu.huynh@email.com",
+      "emailHint": "Nhận thông tin xác nhận hồ sơ.",
+      "phonePlaceholder": "VD: 0912345678",
+      "phoneHint": "Nhận tin nhắn thông báo kết quả tuyển sinh."
     },
     "verifyEmail": {
       "title": "Xác thực email",
@@ -276,21 +280,48 @@
       "live": "Đang vận hành",
       "comingSoon": "Sắp ra mắt",
       "items": {
-        "admission": { "name": "Tuyển sinh", "desc": "Cổng đăng ký, xét duyệt, tra cứu hồ sơ." },
-        "hrms": { "name": "Nhân sự", "desc": "Hồ sơ giáo viên, chấm công, hợp đồng." },
-        "fee": { "name": "Học phí", "desc": "Thu phí, hóa đơn, nhắc thanh toán." },
-        "lms": { "name": "Học tập", "desc": "Lớp học, bài giảng, điểm số." },
-        "survey": { "name": "Khảo sát", "desc": "Thu thập phản hồi phụ huynh, học sinh." },
-        "crm": { "name": "Chăm sóc", "desc": "Quản lý tương tác và tư vấn tuyển sinh." }
+        "admission": {
+          "name": "Tuyển sinh",
+          "desc": "Cổng đăng ký, xét duyệt, tra cứu hồ sơ."
+        },
+        "hrms": {
+          "name": "Nhân sự",
+          "desc": "Hồ sơ giáo viên, chấm công, hợp đồng."
+        },
+        "fee": {
+          "name": "Học phí",
+          "desc": "Thu phí, hóa đơn, nhắc thanh toán."
+        },
+        "lms": {
+          "name": "Học tập",
+          "desc": "Lớp học, bài giảng, điểm số."
+        },
+        "survey": {
+          "name": "Khảo sát",
+          "desc": "Thu thập phản hồi phụ huynh, học sinh."
+        },
+        "crm": {
+          "name": "Chăm sóc",
+          "desc": "Quản lý tương tác và tư vấn tuyển sinh."
+        }
       }
     },
     "steps": {
       "title": "Lên sóng trong một ngày",
       "subtitle": "Không cần đội kỹ thuật.",
       "items": {
-        "one": { "title": "Tạo trường", "desc": "Chúng tôi khởi tạo tenant và miền riêng cho trường." },
-        "two": { "title": "Tùy chỉnh thương hiệu & biểu mẫu", "desc": "Đổi logo, màu, dựng biểu mẫu tuyển sinh trong trình quản trị." },
-        "three": { "title": "Mở cổng tuyển sinh", "desc": "Chia sẻ đường dẫn cho phụ huynh và bắt đầu nhận hồ sơ." }
+        "one": {
+          "title": "Tạo trường",
+          "desc": "Chúng tôi khởi tạo tenant và miền riêng cho trường."
+        },
+        "two": {
+          "title": "Tùy chỉnh thương hiệu & biểu mẫu",
+          "desc": "Đổi logo, màu, dựng biểu mẫu tuyển sinh trong trình quản trị."
+        },
+        "three": {
+          "title": "Mở cổng tuyển sinh",
+          "desc": "Chia sẻ đường dẫn cho phụ huynh và bắt đầu nhận hồ sơ."
+        }
       }
     },
     "cta": {
@@ -430,7 +461,8 @@
         "otherInfo": "Thông tin khác",
         "timeline": "Lịch sử trạng thái",
         "actions": "Hành động",
-        "noValue": "-"
+        "noValue": "-",
+        "studentCode": "Mã học sinh"
       },
       "relationships": {
         "father": "Bố",

@@ -19,7 +19,7 @@ import {
 } from "@ui/components/sheet";
 import { Separator } from "@ui/components/separator";
 
-import type { FormFieldSchema, FormSchema } from "@shared/form";
+import type { FormFieldSchema, FormSchema, GradeTableField } from "@shared/form";
 import { allFields } from "@shared/form";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
@@ -40,9 +40,11 @@ const DOB_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
 // excluded dynamically from the schema, so they are not listed here.
 const DEDICATED_FIELDS = new Set([
   "studentName",
+  "studentCode",
   "dateOfBirth",
   "gender",
   "priorityCategory",
+  "hasSpecialAchievements",
   "specialAchievements",
   "parentWishes",
   // Derived average — surfaced via the score column, not as a raw form answer.
@@ -178,8 +180,7 @@ export function ApplicationDetailSheet({
     for (const opt of priorityField.options) priorityOptions.set(opt.value, opt.label);
   }
 
-  // Scoring fields grouped by their section ("Kết quả học tập THCS", "Điểm thi
-  // tuyển sinh vào 10", "Thành tích học tập"…). Empty groups are dropped.
+  // Scoring fields grouped by section (THPT form). Empty groups dropped.
   const scoreGroups = (formSchema?.sections ?? [])
     .map((section) => ({
       title: section.title,
@@ -190,11 +191,28 @@ export function ApplicationDetailSheet({
     scoreGroups.flatMap((g) => g.fields.map((f) => f.name)),
   );
 
+  // gradeTable fields (THCS form). Each is a single field whose value is a
+  // Record<string, string> mapping row names → chosen option values.
+  const gradeTableFields = schemaFields.filter(
+    (f): f is GradeTableField => f.type === "gradeTable",
+  );
+  const gradeTableNames = new Set(gradeTableFields.map((f) => f.name));
+
   const fd = application.formData;
 
-  // Student basics
+  // Student basics — prefer formData.studentName (mock/lookup), fall back to
+  // applicant.studentFullName (wizard with showStudentName config like NGT).
   const studentName =
-    typeof fd["studentName"] === "string" ? fd["studentName"] : "-";
+    typeof fd["studentName"] === "string" && fd["studentName"]
+      ? fd["studentName"]
+      : typeof application.applicant.studentFullName === "string" &&
+          application.applicant.studentFullName
+        ? application.applicant.studentFullName
+        : "-";
+  const studentCode =
+    typeof fd["studentCode"] === "string" && fd["studentCode"]
+      ? fd["studentCode"]
+      : null;
   const dob =
     typeof fd["dateOfBirth"] === "string" && fd["dateOfBirth"]
       ? (() => {
@@ -240,6 +258,7 @@ export function ApplicationDetailSheet({
   const handledNames = new Set<string>([
     ...DEDICATED_FIELDS,
     ...scoringNames,
+    ...gradeTableNames,
     ...docFields,
   ]);
   const otherEntries = Object.entries(fd).filter(
@@ -276,6 +295,9 @@ export function ApplicationDetailSheet({
             <SectionHeader>{t("studentInfo")}</SectionHeader>
             <div className="space-y-0 divide-y">
               <DetailRow label={tApp("columns.student")} value={studentName} />
+              {studentCode && (
+                <DetailRow label={t("studentCode")} value={studentCode} />
+              )}
               <DetailRow label={t("dob")} value={dob} />
               <DetailRow label={t("gender")} value={genderLabel} />
             </div>
@@ -296,26 +318,70 @@ export function ApplicationDetailSheet({
             </section>
           )}
 
-          {/* Academic record — schema-driven score grids, grouped by section */}
-          {(scoreGroups.length > 0 || specialAchievements) && (
+          {/* Academic record: gradeTable (THCS) or scoring grids (THPT) */}
+          {(gradeTableFields.length > 0 || scoreGroups.length > 0 || specialAchievements) && (
             <section>
               <SectionHeader>{t("gradeRecord")}</SectionHeader>
-              <div className="space-y-3">
-                {scoreGroups.map((group) => (
-                  <div key={group.title}>
-                    {scoreGroups.length > 1 && (
-                      <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-                        {group.title}
-                      </p>
-                    )}
-                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                      {group.fields.map((f) => (
-                        <ScoreCell key={f.name} label={f.label} value={fd[f.name]} />
-                      ))}
-                    </div>
+
+              {/* gradeTable: one compact table per field */}
+              {gradeTableFields.map((gtField) => {
+                const rawVal = fd[gtField.name];
+                const v =
+                  rawVal && typeof rawVal === "object" && !Array.isArray(rawVal)
+                    ? (rawVal as Record<string, string>)
+                    : {};
+                const optionLabel = (val: string) =>
+                  gtField.options.find((o) => o.value === val)?.label ?? val;
+                return (
+                  <div key={gtField.name} className="overflow-x-auto rounded-md border border-border">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border bg-muted/40">
+                          <th className="py-1.5 pl-3 pr-2 text-left text-xs font-medium text-muted-foreground">
+                            Năm học
+                          </th>
+                          <th className="py-1.5 pl-2 pr-3 text-left text-xs font-medium text-muted-foreground">
+                            Xếp loại
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {gtField.rows.map((row) => (
+                          <tr key={row.name}>
+                            <td className="py-2 pl-3 pr-2 font-medium text-foreground">
+                              {row.label}
+                            </td>
+                            <td className="py-2 pl-2 pr-3 text-muted-foreground">
+                              {v[row.name] ? optionLabel(v[row.name]!) : "-"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                ))}
-              </div>
+                );
+              })}
+
+              {/* scoring grids (THPT form) */}
+              {scoreGroups.length > 0 && (
+                <div className="space-y-3">
+                  {scoreGroups.map((group) => (
+                    <div key={group.title}>
+                      {scoreGroups.length > 1 && (
+                        <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+                          {group.title}
+                        </p>
+                      )}
+                      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                        {group.fields.map((f) => (
+                          <ScoreCell key={f.name} label={f.label} value={fd[f.name]} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {specialAchievements && (
                 <div className="mt-3">
                   <p className="mb-1 text-xs font-medium text-muted-foreground">
