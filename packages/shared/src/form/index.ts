@@ -52,3 +52,5 @@ export {
 } from "./build-zod";
 
 export { defaultValuesFor } from "./defaults";
+
+export { formSchemaSchema, parseFormSchema } from "./meta-schema";
