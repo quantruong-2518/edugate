@@ -1,7 +1,6 @@
 import { GraduationCap } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
 
 import { getTenantBranding, getTenantCode } from "@/lib/tenants/branding";
 
@@ -16,14 +15,11 @@ export async function PublicHeader() {
   const code = await getTenantCode();
   if (!code) return null;
 
-  const [branding, t] = await Promise.all([
-    getTenantBranding(code),
-    getTranslations("common.nav"),
-  ]);
+  const branding = await getTenantBranding(code);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70 print:hidden">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center px-4 sm:px-6">
         <Link
           href={"/" as Route}
           className="flex min-w-0 items-center gap-2.5"
@@ -49,21 +45,6 @@ export async function PublicHeader() {
             </span>
           </span>
         </Link>
-
-        <nav className="flex items-center gap-1 sm:gap-2">
-          <Link
-            href={"/register" as Route}
-            className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:px-3"
-          >
-            {t("register")}
-          </Link>
-          <Link
-            href={"/track" as Route}
-            className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:px-3"
-          >
-            {t("track")}
-          </Link>
-        </nav>
       </div>
     </header>
   );
