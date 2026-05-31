@@ -173,6 +173,51 @@ export const pledgeSectionSchema = z.object({
         role: z.string().optional(),
         /** Portrait URL; falls back to an initials avatar when absent. */
         photoUrl: z.string().optional(),
+        /**
+         * How the portrait sits on the card: "cutout" (default — a transparent
+         * PNG whose figure overlaps the card edge) or "framed" (a regular photo
+         * shown in a rounded, object-cover frame). Use "framed" for ordinary
+         * photos that still have their background.
+         */
+        portrait: z.enum(["cutout", "framed"]).optional(),
+      }),
+    )
+    .min(1),
+});
+
+/**
+ * Curated icon set for `storyCards` (used as the square image slot's fallback /
+ * accent). Mapped to Lucide components statically in the renderer.
+ */
+export const STORY_CARD_ICONS = [
+  "landmark",
+  "building",
+  "users",
+  "trophy",
+  "bookOpen",
+  "sparkles",
+] as const;
+export type StoryCardIcon = (typeof STORY_CARD_ICONS)[number];
+
+/**
+ * "Truyền thống"-style storytelling: a horizontal carousel of sliding cards,
+ * each with a square image slot (~1/3 of the card) and a short body. Key facts
+ * in the body are emphasised (tenant gradient + bold) via the `emphasis` list.
+ */
+export const storyCardsSectionSchema = z.object({
+  type: z.literal("storyCards"),
+  title: z.string().optional(),
+  cards: z
+    .array(
+      z.object({
+        title: z.string(),
+        body: z.string(),
+        /** Square image URL shown in the card's image slot. */
+        image: z.string().optional(),
+        /** Fallback / accent icon shown when there is no image. */
+        icon: z.enum(STORY_CARD_ICONS).optional(),
+        /** Substrings of `body` rendered with the tenant gradient + bold. */
+        emphasis: z.array(z.string()).optional(),
       }),
     )
     .min(1),
@@ -189,6 +234,7 @@ export const landingSectionSchema = z.discriminatedUnion("type", [
   footerSectionSchema,
   enrollmentQuotaSectionSchema,
   pledgeSectionSchema,
+  storyCardsSectionSchema,
 ]);
 
 export const landingConfigSchema = z.object({
@@ -206,6 +252,7 @@ export const LANDING_SECTION_TYPES = [
   "footer",
   "enrollmentQuota",
   "pledge",
+  "storyCards",
 ] as const;
 
 export type LandingSectionType = (typeof LANDING_SECTION_TYPES)[number];
@@ -223,5 +270,6 @@ export type EnrollmentQuotaSection = z.infer<
   typeof enrollmentQuotaSectionSchema
 >;
 export type PledgeSection = z.infer<typeof pledgeSectionSchema>;
+export type StoryCardsSection = z.infer<typeof storyCardsSectionSchema>;
 export type LandingSection = z.infer<typeof landingSectionSchema>;
 export type LandingConfig = z.infer<typeof landingConfigSchema>;

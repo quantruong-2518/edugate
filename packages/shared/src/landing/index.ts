@@ -2,6 +2,7 @@ export {
   ENROLLMENT_QUOTA_ICONS,
   INFO_TABS_ICONS,
   LANDING_SECTION_TYPES,
+  STORY_CARD_ICONS,
   aboutSectionSchema,
   enrollmentQuotaSectionSchema,
   faqSectionSchema,
@@ -13,6 +14,7 @@ export {
   pledgeSectionSchema,
   processSectionSchema,
   statsSectionSchema,
+  storyCardsSectionSchema,
   testimonialsSectionSchema,
   type AboutSection,
   type EnrollmentQuotaIcon,
@@ -29,5 +31,7 @@ export {
   type PledgeSection,
   type ProcessSection,
   type StatsSection,
+  type StoryCardIcon,
+  type StoryCardsSection,
   type TestimonialsSection,
 } from "./sections";

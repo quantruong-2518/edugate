@@ -37,6 +37,20 @@ function initials(name: string): string {
 }
 
 function Portrait({ item }: { item: Pledge }) {
+  if (item.photoUrl && item.portrait === "framed") {
+    // Regular photo (still has its background) → a rounded, object-cover frame.
+    // objectPosition biases the crop toward the subject (right-of-centre here).
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={item.photoUrl}
+        alt={item.name}
+        draggable={false}
+        style={{ objectPosition: "58% 50%" }}
+        className="h-64 w-52 select-none rounded-[2rem] object-cover shadow-xl ring-1 ring-border/60 sm:h-80 sm:w-64"
+      />
+    );
+  }
   if (item.photoUrl) {
     // Cut-out portrait (transparent background) — no ring/shadow; the figure
     // itself overlaps the card. Uniform height, width follows each photo.
@@ -60,7 +74,108 @@ function Portrait({ item }: { item: Pledge }) {
   );
 }
 
-export function PledgeSection({ section }: { section: PledgeSectionType }) {
+// Cut-out figure treatment: eight offset white drop-shadows trace a thin
+// "sticker" border around the silhouette; the last is a soft cast shadow so the
+// figure reads as lifted off the card it overlaps.
+const CUTOUT_FILTER = (() => {
+  const s = "#ffffff";
+  const d = "2px";
+  return [
+    `drop-shadow(${d} 0 0 ${s})`,
+    `drop-shadow(-${d} 0 0 ${s})`,
+    `drop-shadow(0 ${d} 0 ${s})`,
+    `drop-shadow(0 -${d} 0 ${s})`,
+    `drop-shadow(${d} ${d} 0 ${s})`,
+    `drop-shadow(-${d} ${d} 0 ${s})`,
+    `drop-shadow(${d} -${d} 0 ${s})`,
+    `drop-shadow(-${d} -${d} 0 ${s})`,
+    "drop-shadow(0 18px 24px rgba(15,40,80,0.32))",
+  ].join(" ");
+})();
+
+/**
+ * Single speaker → a "lời ngỏ" feature card. Mobile: a flex row — the cut-out
+ * beside the quote. Desktop: the figure is pulled out to the far left, overlaps
+ * the card and rises past its top border (sticker outline + lifted shadow). The
+ * card reserves left space so the figure never sits on the text. Inherits the
+ * section's tenant tint via `data-section="pledge"`.
+ */
+function FeatureMessage({ title, item }: { title?: string; item: Pledge }) {
+  return (
+    <section
+      data-section="pledge"
+      className="bg-muted/40 px-4 py-16 sm:px-6 sm:py-24"
+    >
+      <div className="mx-auto max-w-4xl">
+        {title && (
+          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+            {title}
+          </h2>
+        )}
+
+        <article
+          style={{ borderRadius: "2.25rem 1rem 2.25rem 1rem" }}
+          className="relative mt-16 grid grid-cols-[8rem_minmax(0,1fr)] items-end gap-4 bg-gradient-to-br from-card to-muted/30 px-4 py-7 shadow-[0_30px_60px_-28px_rgba(15,40,80,0.5)] sm:mt-24 sm:block sm:min-h-[19rem] sm:px-12 sm:py-12 sm:pl-[22rem]"
+        >
+          {/* Figure: a grid column on mobile, pulled out to the far left and
+              rising above the card on desktop. No `relative` here so the
+              desktop `absolute` img anchors to the card, not this wrapper. */}
+          <div className="self-end">
+            {item.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={item.photoUrl}
+                alt={item.name}
+                draggable={false}
+                style={{ filter: CUTOUT_FILTER }}
+                className="pointer-events-none block h-auto w-full max-w-[12rem] select-none sm:absolute sm:-left-2 sm:bottom-0 sm:h-[23rem] sm:w-auto sm:max-w-none"
+              />
+            ) : (
+              <div
+                aria-hidden
+                className="mx-auto grid size-24 place-items-center rounded-full bg-primary/15 font-display text-3xl font-bold text-primary sm:absolute sm:bottom-10 sm:left-16 sm:size-32"
+              >
+                {initials(item.name)}
+              </div>
+            )}
+          </div>
+
+          {/* Message */}
+          <div className="min-w-0 text-left">
+            <span
+              aria-hidden
+              className="block select-none font-display text-6xl leading-[0.5] text-primary/20 sm:text-8xl"
+            >
+              &ldquo;
+            </span>
+            <blockquote className="mt-3 text-pretty text-base italic leading-relaxed text-foreground/85 sm:text-2xl sm:leading-relaxed">
+              {item.quote}
+            </blockquote>
+            <figcaption className="mt-6 flex items-center gap-3 sm:gap-4">
+              <span
+                aria-hidden
+                className="h-px w-8 shrink-0 bg-gradient-to-r from-primary to-transparent sm:w-10"
+              />
+              <span>
+                <span className="block font-display text-lg font-bold text-foreground sm:text-2xl">
+                  {item.name}
+                </span>
+                {item.role && (
+                  <span className="mt-0.5 block text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary sm:text-xs">
+                    {item.role}
+                  </span>
+                )}
+              </span>
+            </figcaption>
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+/** Multiple speakers → an auto-rotating carousel of clipped pledge cards. */
+function PledgeCarousel({ section }: { section: PledgeSectionType }) {
   const t = useTranslations("landing");
   const items = section.items;
   const [active, setActive] = useState(0);
@@ -82,8 +197,6 @@ export function PledgeSection({ section }: { section: PledgeSectionType }) {
     );
     return () => window.clearInterval(id);
   }, [items.length, paused]);
-
-  if (items.length === 0) return null;
 
   const current = items[active] ?? items[0]!;
 
@@ -116,8 +229,15 @@ export function PledgeSection({ section }: { section: PledgeSectionType }) {
             aria-label={`${active + 1} / ${items.length}`}
             className="flex animate-in flex-col items-center gap-1 bg-gradient-to-br from-card to-muted/30 fade-in-0 zoom-in-95 duration-500 sm:flex-row sm:items-stretch sm:gap-2"
           >
-            {/* Cut-out figure overlaps the card; stands on its base (desktop). */}
-            <div className="shrink-0 sm:self-end">
+            {/* Cut-out figure overlaps the card and stands on its base; a framed
+                photo instead sits centred with breathing room. */}
+            <div
+              className={
+                current.portrait === "framed"
+                  ? "shrink-0 p-5 sm:self-center sm:py-7 sm:pl-7 sm:pr-0"
+                  : "shrink-0 sm:self-end"
+              }
+            >
               <Portrait item={current} />
             </div>
 
@@ -161,4 +281,13 @@ export function PledgeSection({ section }: { section: PledgeSectionType }) {
       </div>
     </section>
   );
+}
+
+export function PledgeSection({ section }: { section: PledgeSectionType }) {
+  if (section.items.length === 0) return null;
+  // A lone speaker reads as a "lời ngỏ" feature; several rotate in a carousel.
+  if (section.items.length === 1) {
+    return <FeatureMessage title={section.title} item={section.items[0]!} />;
+  }
+  return <PledgeCarousel section={section} />;
 }

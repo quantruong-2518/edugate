@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro, Inter, Space_Grotesk } from "next/font/google";
+import { Be_Vietnam_Pro, Fraunces, Inter, Space_Grotesk } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -34,6 +34,16 @@ const fontBrandDisplay = Be_Vietnam_Pro({
   variable: "--font-be-vietnam-pro",
 });
 
+// Per-tenant editorial serif (a modern "tài liệu chính luận" face). Fraunces is
+// a contemporary high-contrast serif with optical sizing — at display sizes the
+// browser's `font-optical-sizing: auto` picks its dramatic display cut. Variable
+// font up to 900, so the heavy display utilities (800) render natively.
+const fontEditorialDisplay = Fraunces({
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
+  variable: "--font-fraunces",
+});
+
 export async function generateMetadata(): Promise<Metadata> {
   const branding = await getTenantBranding(await getTenantCode());
   return {
@@ -54,7 +64,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${fontSans.variable} ${fontDisplay.variable} ${fontBrandDisplay.variable}`}
+      className={`${fontSans.variable} ${fontDisplay.variable} ${fontBrandDisplay.variable} ${fontEditorialDisplay.variable}`}
     >
       <body className="min-h-dvh font-sans antialiased" data-tenant={branding.code}>
         {/*

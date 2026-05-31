@@ -8,6 +8,7 @@ import { InfoTabsSection } from "./info-tabs-section";
 import { PledgeSection } from "./pledge-section";
 import { ProcessSection } from "./process-section";
 import { StatsSection } from "./stats-section";
+import { StoryCardsSection } from "./story-cards-section";
 import { TestimonialsSection } from "./testimonials-section";
 
 /**
@@ -37,6 +38,8 @@ export function LandingSectionRenderer({
       return <TestimonialsSection section={section} />;
     case "pledge":
       return <PledgeSection section={section} />;
+    case "storyCards":
+      return <StoryCardsSection section={section} />;
     case "faq":
       return <FaqSection section={section} />;
     case "footer":

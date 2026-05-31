@@ -38,7 +38,7 @@ export async function FooterSection({ section }: { section: FooterSection }) {
                               backgroundImage:
                                 "linear-gradient(to right, var(--primary), color-mix(in oklab, var(--primary) 60%, white))",
                             }}
-                            className="inline-block bg-clip-text text-sm font-semibold text-transparent transition-opacity hover:opacity-80"
+                            className="inline-block break-words bg-clip-text text-sm font-semibold text-transparent transition-opacity hover:opacity-80"
                           >
                             {link.label}
                           </a>
@@ -48,14 +48,14 @@ export async function FooterSection({ section }: { section: FooterSection }) {
                           {isExternalHref(link.href) ? (
                             <a
                               href={link.href}
-                              className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                              className="break-words text-sm text-muted-foreground transition-colors hover:text-primary"
                             >
                               {link.label}
                             </a>
                           ) : (
                             <Link
                               href={link.href as Route}
-                              className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                              className="break-words text-sm text-muted-foreground transition-colors hover:text-primary"
                             >
                               {link.label}
                             </Link>

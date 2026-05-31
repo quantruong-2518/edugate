@@ -100,15 +100,21 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
     shortName: "NVH",
     logoUrl: null,
     theme: tenantTheme({
-      // Tailwind violet-600 / violet-400 in oklch, "trường học hạnh phúc".
+      // Deep ocean blue ("xanh biển đậm", hue ~245) — the NVH identity. Pairs
+      // with the deep-blue → blue-gray → white gradient + grain set in
+      // globals.css ([data-tenant="nguyen-van-huyen"]).
       light: {
-        primary: "oklch(0.541 0.281 293.009)",
+        primary: "oklch(0.48 0.143 245)",
         primaryForeground: "oklch(0.985 0 0)",
       },
       dark: {
-        primary: "oklch(0.702 0.183 293.541)",
+        primary: "oklch(0.7 0.13 240)",
         primaryForeground: "oklch(0.205 0 0)",
       },
+      // Modern editorial serif (Fraunces) for prominent names — the "tài liệu
+      // chính luận" feel for this heritage school named after GS-TS Nguyễn Văn
+      // Huyên, but contemporary (high-contrast, optical display cut).
+      display: "var(--font-fraunces), ui-serif, Georgia, 'Times New Roman', serif",
     }),
   },
   "nguyen-gia-thieu": {

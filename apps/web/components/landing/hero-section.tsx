@@ -44,7 +44,9 @@ export function HeroSection({ section }: { section: HeroSection }) {
                   backgroundImage:
                     "var(--headline-accent-gradient, linear-gradient(to right, var(--primary), color-mix(in oklab, var(--primary) 55%, white)))",
                 }}
-                className="mt-1 block bg-clip-text font-display text-5xl font-extrabold leading-[1.05] text-transparent sm:text-7xl"
+                // leading + py give Vietnamese diacritics on big display faces
+                // (e.g. ễ, ư, ầ) room so their marks aren't clipped.
+                className="mt-1 block bg-clip-text py-1 font-display text-5xl font-extrabold leading-[1.18] text-transparent sm:text-7xl"
               >
                 {section.headlineHighlight}
               </span>

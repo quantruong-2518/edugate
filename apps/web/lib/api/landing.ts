@@ -357,103 +357,170 @@ const NHT_CONFIG: LandingConfig = {
   ],
 };
 
+// Mirrors NHT's section set (hero → quota → process → infoTabs → pledge →
+// footer) with NVH's own bespoke identity: a deep ocean blue → blue-gray →
+// white gradient + grain + an editorial serif (globals.css + fixtures.ts).
+// Content is the school's real material (public/tenants/nguyen-van-huyen/
+// intro.docx, May 2026): slogan, "Trường Chất lượng cao" output commitments,
+// heritage, and the principal's message. Only the admission *dates* are a
+// placeholder template, flagged inline.
 const NVH_CONFIG: LandingConfig = {
   sections: [
     {
       type: "hero",
-      eyebrow: "Tuyển sinh lớp 6, Năm học 2026 - 2027",
-      headline: "THCS Nguyễn Văn Huyên",
-      subheadline:
-        "Trường học hạnh phúc, nơi mỗi học sinh được yêu thương, tôn trọng và phát triển trọn vẹn.",
+      eyebrow: "Tuyển sinh lớp 6 · Năm học 2026 - 2027",
+      headline: "Trường THCS",
+      headlineHighlight: "Nguyễn Văn Huyên",
+      subheadline: "Hành trình tri thức, đích đến tương lai",
+      // No NVH hero photo yet — Unsplash placeholder; the default overlay tints
+      // it with the tenant ocean blue. Swap for the school's real photo when sent.
       image: unsplash("1580582932707-520aed937b7b"),
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
     },
     {
-      type: "stats",
+      // Real "Trường Chất lượng cao" output commitments (intro.docx, theo Điều 9
+      // QĐ 54/2026/QĐ-UBND) — shown in the quota band's big-number cards.
+      type: "enrollmentQuota",
+      eyebrow: "Năm học",
+      year: "2026 – 2027",
+      title: "Cam kết chất lượng đầu ra",
       items: [
-        { label: "Đỗ THPT công lập", value: "100%" },
-        { label: "Học sinh vào trường chuyên", value: "34" },
-        { label: "Giáo viên đạt chuẩn", value: "100%" },
-        { label: "Xếp hạng thi HSG huyện", value: "Nhất" },
+        {
+          icon: "graduationCap",
+          value: "90%",
+          label: "Học lực Khá & Tốt",
+          note: "Cam kết tối thiểu về chất lượng văn hóa",
+        },
+        {
+          icon: "globe",
+          value: "100%",
+          label: "Ngoại ngữ đạt chuẩn B1",
+          note: "Khung NLNN 6 bậc Việt Nam · thành thạo Tin học ứng dụng",
+        },
       ],
+      footnote: "Mô hình Trường Chất lượng cao (QĐ 54/2026/QĐ-UBND)",
     },
     {
-      type: "about",
-      title: "Lời ngỏ của Cô Hương, Hiệu trưởng",
-      body: "Tại Trường THCS Nguyễn Văn Huyên (Hoài Đức, Hà Nội), chúng tôi xây dựng một 'Trường học Hạnh phúc', nơi học sinh đến trường mỗi ngày là một niềm vui. Với đội ngũ 38 giáo viên đều đạt trình độ đại học, tận tâm và giàu chuyên môn, nhà trường cam kết đồng hành cùng từng em trên hành trình trưởng thành về cả trí tuệ lẫn nhân cách.",
-      image: unsplash("1577896851231-70ef18881754", 1200),
+      // Heritage as a sliding card carousel, before the online steps
+      // (intro.docx). Square image slots fall back to an icon when no photo is
+      // set — drop in NVH's real photos later. Key facts are gradient-bold via
+      // `emphasis` (substrings must appear verbatim in `body`).
+      type: "storyCards",
+      title: "Truyền thống nhà trường",
+      cards: [
+        {
+          icon: "landmark",
+          title: "Giải thích tên trường",
+          body: "Trường vinh dự mang tên Cố Giáo sư, Tiến sĩ Nguyễn Văn Huyên – Bộ trưởng Bộ Giáo dục đầu tiên của Việt Nam. Tiền thân là Trường Chuyên Cấp II Hoài Đức (1992), trường chính thức mang tên ông từ năm 1997.",
+          emphasis: [
+            "Nguyễn Văn Huyên",
+            "Bộ trưởng Bộ Giáo dục đầu tiên",
+            "1992",
+            "1997",
+          ],
+        },
+        {
+          icon: "building",
+          title: "Cơ sở vật chất",
+          body: "Từ năm 2020, trường chuyển về cơ sở mới khang trang rộng 16.505 m², gồm 30 phòng học và 12 phòng bộ môn hiện đại đạt chuẩn quốc gia.",
+          emphasis: [
+            "2020",
+            "16.505 m²",
+            "30 phòng học",
+            "12 phòng bộ môn",
+            "đạt chuẩn quốc gia",
+          ],
+        },
+        {
+          icon: "users",
+          title: "Đội ngũ",
+          body: "Đội ngũ 51 cán bộ, giáo viên, nhân viên đạt 100% trình độ chuẩn và trên chuẩn, với 14 danh hiệu Giáo viên giỏi cấp Tỉnh, Thành phố cùng hàng trăm lượt cấp Huyện.",
+          emphasis: [
+            "51 cán bộ, giáo viên",
+            "100%",
+            "14 danh hiệu Giáo viên giỏi",
+          ],
+        },
+        {
+          icon: "trophy",
+          title: "Thành tích",
+          body: "Các thế hệ học sinh đã mang về hàng chục giải Quốc gia, hàng ngàn giải cấp Tỉnh, Thành phố, nhiều năm liền Nhất – Nhì toàn đoàn Hội khỏe Phù Đổng, cùng Bằng khen của Thủ tướng Chính phủ và Bộ GD&ĐT.",
+          emphasis: [
+            "hàng chục giải Quốc gia",
+            "hàng ngàn giải",
+            "Hội khỏe Phù Đổng",
+            "Bằng khen của Thủ tướng Chính phủ",
+          ],
+        },
+      ],
     },
     {
       type: "process",
-      title: "Quy trình đăng ký tuyển sinh",
+      title: "Các bước tuyển sinh online",
+      // Mirrors the registration wizard (applicant → form → verify → done).
       steps: [
-        { title: "Khai thông tin", description: "Điền thông tin phụ huynh." },
-        { title: "Điền hồ sơ", description: "Hoàn tất biểu mẫu lớp 6." },
-        { title: "Xác thực email", description: "Nhập mã OTP gửi qua email." },
-        { title: "Nộp hồ sơ", description: "Nhận mã hồ sơ để tra cứu." },
-        { title: "Theo dõi", description: "Cập nhật kết quả xét tuyển." },
+        {
+          title: "Người khai",
+          description: "Điền họ tên học sinh và thông tin người khai.",
+        },
+        {
+          title: "Hồ sơ",
+          description: "Hoàn tất biểu mẫu và tải lên ảnh thẻ thí sinh.",
+        },
+        {
+          title: "Xác thực email",
+          description: "Nhập mã OTP gửi tới email đã đăng ký.",
+        },
+        {
+          title: "Hoàn tất",
+          description: "Nhận mã hồ sơ để tra cứu trạng thái.",
+        },
       ],
     },
     {
+      // The 05/6 → 08/6/2026 schedule below is a PLACEHOLDER template — replace
+      // with NVH's official dates when published. The other tabs are real.
       type: "infoTabs",
       title: "Thông tin tuyển sinh",
+      layout: "tabs",
       tabs: [
         {
           id: "eligibility",
           label: "Đối tượng",
-          body: "Học sinh hoàn thành chương trình tiểu học, có hộ khẩu hoặc cư trú tại huyện Hoài Đức và khu vực lân cận theo phân tuyến của Phòng Giáo dục.",
+          highlight: "Sinh năm 2015 · Khu vực Sơn Đồng, Hoài Đức",
+          body: "Học sinh sinh năm 2015 đã hoàn thành chương trình tiểu học, cư trú trên địa bàn xã Sơn Đồng và khu vực Hoài Đức theo phân tuyến tuyển sinh.",
+          icon: "users",
         },
         {
           id: "schedule",
           label: "Lịch tuyển sinh",
-          body: "Nhận hồ sơ trực tuyến từ 01/07 đến 15/07/2026. Công bố danh sách trúng tuyển dự kiến ngày 25/07/2026.",
+          highlight: "Nhận hồ sơ 05/6 → 08/6/2026",
+          body: "Nhận hồ sơ trực tuyến từ ngày 05/6/2026 đến hết ngày 08/6/2026. Hỗ trợ nộp hồ sơ online với những trường hợp không nộp được trực tuyến tại nhà, địa điểm hỗ trợ tại Văn phòng trường THCS Nguyễn Văn Huyên (từ 8h00 đến 17h00 ngày 08/6/2026).",
+          icon: "calendar",
         },
         {
           id: "documents",
-          label: "Hồ sơ cần nộp",
-          body: "Giấy khai sinh, học bạ tiểu học, giấy chứng nhận hoàn thành chương trình tiểu học và ảnh thẻ 3x4.",
+          label: "Hồ sơ cần chuẩn bị",
+          highlight: "Ảnh thẻ của thí sinh",
+          body: "Chuẩn bị sẵn file ảnh thẻ của thí sinh, tải lên khi điền hồ sơ trực tuyến.",
+          icon: "fileText",
         },
       ],
     },
     {
-      type: "testimonials",
-      title: "Cảm nhận của phụ huynh",
+      // The principal's message (intro.docx). Her photo's background was removed
+      // (macOS Vision) → a transparent cut-out that overlaps the message card.
+      type: "pledge",
+      title: "Lời ngỏ của Hiệu trưởng",
       items: [
         {
-          name: "Chị Vũ Mai",
-          role: "Phụ huynh lớp 6C",
+          name: "Cô Trần Thị Mai Hương",
+          role: "Hiệu trưởng",
+          photoUrl: "/tenants/nguyen-van-huyen/tran-thi-mai-huong-cutout.png",
+          portrait: "cutout",
           quote:
-            "Con tôi đi học về luôn kể chuyện vui ở lớp. 'Trường học hạnh phúc' không chỉ là khẩu hiệu mà là điều có thật ở đây.",
-          avatarUrl: unsplash("1487412720507-e7ab37603c6f", 200),
-        },
-        {
-          name: "Anh Nguyễn Thành",
-          role: "Phụ huynh lớp 9A",
-          quote:
-            "Thầy cô tận tâm, sát sao từng học sinh. Năm nay lớp con tôi đỗ công lập gần như tuyệt đối.",
-          avatarUrl: unsplash("1507003211169-0a1dd7228f2d", 200),
-        },
-      ],
-    },
-    {
-      type: "faq",
-      title: "Câu hỏi thường gặp",
-      items: [
-        {
-          question: "'Trường học hạnh phúc' nghĩa là gì?",
-          answer:
-            "Là mô hình giáo dục lấy học sinh làm trung tâm, đề cao sự an toàn, yêu thương và tôn trọng, giúp các em chủ động, tự tin và hạnh phúc khi đến trường.",
-        },
-        {
-          question: "Trường có nhận học sinh trái tuyến không?",
-          answer:
-            "Nhà trường ưu tiên học sinh đúng tuyến; chỉ tiêu trái tuyến (nếu có) được thông báo công khai theo từng năm học.",
-        },
-        {
-          question: "Học phí và các khoản thu như thế nào?",
-          answer:
-            "Trường công lập thu theo quy định của thành phố Hà Nội; chi tiết được niêm yết tại trường và trên website.",
+            "Tại đây, học tập không phải là áp lực thi cử đè nặng mà là một hành trình khám phá đầy hạnh phúc, để các con tự tin làm chủ tương lai và trở thành những công dân toàn cầu có ích.",
         },
       ],
     },
@@ -462,9 +529,14 @@ const NVH_CONFIG: LandingConfig = {
       columns: [
         {
           title: "Liên hệ",
+          // Hotline + email are not in intro.docx — confirm against the school.
           links: [
-            { label: "Địa chỉ: Hoài Đức, Hà Nội", href: "#" },
-            { label: "Hotline: 024 3386 0000", href: "tel:02433860000" },
+            { label: "Địa chỉ: Xã Sơn Đồng, Hoài Đức, Hà Nội", href: "#" },
+            {
+              label: "Hotline: 024 3386 0000",
+              href: "tel:02433860000",
+              gradient: true,
+            },
             {
               label: "Email: c2nguyenvanhuyen@hanoi.edu.vn",
               href: "mailto:c2nguyenvanhuyen@hanoi.edu.vn",

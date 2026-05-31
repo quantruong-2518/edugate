@@ -100,7 +100,7 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
           </ul>
         ) : (
           <Tabs defaultValue={firstTab.id} className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-            <TabsList className="flex h-auto flex-row gap-1 overflow-x-auto rounded-2xl bg-muted/60 p-1.5 sm:w-52 sm:shrink-0 sm:flex-col sm:overflow-visible">
+            <TabsList className="flex h-auto min-w-0 max-w-full flex-row gap-1 overflow-x-auto rounded-2xl bg-muted/60 p-1.5 sm:w-52 sm:shrink-0 sm:flex-col sm:overflow-visible">
               {section.tabs.map((tab) => {
                 const Icon = tab.icon ? ICONS[tab.icon] : Info;
                 return (
