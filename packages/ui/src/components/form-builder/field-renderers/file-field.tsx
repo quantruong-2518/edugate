@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { FileCheck2, Loader2, UploadCloud, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Loader2, UploadCloud, X } from "lucide-react";
 import { toast } from "sonner";
 
 import type {
@@ -25,6 +25,7 @@ import type { FieldProps } from "./types";
 // Domain chrome in VI (default locale `vi`); pha-2 moves these behind intl.
 const COPY = {
   hint: "Kéo thả tệp vào đây, hoặc bấm để chọn",
+  hintMobile: "Bấm để chọn tệp",
   uploading: "Đang tải lên...",
   uploaded: "Đã tải lên hồ sơ",
   replace: "Chọn tệp khác",
@@ -54,7 +55,15 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { fileUploader } = useFormBuilderConfig();
+
+  // Revoke object URL when it changes or on unmount to avoid memory leaks.
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   return (
     <FormField
@@ -74,8 +83,11 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
             return;
           }
           if (!fileUploader) {
-            // No upload pipeline wired (preview / mocks) — record the filename
-            // only so callers that don't need an object store still work.
+            if (field.photoPreview) {
+              // Show a live local preview without uploading.
+              const url = URL.createObjectURL(file);
+              setPreviewUrl(url);
+            }
             f.onChange({ key: "", name: file.name });
             toast.success(COPY.successToast, { description: file.name });
             return;
@@ -95,7 +107,7 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
         };
 
         return (
-          <FormItem>
+          <FormItem className={field.photoPreview ? "space-y-1.5" : undefined}>
             <FormLabel>
               {field.label}
               {field.required && <span className="text-destructive"> *</span>}
@@ -126,9 +138,38 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
                   {COPY.uploading}
                 </p>
               </div>
+            ) : field.photoPreview && previewUrl ? (
+              /* Local image preview — photo slot with overlay controls */
+              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl shadow">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={previewUrl}
+                  alt="Ảnh thẻ thí sinh"
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/40 px-2 py-1.5">
+                  <button
+                    type="button"
+                    onClick={() => inputRef.current?.click()}
+                    className="text-[11px] font-medium text-white/90 hover:text-white"
+                  >
+                    Đổi ảnh
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Xóa ảnh"
+                    onClick={() => {
+                      setPreviewUrl(null);
+                      f.onChange("");
+                    }}
+                    className="rounded-full p-0.5 text-white/70 hover:text-white"
+                  >
+                    <X className="size-3.5" aria-hidden />
+                  </button>
+                </div>
+              </div>
             ) : filename ? (
               <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
-                <FileCheck2 className="size-5 shrink-0 text-primary" aria-hidden />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-foreground">
                     {COPY.uploaded}
@@ -153,6 +194,54 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
                   <X className="size-4" aria-hidden />
                 </button>
               </div>
+            ) : field.photoPreview ? (
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragging(true);
+                }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragging(false);
+                  const file = e.dataTransfer.files?.[0];
+                  if (file) void accept(file);
+                }}
+                className={cn(
+                  "flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition-colors",
+                  "aspect-[3/4] shadow",
+                  dragging
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-muted/20 hover:border-primary/50 hover:bg-accent/40",
+                )}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-muted-foreground/50"
+                  aria-hidden
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span className="text-xs font-medium text-muted-foreground">
+                  Chọn ảnh thẻ
+                </span>
+                {field.accept && (
+                  <span className="text-[10px] text-muted-foreground/50">
+                    JPG / PNG
+                  </span>
+                )}
+              </button>
             ) : (
               <button
                 type="button"
@@ -179,7 +268,11 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
                   className="size-7 text-muted-foreground"
                   aria-hidden
                 />
-                <span className="text-sm font-medium text-foreground">
+                {/* Drag is desktop-only; show a tap-oriented label on mobile. */}
+                <span className="text-sm font-medium text-foreground sm:hidden">
+                  {COPY.hintMobile}
+                </span>
+                <span className="hidden text-sm font-medium text-foreground sm:inline">
                   {COPY.hint}
                 </span>
                 {field.accept && (

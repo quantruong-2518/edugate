@@ -23,6 +23,7 @@ export const FORM_FIELD_TYPES = [
   "address",
   "heading",
   "studentLookup",
+  "gradeTable",
 ] as const;
 
 export type FormFieldType = (typeof FORM_FIELD_TYPES)[number];
@@ -85,6 +86,8 @@ export type FileValue = {
 export type FileField = FieldBase & {
   type: "file";
   accept?: string;
+  /** Render as a portrait-style CV photo upload slot instead of a full-width drop zone. */
+  photoPreview?: boolean;
 };
 
 export type ScoringField = FieldBase & {
@@ -148,6 +151,16 @@ export type StudentLookupValue = {
 
 export type StudentLookupField = FieldBase & { type: "studentLookup" };
 
+export type GradeTableRow = { name: string; label: string };
+
+export type GradeTableField = FieldBase & {
+  type: "gradeTable";
+  /** One row per academic year. */
+  rows: GradeTableRow[];
+  /** Uniform options shown as radio buttons in each row (same for all rows). */
+  options: SelectOption[];
+};
+
 export type FormFieldSchema =
   | TextField
   | NumberField
@@ -161,15 +174,27 @@ export type FormFieldSchema =
   | CheckboxField
   | AddressField
   | HeadingField
-  | StudentLookupField;
+  | StudentLookupField
+  | GradeTableField;
 
 export type FormSection = {
   title?: string;
   description?: string;
   fields: FormFieldSchema[];
+  /**
+   * `"photo-profile"` renders the first field (a photo upload) on the left with
+   * a 3:4 portrait frame and the remaining fields stacked on the right.
+   * All other sections use the default 2-column grid.
+   */
+  layout?: "photo-profile";
 };
 
 export type FormSchema = {
+  /**
+   * Optional inline notice rendered above the form. Use `**text**` to mark
+   * phrases that should render as gradient-bold (parsed by form-step renderer).
+   */
+  notice?: string;
   sections: FormSection[];
 };
 
@@ -210,16 +235,20 @@ export function isFieldEmpty(field: FormFieldSchema, value: unknown): boolean {
       return !s || !s.code || !s.name;
     }
     case "file": {
-      // Tolerate the legacy plain-string shape (pha-1 mocks stored filename
-      // only) so existing drafts/seed data still validate. New writes always
-      // produce { key, name }.
+      // A file is non-empty as long as it has a filename. The `key` may be ""
+      // in pha-1 (no upload pipeline wired) — don't require it for validation.
       if (typeof value === "string") return value === "";
       const f = value as Partial<FileValue> | null | undefined;
-      return !f || !f.key || !f.name;
+      return !f || !f.name;
     }
     case "number":
     case "scoring":
       return value === undefined || value === null;
+    case "gradeTable": {
+      const v = value as Record<string, string> | null | undefined;
+      if (!v || typeof v !== "object") return true;
+      return field.rows.some((row) => !v[row.name]);
+    }
     case "heading":
       return false;
     default:

@@ -17,6 +17,8 @@ export {
   type FormFieldType,
   type FormSchema,
   type FormSection,
+  type GradeTableField,
+  type GradeTableRow,
   type HeadingField,
   type NumberField,
   type PhoneField,

@@ -14,6 +14,7 @@ import { NumberFieldRenderer } from "./number-field";
 import { PhoneFieldRenderer } from "./phone-field";
 import { RadioFieldRenderer } from "./radio-field";
 import { SelectFieldRenderer } from "./select-field";
+import { GradeTableRenderer } from "./grade-table-renderer";
 import { StudentLookupFieldRenderer } from "./student-lookup-field";
 import { TextFieldRenderer } from "./text-field";
 
@@ -50,5 +51,7 @@ export function FieldRenderer({
       return <HeadingFieldRenderer field={field} />;
     case "studentLookup":
       return <StudentLookupFieldRenderer field={field} control={control} />;
+    case "gradeTable":
+      return <GradeTableRenderer field={field} control={control} />;
   }
 }

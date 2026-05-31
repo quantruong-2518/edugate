@@ -78,6 +78,9 @@ function fieldBaseZod(field: FormFieldSchema): z.ZodTypeAny {
       .optional()
       .default("");
   }
+  if (field.type === "gradeTable") {
+    return z.record(z.string()).optional().default({});
+  }
   return z.string().optional().default("");
 }
 

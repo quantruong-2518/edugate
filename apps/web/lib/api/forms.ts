@@ -8,32 +8,7 @@ import type { FormSchema } from "@shared/form";
 
 type FormField = FormSchema["sections"][number]["fields"][number];
 
-/**
- * Shared priority-category checkbox. The option *values* are read back by the
- * admin detail view and seeded by the mock generator, so keep them stable when
- * editing labels. Priority applies at every level (THCS and THPT alike).
- */
-const PRIORITY_CATEGORY_FIELD: FormField = {
-  type: "checkbox",
-  name: "priorityCategory",
-  label: "Đối tượng ưu tiên",
-  description:
-    "Chọn tất cả diện phù hợp. Bỏ trống nếu không thuộc diện ưu tiên.",
-  options: [
-    { value: "remote_area", label: "Con em vùng sâu vùng xa, biên giới, hải đảo" },
-    {
-      value: "policy_family",
-      label: "Con em gia đình thương binh, liệt sỹ, người có công",
-    },
-    { value: "ethnic_minority", label: "Học sinh người dân tộc thiểu số" },
-    {
-      value: "single_parent",
-      label: "Con gia đình đơn thân/có hoàn cảnh đặc biệt",
-    },
-  ],
-};
-
-/** Compact constructor for a 0–10 average/exam score field. */
+/** Compact constructor for a 0–10 average/exam score field (THPT form). */
 const scoring = (name: string, label: string): FormField => ({
   type: "scoring",
   name,
@@ -44,53 +19,111 @@ const scoring = (name: string, label: string): FormField => ({
   step: 0.1,
 });
 
+/** Single-option checkbox: con em gia đình thương binh, liệt sỹ. */
+const PRIORITY_CATEGORY_FIELD: FormField = {
+  type: "checkbox",
+  name: "priorityCategory",
+  label: "Đối tượng ưu tiên",
+  description: "Để trống nếu không thuộc diện ưu tiên.",
+  options: [
+    {
+      value: "policy_family",
+      label: "Con em gia đình thương binh, liệt sỹ, người có công",
+    },
+  ],
+};
+
+/** Academic results per grade year (radio: Xuất sắc / Giỏi / Khá / Trung bình). */
+const ACADEMIC_RESULTS_FIELD: FormField = {
+  type: "gradeTable",
+  name: "academicResults",
+  label: "Thành tích học tập",
+  required: false,
+  rows: [
+    { name: "grade1", label: "Lớp 1" },
+    { name: "grade2", label: "Lớp 2" },
+    { name: "grade3", label: "Lớp 3" },
+    { name: "grade4", label: "Lớp 4" },
+    { name: "grade5", label: "Lớp 5" },
+  ],
+  options: [
+    { value: "excellent", label: "Xuất sắc" },
+    { value: "good", label: "Giỏi" },
+    { value: "average", label: "Khá" },
+    { value: "below_average", label: "Trung bình" },
+  ],
+};
+
 const BASE_FORM_SCHEMA: FormSchema = {
   sections: [
     {
-      title: "Thông tin học sinh",
+      layout: "photo-profile",
       fields: [
         {
-          type: "studentLookup",
-          name: "student",
-          label: "Mã học sinh (do Bộ GD&ĐT cấp)",
+          type: "file",
+          name: "studentPhoto",
+          label: "Ảnh thẻ thí sinh",
+          required: true,
+          accept: ".jpg,.jpeg,.png",
+          photoPreview: true,
+          description: "Ảnh chân dung rõ nét, nền đơn sắc.",
+        },
+        {
+          type: "text",
+          name: "studentName",
+          label: "Họ và tên học sinh",
+          required: true,
+          placeholder: "VD: Nguyễn Văn An",
+        },
+        {
+          type: "text",
+          name: "studentCode",
+          label: "Mã học sinh",
           required: true,
           placeholder: "VD: 79012345678",
-          description: "Nhập mã định danh học sinh.",
+          description: "Mã định danh do Bộ GD&ĐT cấp.",
+        },
+        {
+          type: "date",
+          name: "dateOfBirth",
+          label: "Ngày sinh",
+          required: true,
+        },
+        {
+          type: "select",
+          name: "gender",
+          label: "Giới tính",
+          required: true,
+          placeholder: "Chọn giới tính",
+          options: [
+            { value: "male", label: "Nam" },
+            { value: "female", label: "Nữ" },
+          ],
         },
         PRIORITY_CATEGORY_FIELD,
       ],
     },
     {
-      title: "Thành tích học tập",
       fields: [
-        scoring("grade1", "Điểm TB lớp 1"),
-        scoring("grade2", "Điểm TB lớp 2"),
-        scoring("grade3", "Điểm TB lớp 3"),
-        scoring("grade4", "Điểm TB lớp 4"),
-        scoring("grade5", "Điểm TB lớp 5"),
+        ACADEMIC_RESULTS_FIELD,
+        {
+          type: "checkbox",
+          name: "hasSpecialAchievements",
+          label: "Thành tích đặc biệt",
+          options: [{ value: "yes", label: "Học sinh có giải thưởng hoặc danh hiệu đặc biệt" }],
+        },
         {
           type: "text",
           name: "specialAchievements",
-          label: "Thành tích đặc biệt",
-          description:
-            "Giải thưởng, danh hiệu học sinh giỏi, v.v. Để trống nếu không có.",
+          label: "Mô tả thành tích",
+          multiline: true,
+          maxLength: 500,
+          placeholder: "VD: Giải Nhì môn Toán cấp quận năm học 2024-2025",
+          visibleWhen: { field: "hasSpecialAchievements", op: "nonEmpty" },
         },
       ],
     },
     {
-      title: "Hồ sơ tuyển sinh",
-      fields: [
-        {
-          type: "file",
-          name: "transcript",
-          label: "Hồ sơ học bạ (PDF/ảnh)",
-          required: true,
-          accept: ".pdf,.jpg,.jpeg,.png",
-        },
-      ],
-    },
-    {
-      title: "Nguyện vọng phụ huynh",
       fields: [
         {
           type: "text",
@@ -111,52 +144,60 @@ const STUDENT_PHOTO_FIELD: FormField = {
   label: "Ảnh thẻ thí sinh",
   required: true,
   accept: ".jpg,.jpeg,.png",
-  description: "Ảnh chân dung rõ nét, nền đơn sắc (định dạng JPG/PNG).",
+  photoPreview: true,
+  description: "Ảnh chân dung rõ nét, nền đơn sắc.",
 };
 
 /**
  * Nguyễn Gia Thiều: free-text student code (no MOET lookup), student ID
  * photo, optional note. Per the school: validation against the MOET
  * registry happens offline during admission review, not at submit time.
+ *
+ * Field key `dateOfBirth` aligns with the admin view's dedicated display
+ * column and mock data generator; `gender` is required by the school.
  */
 const NGT_FORM_SCHEMA: FormSchema = {
+  notice:
+    "Nhà trường **chỉ nhận đăng ký từ học sinh đang cư trú tại Thành phố Hà Nội**. " +
+    "Nếu đến ngày nộp hồ sơ chính thức phát hiện thông tin cư trú không đúng quy định, " +
+    "gia đình **tự chịu hoàn toàn trách nhiệm** về mọi hậu quả phát sinh. " +
+    "Xin trân trọng cảm ơn.",
   sections: [
     {
-      title: "Thông tin học sinh",
+      layout: "photo-profile",
       fields: [
-        {
-          type: "text",
-          name: "studentCode",
-          label: "Mã học sinh (do Bộ GD&ĐT cấp)",
-          required: true,
-          placeholder: "VD: 79012345678",
-          description: "Nhập mã định danh học sinh.",
-          colSpan: 1,
-        },
-        {
-          type: "date",
-          name: "dob",
-          label: "Ngày sinh",
-          required: true,
-          colSpan: 1,
-        },
-        {
-          type: "text",
-          name: "residence",
-          label: "Địa chỉ thường trú",
-          required: true,
-          multiline: true,
-          maxLength: 300,
-          placeholder: "Số nhà, tổ/thôn, phường/xã, quận/huyện, tỉnh/thành",
-        },
         STUDENT_PHOTO_FIELD,
         {
           type: "text",
-          name: "note",
-          label: "Ghi chú thêm",
-          multiline: true,
-          maxLength: 500,
-          description: "Không bắt buộc.",
+          name: "studentName",
+          label: "Họ và tên học sinh",
+          required: true,
+          placeholder: "VD: Nguyễn Văn An",
+        },
+        {
+          type: "text",
+          name: "studentCode",
+          label: "Mã học sinh",
+          required: true,
+          placeholder: "VD: 79012345678",
+          description: "Mã định danh do Bộ GD&ĐT cấp.",
+        },
+        {
+          type: "date",
+          name: "dateOfBirth",
+          label: "Ngày tháng năm sinh",
+          required: true,
+        },
+        {
+          type: "select",
+          name: "gender",
+          label: "Giới tính",
+          required: true,
+          placeholder: "Chọn giới tính",
+          options: [
+            { value: "male", label: "Nam" },
+            { value: "female", label: "Nữ" },
+          ],
         },
       ],
     },

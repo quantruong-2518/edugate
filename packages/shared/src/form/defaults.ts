@@ -21,6 +21,8 @@ export function defaultValuesFor(schema: FormSchema): Record<string, unknown> {
       out[field.name] = { province: "", district: "", ward: "" };
     } else if (field.type === "studentLookup") {
       out[field.name] = { code: "" };
+    } else if (field.type === "gradeTable") {
+      out[field.name] = {};
     } else {
       out[field.name] = isNumericField(field) ? undefined : "";
     }
