@@ -104,7 +104,7 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
   },
   "nguyen-gia-thieu": {
     code: "nguyen-gia-thieu",
-    name: "Trường THCS Nguyễn Gia Thiều, Long Biên, Hà Nội",
+    name: "Trường THCS Nguyễn Gia Thiều, Phúc Lợi, Hà Nội",
     shortName: "NGT",
     logoUrl: null,
     theme: tenantTheme({
