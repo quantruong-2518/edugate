@@ -130,12 +130,16 @@
     "codeLabel": "Application code",
     "codePlaceholder": "Enter application code",
     "search": "Track",
+    "studentName": "Student name",
+    "parentName": "Parent name",
+    "notProvided": "Not provided",
     "notFound": {
       "title": "Application not found",
       "description": "Check the application code and try again"
     },
     "timeline": {
-      "title": "Status history"
+      "title": "Application progress",
+      "by": "by {name}"
     }
   },
   "auth": {

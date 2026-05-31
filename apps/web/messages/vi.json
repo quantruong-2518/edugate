@@ -130,12 +130,16 @@
     "codeLabel": "Mã hồ sơ",
     "codePlaceholder": "Nhập mã hồ sơ",
     "search": "Tra cứu",
+    "studentName": "Tên học sinh",
+    "parentName": "Tên phụ huynh",
+    "notProvided": "Chưa cập nhật",
     "notFound": {
       "title": "Không tìm thấy hồ sơ",
       "description": "Kiểm tra lại mã hồ sơ và thử lại"
     },
     "timeline": {
-      "title": "Lịch sử trạng thái"
+      "title": "Tiến trình hồ sơ",
+      "by": "bởi {name}"
     }
   },
   "auth": {
