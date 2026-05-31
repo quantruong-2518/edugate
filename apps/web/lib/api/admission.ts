@@ -1,6 +1,5 @@
-import axios from "axios";
-
 import {
+  generateApplicationCode,
   type Applicant,
   type Application,
   type ApplicationCode,
@@ -14,16 +13,19 @@ import {
 import { http } from "./http";
 
 /**
- * Admission API seam. The 4 public flows below talk to the NestJS API via
- * `http` (axios) — base URL from `NEXT_PUBLIC_API_URL`, `x-tenant-code`
- * header set by the request interceptor. The seam preserves signatures so
- * the TanStack Query hooks in `queries.ts` and every call site stayed
- * unchanged across the swap (the one exception is `otpToken`, which the
- * wizard now threads from verify → submit per API_SPEC §3.3 + §3.1).
+ * Admission API seam.
  *
- * Management endpoints (`listApplications`, `getApplicationAnalytics`,
- * notifications) are still mock-backed until the corresponding NestJS
- * routes land in Day 6+.
+ * Pha-1 mock: the public apply flow runs without a back-end. OTP is a fixed
+ * dev code (`MOCK_OTP_CODE`) and submitted applications are stored in
+ * localStorage so the confirmation + `/track/:code` pages work offline.
+ * Signatures match the pha-2 API, so the TanStack Query hooks in `queries.ts`
+ * and every call site are unchanged — pha 2 sets `NEXT_PUBLIC_API_URL` and
+ * swaps each body back to an `http` call (threading `otpToken` from verify →
+ * submit per API_SPEC §3.3 + §3.1).
+ *
+ * Only the public apply flow (OTP + submit + track-by-code) is mocked here.
+ * The admin/management endpoints below are a mix of real `http` calls (e.g.
+ * `listApplications`) and the deterministic seeded generator — left untouched.
  */
 
 export type CreateApplicationInput = {
@@ -58,127 +60,93 @@ export type VerifyEmailOtpResult = {
   expiresAt: string;
 };
 
-type CreateApplicationResponse = {
-  code: string;
-  state: ApplicationState;
-  createdAt: string;
-};
+/** Fixed OTP for the pha-1 mock — no SMTP / back-end needed. */
+const MOCK_OTP_CODE = "123456";
 
-type GetApplicationResponse = {
-  code: string;
-  state: ApplicationState;
-  applicant: Applicant;
-  formData: Record<string, unknown>;
-  history: Array<{
-    state: ApplicationState;
-    at: string;
-    byRole: string | null;
-    note: string | null;
-  }>;
-  createdAt: string;
-  updatedAt: string;
-  submittedAt: string | null;
-};
+/** localStorage key for mock-submitted applications (apply → track, offline). */
+const APPLICATION_STORE_KEY = "ghidanh:applications";
+
+function readApplicationStore(): Record<string, Application> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(APPLICATION_STORE_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, Application>) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeApplicationStore(store: Record<string, Application>): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(APPLICATION_STORE_KEY, JSON.stringify(store));
+  } catch {
+    // Ignore quota / private-mode failures.
+  }
+}
+
+/** ISO timestamp `minutes` from now (OTP expiry). */
+function isoIn(minutes: number): string {
+  return new Date(Date.now() + minutes * 60 * 1000).toISOString();
+}
 
 /**
- * Submit a new application. The API returns a thin acknowledgement; we
- * project it into the FE `Application` shape using the fields the caller
- * already had so consumers (confirmation page, TanStack Query cache seed)
- * don't need a second round-trip.
+ * Submit a new application. Mock: generate a code, mark it SUBMITTED, and
+ * persist to localStorage so the confirmation page + `/track/:code` resolve
+ * offline. `otpToken` is accepted as-is (the mock verify issues it); pha 2 has
+ * the API validate it and own canonical code generation.
  */
 export async function createApplication(
   input: CreateApplicationInput,
 ): Promise<Application> {
-  const { data } = await http.post<CreateApplicationResponse>("/v1/applications", {
-    campaignId: input.campaignId,
-    applicant: input.applicant,
-    formData: input.formData,
-    otpToken: input.otpToken,
-  });
-  return {
-    code: data.code,
+  const code = generateApplicationCode(input.tenantCode).toUpperCase();
+  const at = new Date().toISOString();
+  const application: Application = {
+    code,
     tenantCode: input.tenantCode,
-    campaignId: input.campaignId,
-    state: data.state,
+    ...(input.campaignId ? { campaignId: input.campaignId } : {}),
+    state: "SUBMITTED",
     applicant: input.applicant,
     formData: input.formData,
-    history: [{ state: data.state, at: data.createdAt }],
-    createdAt: data.createdAt,
-    updatedAt: data.createdAt,
+    history: [{ state: "SUBMITTED", at }],
+    createdAt: at,
+    updatedAt: at,
   };
+  const store = readApplicationStore();
+  store[code] = application;
+  writeApplicationStore(store);
+  return delay(application);
 }
 
 export async function getApplicationByCode(
   code: ApplicationCode,
 ): Promise<Application | null> {
-  try {
-    const { data } = await http.get<GetApplicationResponse>(
-      `/v1/applications/by-code/${encodeURIComponent(code.trim().toUpperCase())}`,
-    );
-    // Cross-tenant codes return 404 via RLS; non-404 errors fall through to
-    // the catch and bubble up so the caller's error UI fires.
-    const tenantCode = readTenantCodeFromUrl();
-    return {
-      code: data.code,
-      tenantCode,
-      state: data.state,
-      applicant: data.applicant,
-      formData: data.formData,
-      history: data.history.map((h) => ({
-        state: h.state,
-        at: h.at,
-        ...(h.note !== null ? { note: h.note } : {}),
-      })),
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
-  } catch (err) {
-    if (axios.isAxiosError(err) && err.response?.status === 404) {
-      return null;
-    }
-    throw err;
-  }
+  // Mock: read from the localStorage store this session's submit wrote to.
+  const store = readApplicationStore();
+  return delay(store[code.trim().toUpperCase()] ?? null);
 }
 
 export async function sendEmailOtp(
-  input: SendEmailOtpInput,
+  _input: SendEmailOtpInput,
 ): Promise<SendEmailOtpResult> {
-  const { data } = await http.post<SendEmailOtpResult>(
-    "/v1/applications/otp/send",
-    { email: input.email },
-  );
-  return data;
+  // Mock: no SMTP. The code is always MOCK_OTP_CODE; `devCode` lets the UI
+  // toast it so a tester can self-serve without a back-end.
+  return delay({ sent: true, expiresAt: isoIn(10), devCode: MOCK_OTP_CODE });
 }
 
 export async function verifyEmailOtp(
   input: VerifyEmailOtpInput,
 ): Promise<VerifyEmailOtpResult> {
-  try {
-    const { data } = await http.post<VerifyEmailOtpResult>(
-      "/v1/applications/otp/verify",
-      { email: input.email, code: input.code },
-    );
-    return data;
-  } catch (err) {
-    if (axios.isAxiosError(err) && err.response?.status === 400) {
-      // Wrong code or expired — surface a "not verified" result rather than
-      // throwing so the form UI can show a normal validation message.
-      return { verified: false, otpToken: "", expiresAt: "" };
-    }
-    throw err;
+  // Mock: only MOCK_OTP_CODE verifies. A wrong code returns "not verified"
+  // (not a throw) so the form shows a normal validation message.
+  if (input.code.trim() !== MOCK_OTP_CODE) {
+    return delay({ verified: false, otpToken: "", expiresAt: "" });
   }
-}
-
-function readTenantCodeFromUrl(): string {
-  if (typeof window === "undefined") return "";
-  // The seam runs client-side after the wizard renders, so the URL is real.
-  const host = window.location.host;
-  const subdomain = host.split(".")[0];
-  if (subdomain && subdomain !== "localhost" && subdomain !== "127") {
-    return subdomain;
-  }
-  const m = window.location.pathname.match(/^\/t\/([^/]+)/);
-  return m?.[1] ?? "";
+  return delay({
+    verified: true,
+    otpToken: `mock-otp-${Date.now()}`,
+    expiresAt: isoIn(10),
+  });
 }
 
 /** Simulated network latency for the mock-backed management endpoints below. */

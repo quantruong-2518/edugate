@@ -53,9 +53,9 @@ All UI strings go through `next-intl` (`getTranslations` in RSC, `useTranslation
 
 ## Data seam pattern
 
-`lib/api/` is the single swap-point for pha 1 → pha 2. Public/apply flows (`createApplication`, `sendEmailOtp`, `verifyEmailOtp`) already talk to the NestJS API via `lib/api/http.ts` (axios). Management endpoints (`listApplications`, analytics, notifications) are still mock-backed in `mock-applications.ts`. TanStack Query hooks live in `queries.ts`; call sites never import seam functions directly.
+`lib/api/` is the single swap-point for pha 1 → pha 2. The public apply flow (`createApplication`, `getApplicationByCode`, `sendEmailOtp`, `verifyEmailOtp` in `admission.ts`) is **mock-backed** for offline FE work: OTP is the fixed code `123456` (`MOCK_OTP_CODE`), submitted applications persist to `localStorage` (`ghidanh:applications`) so confirmation + `/track/:code` resolve without a back-end. Admin/management endpoints are mixed — `listApplications` calls the real NestJS API via `lib/api/http.ts` (axios), analytics/notifications use the seeded generator. To go live, set `NEXT_PUBLIC_API_URL` and swap the apply-flow bodies back to `http` (signatures are API-compatible). TanStack Query hooks live in `queries.ts`; call sites never import seam functions directly.
 
-RSC fetchers (`getLandingConfig`, `getApplicationFormSchema`, `getTenantBranding`) stay server-only and are **not** wrapped in `useQuery`.
+RSC fetchers (`getLandingConfig`, `getApplicationFormSchema`, `getTenantBranding`) stay server-only and are **not** wrapped in `useQuery`. Per-tenant form schemas live in `lib/api/form-schemas/` (one file per tenant + registry, validated by the `@shared/form` meta-validator).
 
 ## FormBuilder
 
