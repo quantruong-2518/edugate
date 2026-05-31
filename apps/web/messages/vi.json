@@ -52,6 +52,9 @@
     "pledge": {
       "goto": "Xem tuyên ngôn {index}"
     },
+    "storyCards": {
+      "goto": "Xem mục {index}"
+    },
     "faq": {
       "title": "Câu hỏi thường gặp"
     },
@@ -81,7 +84,7 @@
       "description": "Cho chúng tôi biết ai đang nộp hồ sơ này.",
       "studentFullName": "Họ và tên học sinh",
       "studentFullNamePlaceholder": "VD: Nguyễn Văn An",
-      "fullName": "Họ và tên",
+      "fullName": "Họ và tên người nộp hồ sơ",
       "email": "Email",
       "phone": "Số điện thoại",
       "relationship": "Quan hệ với học sinh",

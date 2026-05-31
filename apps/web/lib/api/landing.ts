@@ -298,7 +298,7 @@ const NHT_CONFIG: LandingConfig = {
       // Real staff photos (background removed → transparent cut-outs). Quotes
       // are still sample copy — swap for the school's actual pledges.
       type: "pledge",
-      title: "Tuyên ngôn chất lượng",
+      title: "Quan điểm giáo dục",
       items: [
         {
           name: "Cô Nguyễn Thị Thu Hà",
@@ -402,10 +402,10 @@ const NVH_CONFIG: LandingConfig = {
       footnote: "Mô hình Trường Chất lượng cao (QĐ 54/2026/QĐ-UBND)",
     },
     {
-      // Heritage as a sliding card carousel, before the online steps
-      // (intro.docx). Square image slots fall back to an icon when no photo is
-      // set — drop in NVH's real photos later. Key facts are gradient-bold via
-      // `emphasis` (substrings must appear verbatim in `body`).
+      // Heritage as a one-at-a-time newspaper-style feature before the online
+      // steps (intro.docx): each story rotates in with a large drop cap and key
+      // facts gradient-bold via `emphasis` (substrings must appear verbatim in
+      // `body`). No images — pure editorial type.
       type: "storyCards",
       title: "Truyền thống nhà trường",
       cards: [

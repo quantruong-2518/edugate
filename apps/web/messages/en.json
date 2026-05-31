@@ -52,6 +52,9 @@
     "pledge": {
       "goto": "View pledge {index}"
     },
+    "storyCards": {
+      "goto": "View item {index}"
+    },
     "faq": {
       "title": "Frequently asked questions"
     },

@@ -18,7 +18,7 @@ import {
  */
 export const NHT_FORM_SCHEMA = {
   notice:
-    "Nhà trường tuyển sinh theo **phân tuyến của huyện Đông Anh**. " +
+    "Nhà trường tuyển sinh theo **phân tuyến của thành phố Hà Nội**. " +
     "Phụ huynh vui lòng kê khai trung thực; nếu thông tin cư trú không đúng quy định, " +
     "gia đình **tự chịu trách nhiệm** về mọi hậu quả phát sinh. Xin trân trọng cảm ơn.",
   sections: [

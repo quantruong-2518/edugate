@@ -1,23 +1,12 @@
-import {
-  BookOpen,
-  Building2,
-  Landmark,
-  Sparkles,
-  Trophy,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
+"use client";
 
-import type { StoryCardIcon, StoryCardsSection } from "@shared/landing";
+import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 
-const ICONS: Record<StoryCardIcon, LucideIcon> = {
-  landmark: Landmark,
-  building: Building2,
-  users: Users,
-  trophy: Trophy,
-  bookOpen: BookOpen,
-  sparkles: Sparkles,
-};
+import type { StoryCardsSection } from "@shared/landing";
+
+/** One story every this many ms. */
+const ROTATE_MS = 3000;
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -56,69 +45,93 @@ function Emphasized({ text, emphasis }: { text: string; emphasis?: string[] }) {
 }
 
 /**
- * A horizontal, snap-scrolling carousel of story cards (e.g. a school's
- * "Truyền thống"). Each card leads with a square, rounded image slot (~1/3 of
- * the card) — an icon-on-gradient placeholder when no photo is set — then a
- * title and a short body with key facts emphasised. Pure CSS scroll-snap, so it
- * stays a server component. Inherits the tenant tint via `data-section`.
+ * Editorial "Truyền thống" feature, styled as a newspaper column: one story at
+ * a time, no headline — just a short accent rule and the body led by a large
+ * drop cap spanning several lines, with key facts emphasised. Auto-advances
+ * every 3s, pausing on hover/focus and when the visitor prefers reduced motion.
+ * Inherits the tenant tint via `data-section`.
  */
 export function StoryCardsSection({ section }: { section: StoryCardsSection }) {
-  if (section.cards.length === 0) return null;
+  const t = useTranslations("landing");
+  const cards = section.cards;
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (cards.length <= 1 || paused) return;
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+    const id = window.setInterval(
+      () => setActive((a) => (a + 1) % cards.length),
+      ROTATE_MS,
+    );
+    return () => window.clearInterval(id);
+  }, [cards.length, paused, active]);
+
+  if (cards.length === 0) return null;
+
+  const current = cards[active] ?? cards[0]!;
 
   return (
     <section
       data-section="storyCards"
       className="bg-muted/40 px-4 py-16 sm:px-6 sm:py-24"
     >
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-2xl">
         {section.title && (
-          <h2 className="mb-8 text-center text-3xl font-semibold tracking-tight sm:mb-12 sm:text-4xl">
+          <h2 className="mb-10 text-center text-3xl font-semibold tracking-tight sm:mb-14 sm:text-4xl">
             {section.title}
           </h2>
         )}
 
-        {/* Edge-to-edge snap carousel; hidden scrollbar, drag/swipe to slide. */}
-        <ul className="-mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:-mx-6 sm:px-6 [&::-webkit-scrollbar]:hidden">
-          {section.cards.map((card, i) => {
-            const Icon = (card.icon && ICONS[card.icon]) || Sparkles;
-            return (
-              <li
-                key={card.title}
-                className="flex min-w-[78%] max-w-[22rem] shrink-0 snap-start flex-col rounded-3xl bg-gradient-to-br from-card to-muted/40 p-6 shadow-sm ring-1 ring-border/50 sm:min-w-[20rem] sm:p-7"
-              >
-                <div className="flex items-center gap-4">
-                  {/* Square image slot (~1/3 of the card) — photo or icon. */}
-                  <div className="aspect-square w-[34%] min-w-[5.5rem] shrink-0 overflow-hidden rounded-2xl ring-1 ring-border/60">
-                    {card.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={card.image}
-                        alt={card.title}
-                        className="size-full object-cover"
-                      />
-                    ) : (
-                      <div className="grid size-full place-items-center bg-gradient-to-br from-primary to-primary/55 text-primary-foreground">
-                        <Icon className="size-8" aria-hidden />
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <span className="font-display text-sm font-bold text-primary">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <h3 className="font-display text-lg font-bold leading-tight tracking-tight text-foreground sm:text-xl">
-                      {card.title}
-                    </h3>
-                  </div>
-                </div>
+        <div
+          className="min-h-[14rem] sm:min-h-[10rem]"
+          role="group"
+          aria-roledescription="carousel"
+          aria-label={section.title}
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onFocusCapture={() => setPaused(true)}
+          onBlurCapture={() => setPaused(false)}
+        >
+          {/* Re-mounting on `active` replays the fade for each story. */}
+          <article
+            key={active}
+            aria-roledescription="slide"
+            aria-label={`${active + 1} / ${cards.length}`}
+            className="animate-in fade-in-0 slide-in-from-right-4 duration-500"
+          >
+            <div className="h-1 w-12 rounded-full bg-primary" />
+            {/* Drop cap on the first letter — the newspaper lede look. */}
+            <p className="mt-6 text-pretty text-lg leading-relaxed text-foreground/85 [&::first-letter]:float-left [&::first-letter]:mr-3 [&::first-letter]:mt-1 [&::first-letter]:font-display [&::first-letter]:text-7xl [&::first-letter]:font-bold [&::first-letter]:leading-[0.85] [&::first-letter]:text-primary sm:text-xl sm:[&::first-letter]:text-8xl">
+              <Emphasized text={current.body} emphasis={current.emphasis} />
+            </p>
+          </article>
+        </div>
 
-                <p className="mt-5 text-pretty text-[15px] leading-relaxed text-muted-foreground">
-                  <Emphasized text={card.body} emphasis={card.emphasis} />
-                </p>
-              </li>
-            );
-          })}
-        </ul>
+        {/* Passive progress ticks — no prev/next controls (auto only). */}
+        {cards.length > 1 && (
+          <div className="mt-10 flex justify-center gap-2.5">
+            {cards.map((card, i) => (
+              <button
+                key={card.title}
+                type="button"
+                aria-label={t("storyCards.goto", { index: i + 1 })}
+                aria-current={i === active}
+                onClick={() => setActive(i)}
+                className={`h-2 rounded-full transition-all ${
+                  i === active
+                    ? "w-7 bg-primary"
+                    : "w-2 bg-primary/25 hover:bg-primary/50"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

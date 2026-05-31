@@ -156,7 +156,7 @@ export const enrollmentQuotaSectionSchema = z.object({
 });
 
 /**
- * "Tuyên ngôn chất lượng" — a carousel of staff quality pledges. Each slide is a
+ * "Quan điểm giáo dục" — a carousel of staff quality pledges. Each slide is a
  * clipped ("lẹm") card with the speaker's portrait overlapping the top edge, the
  * pledge in italic, and the speaker's name + role beneath. Distinct from
  * `testimonials` (parent quotes, static grid).
