@@ -14,6 +14,14 @@
 
 export const TENANT_HEADER = "x-tenant-code";
 
+/**
+ * Cookie that persists the active tenant across tenant-less URLs on a shared
+ * host (e.g. reloading `/register` on dev localhost). The URL always wins over
+ * it; it is only a fallback. Host-scoped (no Domain attr) so prod subdomains
+ * stay isolated. See ADR-014.
+ */
+export const TENANT_COOKIE = "EDUGATE_TENANT";
+
 /** Subdomains that map to the root site or infra, not a tenant. */
 export const RESERVED_SUBDOMAINS: ReadonlySet<string> = new Set([
   "www",

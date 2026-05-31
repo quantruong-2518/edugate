@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import {
+  TENANT_COOKIE,
   TENANT_HEADER,
+  isValidTenantCode,
   parseTenantFromCustomDomain,
   parseTenantFromHost,
   parseTenantFromPath,
@@ -12,10 +14,17 @@ import { CUSTOM_DOMAIN_TENANTS } from "@/lib/tenants/custom-domains";
 
 const ROOT_HOSTS = resolveRootHosts(process.env.TENANT_ROOT_HOSTS);
 
+// 30 days, refreshed on every tenant'd request (sliding expiry). Persists the
+// active tenant so a reload of a tenant-less URL keeps the school's branding +
+// form instead of dropping to the unbranded default (ADR-014).
+const TENANT_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+
 export function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const host = req.headers.get("host");
 
+  // Resolution order — these three are explicit (the tenant is named in the
+  // request), so they always win over the cookie fallback below.
   let tenantCode = parseTenantFromHost(host, ROOT_HOSTS);
   let rewritten = false;
 
@@ -35,6 +44,19 @@ export function middleware(req: NextRequest) {
     }
   }
 
+  // Cookie fallback — only when the URL names no tenant, and never on the root
+  // path. On a shared host (dev localhost), `/` is the marketing / tenant
+  // chooser and must ignore the cookie so the visitor can leave or switch
+  // schools (ADR-014, option A). Deeper applicant routes (/register, /track)
+  // inherit the last active tenant. In prod each tenant is its own host, so the
+  // cookie is host-scoped and can never bleed across tenants.
+  if (!tenantCode && url.pathname !== "/") {
+    const cookieCode = req.cookies.get(TENANT_COOKIE)?.value;
+    if (cookieCode && isValidTenantCode(cookieCode)) {
+      tenantCode = cookieCode;
+    }
+  }
+
   const requestHeaders = new Headers(req.headers);
   if (tenantCode) {
     requestHeaders.set(TENANT_HEADER, tenantCode);
@@ -49,6 +71,15 @@ export function middleware(req: NextRequest) {
 
   if (tenantCode) {
     response.headers.set(TENANT_HEADER, tenantCode);
+    // Persist / refresh the active tenant. Host-only (no Domain attr) keeps
+    // prod subdomains isolated; httpOnly because the client never reads it —
+    // theme + form schema are resolved server-side from the header.
+    response.cookies.set(TENANT_COOKIE, tenantCode, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: TENANT_COOKIE_MAX_AGE,
+    });
   }
 
   return response;
