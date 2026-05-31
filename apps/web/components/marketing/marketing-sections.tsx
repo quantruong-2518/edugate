@@ -16,8 +16,6 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
-import type { Route } from "next";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { TENANT_FIXTURES } from "@/lib/tenants/fixtures";
@@ -50,7 +48,10 @@ export async function Hero() {
             </a>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <Link href={DEMO_PATH as Route}>{t("ctaSecondary")}</Link>
+            {/* Tenant entry = full page load so the root layout re-renders with
+                the school's theme. The App Router root layout does not re-render
+                on a soft <Link> nav, so it would keep the marketing theme. */}
+            <a href={DEMO_PATH}>{t("ctaSecondary")}</a>
           </Button>
         </div>
       </div>
@@ -70,9 +71,9 @@ export async function Proof() {
         </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
           {schools.map((school) => (
-            <Link
+            <a
               key={school.code}
-              href={`/t/${school.code}` as Route}
+              href={`/t/${school.code}`}
               className="group flex h-full items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
             >
               <span
@@ -94,7 +95,7 @@ export async function Proof() {
                   {t("viewDemo")} →
                 </span>
               </span>
-            </Link>
+            </a>
           ))}
         </div>
       </div>

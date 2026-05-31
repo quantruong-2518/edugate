@@ -3,6 +3,14 @@ import Link from "next/link";
 
 import type { FooterSection } from "@shared/landing";
 
+function isExternalHref(href: string) {
+  return (
+    href.startsWith("tel:") ||
+    href.startsWith("mailto:") ||
+    href.startsWith("http")
+  );
+}
+
 export async function FooterSection({ section }: { section: FooterSection }) {
   const year = new Date().getFullYear();
 
@@ -16,16 +24,36 @@ export async function FooterSection({ section }: { section: FooterSection }) {
                 <div key={column.title}>
                   <h3 className="text-sm font-semibold">{column.title}</h3>
                   <ul className="mt-4 space-y-2.5">
-                    {column.links.map((link) => (
-                      <li key={link.href}>
-                        <Link
-                          href={link.href as Route}
-                          className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                        >
-                          {link.label}
-                        </Link>
-                      </li>
-                    ))}
+                    {column.links.map((link) =>
+                      link.gradient ? (
+                        <li key={link.href}>
+                          <a
+                            href={link.href}
+                            className="inline-block bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-400 bg-clip-text text-sm font-semibold text-transparent transition-opacity hover:opacity-80"
+                          >
+                            {link.label}
+                          </a>
+                        </li>
+                      ) : (
+                        <li key={link.href}>
+                          {isExternalHref(link.href) ? (
+                            <a
+                              href={link.href}
+                              className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                            >
+                              {link.label}
+                            </a>
+                          ) : (
+                            <Link
+                              href={link.href as Route}
+                              className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                            >
+                              {link.label}
+                            </Link>
+                          )}
+                        </li>
+                      ),
+                    )}
                   </ul>
                 </div>
               ))}

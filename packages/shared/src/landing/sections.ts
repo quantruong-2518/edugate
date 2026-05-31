@@ -13,6 +13,7 @@ import { z } from "zod";
 const linkSchema = z.object({
   label: z.string(),
   href: z.string(),
+  gradient: z.boolean().optional(),
 });
 
 export const heroSectionSchema = z.object({

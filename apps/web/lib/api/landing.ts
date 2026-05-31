@@ -563,7 +563,11 @@ const NGT_CONFIG: LandingConfig = {
               label: "Địa chỉ: C14 phố Nguyễn Minh Châu, Phường Phúc Lợi, Hà Nội",
               href: "#",
             },
-            { label: "Hotline: 0392349383", href: "tel:0392349383" },
+            {
+              label: "Hotline: 0369 906 736",
+              href: "tel:0369906736",
+              gradient: true,
+            },
             {
               label: "Email: c2nguyengiathieu@longbien.edu.vn",
               href: "mailto:c2nguyengiathieu@longbien.edu.vn",

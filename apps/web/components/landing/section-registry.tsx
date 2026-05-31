@@ -2,7 +2,6 @@ import type { LandingSection } from "@shared/landing";
 
 import { AboutSection } from "./about-section";
 import { FaqSection } from "./faq-section";
-import { FooterSection } from "./footer-section";
 import { HeroSection } from "./hero-section";
 import { InfoTabsSection } from "./info-tabs-section";
 import { ProcessSection } from "./process-section";
@@ -35,7 +34,9 @@ export function LandingSectionRenderer({
     case "faq":
       return <FaqSection section={section} />;
     case "footer":
-      return <FooterSection section={section} />;
+      // Footer is rendered by (public)/layout.tsx so it appears on all public
+      // pages (register, track, landing). Skip here to avoid double-render.
+      return null;
     default: {
       if (process.env.NODE_ENV !== "production") {
         const unknownType = (section as { type: string }).type;
