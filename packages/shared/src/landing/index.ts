@@ -1,7 +1,9 @@
 export {
+  ENROLLMENT_QUOTA_ICONS,
   INFO_TABS_ICONS,
   LANDING_SECTION_TYPES,
   aboutSectionSchema,
+  enrollmentQuotaSectionSchema,
   faqSectionSchema,
   footerSectionSchema,
   heroSectionSchema,
@@ -12,6 +14,8 @@ export {
   statsSectionSchema,
   testimonialsSectionSchema,
   type AboutSection,
+  type EnrollmentQuotaIcon,
+  type EnrollmentQuotaSection,
   type FaqSection,
   type FooterSection,
   type HeroSection,

@@ -1,6 +1,7 @@
 import type { LandingSection } from "@shared/landing";
 
 import { AboutSection } from "./about-section";
+import { EnrollmentQuotaSection } from "./enrollment-quota-section";
 import { FaqSection } from "./faq-section";
 import { HeroSection } from "./hero-section";
 import { InfoTabsSection } from "./info-tabs-section";
@@ -23,6 +24,8 @@ export function LandingSectionRenderer({
       return <HeroSection section={section} />;
     case "stats":
       return <StatsSection section={section} />;
+    case "enrollmentQuota":
+      return <EnrollmentQuotaSection section={section} />;
     case "process":
       return <ProcessSection section={section} />;
     case "infoTabs":

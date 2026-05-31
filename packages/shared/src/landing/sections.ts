@@ -111,6 +111,45 @@ export const footerSectionSchema = z.object({
   copyright: z.string().optional(),
 });
 
+/**
+ * Curated icon set for `enrollmentQuota.items`. Kept short so the editor (task
+ * 17) can offer a picker; the renderer maps each name to a Lucide component
+ * statically so the bundle does not pull in every icon.
+ */
+export const ENROLLMENT_QUOTA_ICONS = ["graduationCap", "globe"] as const;
+export type EnrollmentQuotaIcon = (typeof ENROLLMENT_QUOTA_ICONS)[number];
+
+/**
+ * Admission targets — "Chỉ tiêu tuyển sinh". A school-year banner above a row of
+ * program cards, each stating how many classes / seats are offered. Models the
+ * NGT-style quota block (6 high-quality + 2 Cambridge classes).
+ */
+export const enrollmentQuotaSectionSchema = z.object({
+  type: z.literal("enrollmentQuota"),
+  /** Small centred label above the year, e.g. "Năm học". */
+  eyebrow: z.string().optional(),
+  /** Prominent school year, e.g. "2026 – 2027". */
+  year: z.string(),
+  /** Section subtitle, e.g. "Chỉ tiêu tuyển sinh lớp 6". */
+  title: z.string().optional(),
+  items: z
+    .array(
+      z.object({
+        /** Headline count, e.g. "06". */
+        value: z.string(),
+        /** Program name, e.g. "Lớp chất lượng cao". */
+        label: z.string(),
+        /** Capacity note, e.g. "35 - 40 học sinh/lớp". */
+        note: z.string().optional(),
+        /** Optional leading icon. */
+        icon: z.enum(ENROLLMENT_QUOTA_ICONS).optional(),
+      }),
+    )
+    .min(1),
+  /** Optional footer pill, e.g. "Năm học 2026 – 2027". */
+  footnote: z.string().optional(),
+});
+
 export const landingSectionSchema = z.discriminatedUnion("type", [
   heroSectionSchema,
   statsSectionSchema,
@@ -120,6 +159,7 @@ export const landingSectionSchema = z.discriminatedUnion("type", [
   testimonialsSectionSchema,
   faqSectionSchema,
   footerSectionSchema,
+  enrollmentQuotaSectionSchema,
 ]);
 
 export const landingConfigSchema = z.object({
@@ -135,6 +175,7 @@ export const LANDING_SECTION_TYPES = [
   "testimonials",
   "faq",
   "footer",
+  "enrollmentQuota",
 ] as const;
 
 export type LandingSectionType = (typeof LANDING_SECTION_TYPES)[number];
@@ -148,5 +189,8 @@ export type AboutSection = z.infer<typeof aboutSectionSchema>;
 export type TestimonialsSection = z.infer<typeof testimonialsSectionSchema>;
 export type FaqSection = z.infer<typeof faqSectionSchema>;
 export type FooterSection = z.infer<typeof footerSectionSchema>;
+export type EnrollmentQuotaSection = z.infer<
+  typeof enrollmentQuotaSectionSchema
+>;
 export type LandingSection = z.infer<typeof landingSectionSchema>;
 export type LandingConfig = z.infer<typeof landingConfigSchema>;

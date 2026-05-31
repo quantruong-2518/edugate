@@ -465,17 +465,25 @@ const NGT_CONFIG: LandingConfig = {
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
     },
     {
-      type: "stats",
+      type: "enrollmentQuota",
+      eyebrow: "Năm học",
+      year: "2026 – 2027",
+      title: "Chỉ tiêu tuyển sinh lớp 6",
       items: [
         {
-          value: "6",
-          label: "Lớp chất lượng cao (35 - 40 học sinh)",
+          icon: "graduationCap",
+          value: "06",
+          label: "Lớp chất lượng cao",
+          note: "35 - 40 học sinh/lớp",
         },
         {
-          value: "2",
-          label: "Lớp tích hợp quốc tế Cambridge (25 - 30 học sinh)",
+          icon: "globe",
+          value: "02",
+          label: "Lớp hệ quốc tế Cambridge",
+          note: "25 - 30 học sinh/lớp",
         },
       ],
+      footnote: "Năm học 2026 – 2027",
     },
     {
       type: "process",
