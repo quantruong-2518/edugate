@@ -49,6 +49,9 @@
     "testimonials": {
       "title": "Phụ huynh & học sinh nói gì"
     },
+    "pledge": {
+      "goto": "Xem tuyên ngôn {index}"
+    },
     "faq": {
       "title": "Câu hỏi thường gặp"
     },

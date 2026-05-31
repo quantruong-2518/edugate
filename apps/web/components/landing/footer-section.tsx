@@ -15,7 +15,10 @@ export async function FooterSection({ section }: { section: FooterSection }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/50 bg-gradient-to-b from-muted/30 to-muted/60">
+    <footer
+      data-section="footer"
+      className="border-t border-border/50 bg-gradient-to-b from-muted/30 to-muted/60"
+    >
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between md:gap-16">
           {section.columns && section.columns.length > 0 && (
@@ -27,9 +30,15 @@ export async function FooterSection({ section }: { section: FooterSection }) {
                     {column.links.map((link) =>
                       link.gradient ? (
                         <li key={link.href}>
+                          {/* Brand-coloured hotline — derived from the tenant
+                              primary so each school gets its own accent. */}
                           <a
                             href={link.href}
-                            className="inline-block bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-400 bg-clip-text text-sm font-semibold text-transparent transition-opacity hover:opacity-80"
+                            style={{
+                              backgroundImage:
+                                "linear-gradient(to right, var(--primary), color-mix(in oklab, var(--primary) 60%, white))",
+                            }}
+                            className="inline-block bg-clip-text text-sm font-semibold text-transparent transition-opacity hover:opacity-80"
                           >
                             {link.label}
                           </a>

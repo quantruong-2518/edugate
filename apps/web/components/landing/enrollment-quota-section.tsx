@@ -1,9 +1,9 @@
-import { CalendarDays, Globe, GraduationCap, type LucideIcon } from 'lucide-react';
+import { Globe, GraduationCap, type LucideIcon } from "lucide-react";
 
 import type {
   EnrollmentQuotaIcon,
   EnrollmentQuotaSection as EnrollmentQuotaSectionType,
-} from '@shared/landing';
+} from "@shared/landing";
 
 /**
  * Static icon map so the bundle only pulls the icons the section can use (see
@@ -21,7 +21,10 @@ const ICON_MAP: Record<EnrollmentQuotaIcon, LucideIcon> = {
  */
 export function EnrollmentQuotaSection({ section }: { section: EnrollmentQuotaSectionType }) {
   return (
-    <section className="bg-muted/40 px-4 py-16 sm:px-6 sm:py-20">
+    <section
+      data-section="enrollmentQuota"
+      className="bg-muted/40 px-4 py-16 sm:px-6 sm:py-20"
+    >
       <div className="mx-auto max-w-4xl">
         {section.eyebrow && (
           <div className="flex items-center justify-center gap-4">
@@ -73,15 +76,6 @@ export function EnrollmentQuotaSection({ section }: { section: EnrollmentQuotaSe
             );
           })}
         </div>
-
-        {section.footnote && (
-          <div className="mt-8 flex justify-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-              <CalendarDays className="size-4" aria-hidden />
-              {section.footnote}
-            </span>
-          </div>
-        )}
       </div>
     </section>
   );

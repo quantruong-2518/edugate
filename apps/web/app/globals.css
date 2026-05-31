@@ -159,3 +159,124 @@
     @apply bg-background text-foreground;
   }
 }
+
+/*
+ * Nguyễn Huy Tưởng — bespoke public identity: jade ("xanh ngọc") tone, a
+ * bamboo-stalk gradient and a matte "sơn sần" grain on the hero + quota band.
+ * Scoped by `data-tenant` (set on <body> in the root layout) so every other
+ * school is untouched. The hero re-pins foreground/primary locally so text and
+ * CTAs stay legible on the light-green panel regardless of light/dark mode.
+ */
+[data-tenant="nguyen-huy-tuong"] [data-section="hero"],
+[data-tenant="nguyen-huy-tuong"] [data-section="enrollmentQuota"] {
+  --foreground: oklch(0.27 0.055 168);
+  --muted-foreground: oklch(0.44 0.045 168);
+  --primary: oklch(0.5 0.115 174);
+  --primary-foreground: oklch(0.985 0 0);
+  --border: oklch(0.84 0.04 168);
+}
+
+[data-tenant="nguyen-huy-tuong"] [data-section="hero"] {
+  background-color: oklch(0.95 0.04 160);
+  /* Bamboo gradient — fallback backdrop while the hero photo loads / if absent. */
+  background-image:
+    radial-gradient(
+      115% 75% at 12% 6%,
+      oklch(0.88 0.12 172 / 0.55),
+      transparent 55%
+    ),
+    linear-gradient(
+      157deg,
+      oklch(0.96 0.045 142) 0%,
+      oklch(0.9 0.085 158) 32%,
+      oklch(0.82 0.11 168) 66%,
+      oklch(0.74 0.115 176) 100%
+    );
+}
+
+/* Re-tint the photo wash bamboo-green so the jade identity reads over the photo
+   while the headline (deep-bamboo foreground) stays legible. */
+[data-tenant="nguyen-huy-tuong"] [data-section="hero"] [data-hero-overlay] {
+  background-image: linear-gradient(
+    to bottom right,
+    oklch(0.97 0.03 165 / 0.94),
+    oklch(0.92 0.06 170 / 0.8),
+    oklch(0.7 0.12 176 / 0.3)
+  );
+}
+
+/* School name "Nguyễn Huy Tưởng" — bamboo ("tre") gradient, young green → jade
+   → deep teal-green, dark enough to read on the light bamboo wash. */
+[data-tenant="nguyen-huy-tuong"] [data-section="hero"] {
+  --headline-accent-gradient: linear-gradient(
+    100deg,
+    oklch(0.58 0.135 142),
+    oklch(0.52 0.13 168) 55%,
+    oklch(0.46 0.115 184)
+  );
+}
+
+/* Slogan — one elegant italic line that scales down to fit narrow viewports. */
+[data-tenant="nguyen-huy-tuong"] [data-section="hero"] [data-hero-subheadline] {
+  max-width: none;
+  white-space: nowrap;
+  font-style: italic;
+  font-size: clamp(0.62rem, 2.8vw, 1.45rem);
+}
+
+[data-tenant="nguyen-huy-tuong"] [data-section="enrollmentQuota"] {
+  background-color: oklch(0.97 0.025 165);
+  background-image: linear-gradient(
+    180deg,
+    oklch(0.97 0.03 160) 0%,
+    oklch(0.94 0.05 170) 100%
+  );
+}
+
+/* Footer carries the jade identity too: bamboo-tinted neutrals + jade accents.
+   Overriding the tokens re-tints the existing muted gradient/borders/links
+   without touching the shared footer markup. */
+[data-tenant="nguyen-huy-tuong"] [data-section="footer"] {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  --foreground: oklch(0.27 0.055 168);
+  --muted: oklch(0.95 0.04 168);
+  --muted-foreground: oklch(0.42 0.045 168);
+  --primary: oklch(0.52 0.115 174);
+  --border: oklch(0.86 0.04 168);
+}
+
+/* Pledge carousel ("Tuyên ngôn chất lượng") — bamboo-tinted surface + cards. */
+[data-tenant="nguyen-huy-tuong"] [data-section="pledge"] {
+  position: relative;
+  isolation: isolate;
+  --foreground: oklch(0.27 0.055 168);
+  --muted: oklch(0.92 0.05 170);
+  --muted-foreground: oklch(0.44 0.045 168);
+  --card: oklch(0.99 0.012 160);
+  --primary: oklch(0.5 0.115 174);
+  --primary-foreground: oklch(0.985 0 0);
+  --border: oklch(0.86 0.04 168);
+}
+
+/* Matte paint grain ("sơn sần") — fractal noise, soft-lit, behind the content. */
+[data-tenant="nguyen-huy-tuong"] [data-section="hero"]::after,
+[data-tenant="nguyen-huy-tuong"] [data-section="enrollmentQuota"]::after,
+[data-tenant="nguyen-huy-tuong"] [data-section="footer"]::after,
+[data-tenant="nguyen-huy-tuong"] [data-section="pledge"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.16;
+  mix-blend-mode: soft-light;
+}
+
+[data-tenant="nguyen-huy-tuong"] [data-section="enrollmentQuota"] {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}

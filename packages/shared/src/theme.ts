@@ -39,6 +39,8 @@ export type TenantTheme = {
   font: {
     sans: string;
     mono?: string;
+    /** Optional override for the display face (prominent names/headings). */
+    display?: string;
   };
   light: TenantColorTokens;
   dark: TenantColorTokens;
@@ -137,6 +139,7 @@ export function tenantThemeToCss(theme: TenantTheme): string {
     `--radius: ${theme.radius};`,
     `--font-sans-tenant: ${theme.font.sans};`,
     theme.font.mono ? `--font-mono-tenant: ${theme.font.mono};` : "",
+    theme.font.display ? `--font-display-tenant: ${theme.font.display};` : "",
     colorBlock(theme.light),
   ].join("");
 

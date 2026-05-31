@@ -20,6 +20,11 @@ export const heroSectionSchema = z.object({
   type: z.literal("hero"),
   eyebrow: z.string().optional(),
   headline: z.string(),
+  /**
+   * Optional trailing emphasis (e.g. the school name) rendered on its own line
+   * in the display face with a brand gradient — `headline` becomes a small lead.
+   */
+  headlineHighlight: z.string().optional(),
   subheadline: z.string().optional(),
   /** Full-bleed background image URL (optional). */
   image: z.string().optional(),
@@ -150,6 +155,29 @@ export const enrollmentQuotaSectionSchema = z.object({
   footnote: z.string().optional(),
 });
 
+/**
+ * "Tuyên ngôn chất lượng" — a carousel of staff quality pledges. Each slide is a
+ * clipped ("lẹm") card with the speaker's portrait overlapping the top edge, the
+ * pledge in italic, and the speaker's name + role beneath. Distinct from
+ * `testimonials` (parent quotes, static grid).
+ */
+export const pledgeSectionSchema = z.object({
+  type: z.literal("pledge"),
+  title: z.string().optional(),
+  items: z
+    .array(
+      z.object({
+        quote: z.string(),
+        name: z.string(),
+        /** Speaker position, e.g. "Hiệu trưởng". */
+        role: z.string().optional(),
+        /** Portrait URL; falls back to an initials avatar when absent. */
+        photoUrl: z.string().optional(),
+      }),
+    )
+    .min(1),
+});
+
 export const landingSectionSchema = z.discriminatedUnion("type", [
   heroSectionSchema,
   statsSectionSchema,
@@ -160,6 +188,7 @@ export const landingSectionSchema = z.discriminatedUnion("type", [
   faqSectionSchema,
   footerSectionSchema,
   enrollmentQuotaSectionSchema,
+  pledgeSectionSchema,
 ]);
 
 export const landingConfigSchema = z.object({
@@ -176,6 +205,7 @@ export const LANDING_SECTION_TYPES = [
   "faq",
   "footer",
   "enrollmentQuota",
+  "pledge",
 ] as const;
 
 export type LandingSectionType = (typeof LANDING_SECTION_TYPES)[number];
@@ -192,5 +222,6 @@ export type FooterSection = z.infer<typeof footerSectionSchema>;
 export type EnrollmentQuotaSection = z.infer<
   typeof enrollmentQuotaSectionSchema
 >;
+export type PledgeSection = z.infer<typeof pledgeSectionSchema>;
 export type LandingSection = z.infer<typeof landingSectionSchema>;
 export type LandingConfig = z.infer<typeof landingConfigSchema>;

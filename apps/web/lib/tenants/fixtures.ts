@@ -14,10 +14,14 @@ import { DEFAULT_TENANT_THEME, type TenantTheme } from "@shared/theme";
 function tenantTheme(overrides: {
   light: { primary: string; primaryForeground: string };
   dark: { primary: string; primaryForeground: string };
+  /** Optional CSS font-family stack for the display face (prominent names). */
+  display?: string;
 }): TenantTheme {
   return {
     radius: DEFAULT_TENANT_THEME.radius,
-    font: DEFAULT_TENANT_THEME.font,
+    font: overrides.display
+      ? { ...DEFAULT_TENANT_THEME.font, display: overrides.display }
+      : DEFAULT_TENANT_THEME.font,
     light: {
       ...DEFAULT_TENANT_THEME.light,
       primary: overrides.light.primary,
@@ -70,19 +74,24 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
   },
   "nguyen-huy-tuong": {
     code: "nguyen-huy-tuong",
-    name: "Trường THCS Nguyễn Huy Tưởng, Đông Anh",
+    name: "Trường THCS Nguyễn Huy Tưởng, Đông Anh, Hà Nội",
     shortName: "NHT",
     logoUrl: null,
     theme: tenantTheme({
-      // Tailwind emerald-600 / emerald-400 in oklch, fresh green.
+      // Jade ("xanh ngọc") — a cooler, gemstone green leaning teal (hue ~178),
+      // the bamboo identity of NHT. Pairs with the grain + bamboo gradient set
+      // in globals.css ([data-tenant="nguyen-huy-tuong"]).
       light: {
-        primary: "oklch(0.596 0.145 163.225)",
+        primary: "oklch(0.58 0.118 178)",
         primaryForeground: "oklch(0.985 0 0)",
       },
       dark: {
-        primary: "oklch(0.765 0.177 163.223)",
+        primary: "oklch(0.78 0.14 178)",
         primaryForeground: "oklch(0.205 0 0)",
       },
+      // Modern, Vietnamese-first display face (Be Vietnam Pro, loaded in layout).
+      display:
+        "var(--font-be-vietnam-pro), var(--font-sans), ui-sans-serif, system-ui, sans-serif",
     }),
   },
   "nguyen-van-huyen": {

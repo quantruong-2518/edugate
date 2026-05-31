@@ -49,6 +49,9 @@
     "testimonials": {
       "title": "What parents & students say"
     },
+    "pledge": {
+      "goto": "View pledge {index}"
+    },
     "faq": {
       "title": "Frequently asked questions"
     },

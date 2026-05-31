@@ -198,103 +198,128 @@ const TDN_CONFIG: LandingConfig = {
   ],
 };
 
+// Mirrors NGT's section set (hero → quota → process → infoTabs → testimonials →
+// footer). Contact data is REAL (school site, May 2026); admission quota/schedule
+// and parent quotes are placeholders flagged for the school to fill — never
+// fabricate official admission figures. Identity: jade ("xanh ngọc") + bamboo
+// gradient + grain, set in globals.css ([data-tenant="nguyen-huy-tuong"]).
 const NHT_CONFIG: LandingConfig = {
   sections: [
     {
       type: "hero",
-      eyebrow: "Tuyển sinh lớp 6, Năm học 2026 - 2027",
-      headline: "THCS Nguyễn Huy Tưởng",
+      eyebrow: "Tuyển sinh lớp 6 · Năm học 2026 - 2027",
+      headline: "Trường THCS",
+      headlineHighlight: "Nguyễn Huy Tưởng",
       subheadline:
-        "Ngôi trường giàu truyền thống tại Đông Anh, Hà Nội, ươm mầm tri thức và nuôi dưỡng nhân cách.",
-      image: unsplash("1509062522246-3755977927d7"),
+        "Tự hào truyền thống – Tiên phong sáng tạo – Kiến tạo tương lai",
+      // Real school photo (lễ khai giảng 2025–2026). The NHT-scoped overlay in
+      // globals.css re-tints the wash bamboo-green and adds the matte grain, so
+      // the jade identity reads over the photo.
+      image: "/tenants/nguyen-huy-tuong/hero.jpg",
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
     },
     {
-      type: "stats",
+      type: "enrollmentQuota",
+      eyebrow: "Năm học",
+      year: "2026 – 2027",
+      title: "Chỉ tiêu tuyển sinh lớp 6",
+      // Figures mirror NGT (per request) — confirm against NHT's official plan.
       items: [
-        { label: "Học sinh toàn trường", value: "1.080" },
-        { label: "Giáo viên đạt chuẩn", value: "100%" },
-        { label: "Năm thành lập", value: "1996" },
-        { label: "Học sinh giỏi cấp huyện", value: "320+" },
+        {
+          icon: "graduationCap",
+          value: "06",
+          label: "Lớp chất lượng cao",
+          note: "35 - 40 học sinh/lớp",
+        },
+        {
+          icon: "globe",
+          value: "02",
+          label: "Lớp hệ Cambridge",
+          note: "25 - 30 học sinh/lớp",
+        },
       ],
-    },
-    {
-      type: "about",
-      title: "Về Trường THCS Nguyễn Huy Tưởng",
-      body: "Tọa lạc tại huyện Đông Anh, Hà Nội, Trường THCS Nguyễn Huy Tưởng tự hào với bề dày truyền thống dạy tốt - học tốt. Nhà trường không ngừng đổi mới phương pháp giảng dạy, chú trọng giáo dục đạo đức và phát triển năng lực toàn diện cho mỗi học sinh.",
-      image: unsplash("1577896851231-70ef18881754", 1200),
     },
     {
       type: "process",
-      title: "Quy trình đăng ký tuyển sinh",
+      title: "Các bước tuyển sinh online",
+      // Mirrors the registration wizard (applicant → form → verify → done).
       steps: [
-        { title: "Khai thông tin", description: "Điền thông tin phụ huynh." },
-        { title: "Điền hồ sơ", description: "Hoàn tất biểu mẫu lớp 6." },
-        { title: "Xác thực email", description: "Nhập mã OTP gửi qua email." },
-        { title: "Nộp hồ sơ", description: "Nhận mã hồ sơ để tra cứu." },
-        { title: "Theo dõi", description: "Cập nhật kết quả xét tuyển." },
+        {
+          title: "Người khai",
+          description: "Điền họ tên học sinh và thông tin người khai.",
+        },
+        {
+          title: "Hồ sơ",
+          description: "Hoàn tất biểu mẫu và tải lên ảnh thẻ thí sinh.",
+        },
+        {
+          title: "Xác thực email",
+          description: "Nhập mã OTP gửi tới email đã đăng ký.",
+        },
+        {
+          title: "Hoàn tất",
+          description: "Nhận mã hồ sơ để tra cứu trạng thái.",
+        },
       ],
     },
     {
+      // Mirrors NGT's "Thông tin tuyển sinh" verbatim (per request). NOTE: the
+      // 05/6–08/6/2026 dates are NGT's real schedule, kept as a template —
+      // replace with NHT's official dates when published.
       type: "infoTabs",
       title: "Thông tin tuyển sinh",
+      layout: "tabs",
       tabs: [
         {
           id: "eligibility",
           label: "Đối tượng",
-          body: "Học sinh hoàn thành chương trình tiểu học, có hộ khẩu hoặc cư trú tại huyện Đông Anh và các khu vực lân cận theo phân tuyến.",
+          highlight: "Sinh năm 2015 · Cư trú tại Hà Nội",
+          body: "Học sinh sinh năm 2015 đã hoàn thành chương trình tiểu học, cư trú trên địa bàn Thành phố Hà Nội.",
+          icon: "users",
         },
         {
           id: "schedule",
           label: "Lịch tuyển sinh",
-          body: "Nhận hồ sơ trực tuyến từ 01/07 đến 15/07/2026. Công bố danh sách trúng tuyển dự kiến ngày 25/07/2026.",
+          highlight: "Nhận hồ sơ 05/6 → 08/6/2026",
+          body: "Nhận hồ sơ trực tuyến từ ngày 05/6/2026 đến hết ngày 08/6/2026. Hỗ trợ nộp hồ sơ online với những trường hợp không nộp được trực tuyến tại nhà, địa điểm hỗ trợ tại Văn phòng trường THCS Nguyễn Huy Tưởng (từ 8h00 đến 17h00 ngày 08/6/2026).",
+          icon: "calendar",
         },
         {
           id: "documents",
-          label: "Hồ sơ cần nộp",
-          body: "Giấy khai sinh, học bạ tiểu học, giấy chứng nhận hoàn thành chương trình tiểu học và ảnh thẻ 3x4.",
+          label: "Hồ sơ cần chuẩn bị",
+          highlight: "Ảnh thẻ của thí sinh",
+          body: "Chuẩn bị sẵn file ảnh thẻ của thí sinh, tải lên khi điền hồ sơ trực tuyến.",
+          icon: "fileText",
         },
       ],
     },
     {
-      type: "testimonials",
-      title: "Cảm nhận của phụ huynh",
+      // Real staff photos (background removed → transparent cut-outs). Quotes
+      // are still sample copy — swap for the school's actual pledges.
+      type: "pledge",
+      title: "Tuyên ngôn chất lượng",
       items: [
         {
-          name: "Chị Đỗ Hương",
-          role: "Phụ huynh lớp 6A",
+          name: "Cô Nguyễn Thị Thu Hà",
+          role: "Hiệu trưởng",
+          photoUrl: "/tenants/nguyen-huy-tuong/nguyen-thi-thu-ha-cutout.png",
           quote:
-            "Thầy cô tận tâm, môi trường học tập kỷ luật mà vẫn ấm áp. Con tôi tiến bộ rõ rệt từng học kỳ.",
-          avatarUrl: unsplash("1534528741775-53994a69daeb", 200),
+            "Chúng tôi cam kết xây dựng môi trường giáo dục kỷ cương, an toàn và hạnh phúc, nơi mỗi học sinh được phát triển trọn vẹn cả phẩm chất lẫn năng lực.",
         },
         {
-          name: "Anh Lê Quang",
-          role: "Phụ huynh lớp 7B",
+          name: "Cô Nguyễn Thị Kim Hoa",
+          role: "Phó hiệu trưởng",
+          photoUrl: "/tenants/nguyen-huy-tuong/nguyen-thi-kim-hoa-cutout.png",
           quote:
-            "Việc đăng ký tuyển sinh online giúp gia đình ở xa như chúng tôi tiết kiệm rất nhiều thời gian.",
-          avatarUrl: unsplash("1500648767791-00dcc994a43e", 200),
-        },
-      ],
-    },
-    {
-      type: "faq",
-      title: "Câu hỏi thường gặp",
-      items: [
-        {
-          question: "Trường có nhận học sinh trái tuyến không?",
-          answer:
-            "Nhà trường ưu tiên học sinh đúng tuyến; chỉ tiêu trái tuyến (nếu có) sẽ được thông báo công khai theo từng năm.",
+            "Mỗi học sinh là một cá thể riêng biệt. Chúng tôi đồng hành để các em tự tin, chủ động và không ngừng tiến bộ mỗi ngày.",
         },
         {
-          question: "Có tổ chức khảo sát đầu vào không?",
-          answer:
-            "Tùy năm học, nhà trường có thể tổ chức khảo sát năng lực. Thông tin cụ thể sẽ gửi qua email đã đăng ký.",
-        },
-        {
-          question: "Học phí và các khoản thu như thế nào?",
-          answer:
-            "Trường công lập thu theo quy định của thành phố Hà Nội; chi tiết được niêm yết tại trường và website.",
+          name: "Cô Nguyễn Thị Mai Lan",
+          role: "Phó hiệu trưởng",
+          photoUrl: "/tenants/nguyen-huy-tuong/nguyen-thi-mai-lan-cutout.png",
+          quote:
+            "Đổi mới phương pháp, dạy thật – học thật, lấy chất lượng và sự tiến bộ của học sinh làm thước đo cho mọi nỗ lực.",
         },
       ],
     },
@@ -304,11 +329,18 @@ const NHT_CONFIG: LandingConfig = {
         {
           title: "Liên hệ",
           links: [
-            { label: "Địa chỉ: Đông Anh, Hà Nội", href: "#" },
-            { label: "Hotline: 024 3883 0000", href: "tel:02438830000" },
             {
-              label: "Email: c2nguyenhuytuong@hanoi.edu.vn",
-              href: "mailto:c2nguyenhuytuong@hanoi.edu.vn",
+              label: "Địa chỉ: Tổ 3, Thị trấn Đông Anh, Hà Nội",
+              href: "#",
+            },
+            {
+              label: "Hotline: 024 3883 2196",
+              href: "tel:02438832196",
+              gradient: true,
+            },
+            {
+              label: "Email: c2donganh-da@hanoiedu.vn",
+              href: "mailto:c2donganh-da@hanoiedu.vn",
             },
           ],
         },

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Be_Vietnam_Pro, Inter, Space_Grotesk } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -25,6 +25,15 @@ const fontDisplay = Space_Grotesk({
   variable: "--font-display",
 });
 
+// Per-tenant opt-in display face (Vietnamese-first, modern). A tenant theme
+// points `font.display` at this variable; tenants that don't keep Space Grotesk.
+const fontBrandDisplay = Be_Vietnam_Pro({
+  subsets: ["latin", "vietnamese"],
+  weight: ["600", "700", "800"],
+  display: "swap",
+  variable: "--font-be-vietnam-pro",
+});
+
 export async function generateMetadata(): Promise<Metadata> {
   const branding = await getTenantBranding(await getTenantCode());
   return {
@@ -45,9 +54,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${fontSans.variable} ${fontDisplay.variable}`}
+      className={`${fontSans.variable} ${fontDisplay.variable} ${fontBrandDisplay.variable}`}
     >
-      <body className="min-h-dvh font-sans antialiased">
+      <body className="min-h-dvh font-sans antialiased" data-tenant={branding.code}>
         {/*
           Per-tenant token override. React 19 hoists this <style> into <head>
           during SSR; placement after globals.css gives tenant tokens precedence.

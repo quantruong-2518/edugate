@@ -2,6 +2,7 @@ import { parseFormSchema, type FormSchema } from "@shared/form";
 
 import { DEFAULT_FORM_SCHEMA } from "./default";
 import { NGT_FORM_SCHEMA } from "./nguyen-gia-thieu";
+import { NHT_FORM_SCHEMA } from "./nguyen-huy-tuong";
 import { THPT_FORM_SCHEMA } from "./tran-dai-nghia";
 
 /**
@@ -14,6 +15,7 @@ import { THPT_FORM_SCHEMA } from "./tran-dai-nghia";
 const RAW_SCHEMAS: Record<string, FormSchema> = {
   "tran-dai-nghia": THPT_FORM_SCHEMA,
   "nguyen-gia-thieu": NGT_FORM_SCHEMA,
+  "nguyen-huy-tuong": NHT_FORM_SCHEMA,
 };
 
 /**
