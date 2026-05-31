@@ -85,10 +85,12 @@ export function ApplicantStep({
                   type="email"
                   inputMode="email"
                   autoComplete="email"
+                  placeholder={t("emailPlaceholder")}
                   {...field}
                   value={field.value ?? ""}
                 />
               </FormControl>
+              <p className="text-xs text-muted-foreground">{t("emailHint")}</p>
               <FormMessage />
             </FormItem>
           )}
@@ -104,10 +106,12 @@ export function ApplicantStep({
                   type="tel"
                   inputMode="tel"
                   autoComplete="tel"
+                  placeholder={t("phonePlaceholder")}
                   {...field}
                   value={field.value ?? ""}
                 />
               </FormControl>
+              <p className="text-xs text-muted-foreground">{t("phoneHint")}</p>
               <FormMessage />
             </FormItem>
           )}

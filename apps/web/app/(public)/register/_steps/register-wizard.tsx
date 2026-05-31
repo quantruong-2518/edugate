@@ -24,7 +24,16 @@ import {
 } from "@shared/form";
 import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@ui/components/dialog";
 import { Form } from "@ui/components/form";
+import { Input } from "@ui/components/input";
 import { Stepper } from "@ui/components/stepper";
 import { cn } from "@ui/lib/utils";
 
@@ -137,6 +146,12 @@ export function RegisterWizard({
   const control = form.control as unknown as Control<FieldValues>;
   const createApplication = useCreateApplication();
 
+  // --- Confirm-code modal (form step → verify student code before advancing) -
+  const hasStudentCode = dynamicFields.some((f) => f.name === "studentCode");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmInput, setConfirmInput] = useState("");
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+
   // --- Draft hydrate (once, after mount) -----------------------------------
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
@@ -243,6 +258,28 @@ export function RegisterWizard({
         ? true
         : await form.trigger(fieldsForStep as never);
     if (!ok) return;
+    // On form step with studentCode: require the parent to re-enter the code
+    // before advancing — catches transcription errors early.
+    if (step === "form" && hasStudentCode) {
+      setConfirmInput("");
+      setConfirmError(null);
+      setConfirmOpen(true);
+      return;
+    }
+    goTo(STEPS[stepIndex + 1] as Step);
+  };
+
+  const handleConfirm = () => {
+    const entered = confirmInput.trim();
+    const allValues = form.getValues() as Record<string, unknown>;
+    const stored = String(allValues["studentCode"] ?? "").trim();
+    if (!entered || entered !== stored) {
+      setConfirmError(
+        "Mã học sinh không khớp. Vui lòng kiểm tra lại và nhập đúng mã đã điền trong hồ sơ.",
+      );
+      return;
+    }
+    setConfirmOpen(false);
     goTo(STEPS[stepIndex + 1] as Step);
   };
 
@@ -361,9 +398,16 @@ export function RegisterWizard({
                 />
               ))}
             </div>
-            <p className="text-sm font-medium text-foreground">
-              {stepperSteps[stepIndex]?.label}
-            </p>
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                {stepperSteps[stepIndex]?.label}
+              </p>
+              {stepperSteps[stepIndex]?.description && (
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {stepperSteps[stepIndex]?.description}
+                </p>
+              )}
+            </div>
           </div>
 
           <Card className="rounded-2xl">
@@ -416,6 +460,50 @@ export function RegisterWizard({
           </div>
         </div>
       </div>
+
+      {/* Confirmation modal — re-enter student code before advancing */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Xác nhận mã học sinh</DialogTitle>
+            <DialogDescription>
+              Vui lòng nhập lại{" "}
+              <span className="font-medium text-foreground">mã học sinh</span>{" "}
+              để xác nhận thông tin hồ sơ trước khi tiếp tục.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <Input
+              placeholder="Nhập mã học sinh"
+              value={confirmInput}
+              onChange={(e) => {
+                setConfirmInput(e.target.value);
+                setConfirmError(null);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleConfirm();
+              }}
+              autoFocus
+            />
+            {confirmError && (
+              <p className="text-sm text-destructive">{confirmError}</p>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmOpen(false)}
+            >
+              Hủy
+            </Button>
+            <Button onClick={handleConfirm} disabled={!confirmInput.trim()}>
+              Xác nhận
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
