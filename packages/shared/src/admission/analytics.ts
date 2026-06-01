@@ -30,6 +30,12 @@ export type ApplicationAnalytics = {
   series: AnalyticsPoint[];
   /** Approval funnel: SUBMITTED → UNDER_REVIEW → APPROVED → CONFIRMED → ENROLLED. */
   funnel: FunnelStep[];
+  /**
+   * Resolved date window the BE computed for this response (echoes the
+   * caller's `from`/`to` filter, or the all-time bounds when unset). Optional
+   * — early BE versions before range support omit it.
+   */
+  range?: { from: string; to: string };
 };
 
 /** Funnel state order used by both BE aggregation and FE chart rendering. */

@@ -13,6 +13,16 @@ import {
 
 export type { AnalyticsPoint, ApplicationAnalytics, FunnelStep };
 
+/**
+ * Optional date window for analytics queries. Both fields are `yyyy-mm-dd`
+ * (tenant wall clock). Omit either side for an open-ended bound; an empty
+ * object means "all-time", which is the dashboard's default preset.
+ */
+export type AnalyticsRange = {
+  from?: string;
+  to?: string;
+};
+
 import {
   generateApplications,
   REFERENCE_DATE,
@@ -320,10 +330,14 @@ export async function listApplications(
 
 export async function getApplicationAnalytics(
   tenantCode: string,
+  range: AnalyticsRange = {},
 ): Promise<ApplicationAnalytics> {
+  const params: Record<string, string> = {};
+  if (range.from) params.from = range.from;
+  if (range.to) params.to = range.to;
   const { data } = await http.get<ApplicationAnalytics>(
     "/v1/admin/applications/analytics",
-    { headers: { "x-tenant-code": tenantCode } },
+    { headers: { "x-tenant-code": tenantCode }, params },
   );
   // BE returns byState as a partial object — ensure every state is present so
   // dashboard consumers can read `byState[s]` without an undefined check.

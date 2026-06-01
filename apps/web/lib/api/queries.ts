@@ -33,6 +33,7 @@ import {
   type ListApplicationsInput,
   type ListApplicationsResult,
   type ApplicationAnalytics,
+  type AnalyticsRange,
   type AppNotification,
 } from "./admission";
 import {
@@ -57,8 +58,8 @@ export const admissionKeys = {
     [...admissionKeys.all, "application", code] as const,
   list: (input: ListApplicationsInput) =>
     [...admissionKeys.all, "list", input] as const,
-  analytics: (tenantCode: string) =>
-    [...admissionKeys.all, "analytics", tenantCode] as const,
+  analytics: (tenantCode: string, range: AnalyticsRange = {}) =>
+    [...admissionKeys.all, "analytics", tenantCode, range] as const,
   notifications: (tenantCode: string) =>
     [...admissionKeys.all, "notifications", tenantCode] as const,
 };
@@ -126,10 +127,11 @@ export function useApplications(
 
 export function useApplicationAnalytics(
   tenantCode: string,
+  range: AnalyticsRange = {},
 ): UseQueryResult<ApplicationAnalytics> {
   return useQuery({
-    queryKey: admissionKeys.analytics(tenantCode),
-    queryFn: () => getApplicationAnalytics(tenantCode),
+    queryKey: admissionKeys.analytics(tenantCode, range),
+    queryFn: () => getApplicationAnalytics(tenantCode, range),
   });
 }
 

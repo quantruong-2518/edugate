@@ -322,7 +322,7 @@ export function DashboardOverview({ tenantCode }: { tenantCode: string }) {
       setRange({});
       return;
     }
-    const anchor = data?.range.to ?? todayKey();
+    const anchor = data?.range?.to ?? todayKey();
     setRange({ from: shiftKey(anchor, -(PRESET_DAYS[p] - 1)), to: anchor });
   }
 
