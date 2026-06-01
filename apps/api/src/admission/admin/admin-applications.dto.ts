@@ -43,6 +43,20 @@ export const listApplicationsQuerySchema = z.object({
 
 export type ListApplicationsQuery = z.infer<typeof listApplicationsQuerySchema>;
 
+/** Query schema for `GET /v1/admin/applications/analytics`. */
+export const analyticsRangeQuerySchema = z.object({
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "from phải dạng YYYY-MM-DD.")
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "to phải dạng YYYY-MM-DD.")
+    .optional(),
+});
+
+export type AnalyticsRangeQuery = z.infer<typeof analyticsRangeQuerySchema>;
+
 export function parseStates(raw: string | undefined): readonly string[] {
   if (!raw) return [];
   return raw

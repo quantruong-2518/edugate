@@ -13,7 +13,9 @@ import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import type { AppRequest } from "../../common/types.js";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe.js";
 import {
+  analyticsRangeQuerySchema,
   listApplicationsQuerySchema,
+  type AnalyticsRangeQuery,
   type ListApplicationsQuery,
 } from "./admin-applications.dto.js";
 import { AdminApplicationsService } from "./admin-applications.service.js";
@@ -52,8 +54,12 @@ export class AdminApplicationsController {
 
   @Get("analytics")
   @ApiOperation({ summary: "Dashboard analytics for admissions" })
-  getAnalytics(@Req() req: AppRequest) {
-    return this.analytics.overview(req);
+  getAnalytics(
+    @Req() req: AppRequest,
+    @Query(new ZodValidationPipe(analyticsRangeQuerySchema))
+    query: AnalyticsRangeQuery,
+  ) {
+    return this.analytics.overview(req, query);
   }
 
   @Patch(":code/transition")

@@ -41,7 +41,11 @@ import {
   studentNameOf,
   type ApplicationSort,
 } from "@/lib/api";
-import { useApplications, useTransitionApplication } from "@/lib/api/queries";
+import {
+  useApplicationAnalytics,
+  useApplications,
+  useTransitionApplication,
+} from "@/lib/api/queries";
 
 import { ApplicationDetailSheet } from "./application-detail-sheet";
 import { StateFilter } from "./state-filter";
@@ -148,22 +152,18 @@ export function ApplicationsView({
   const { data, isPending, isError, refetch, isPlaceholderData } =
     useApplications(input);
 
-  // Unfiltered analytics for the quick-stat row come from a baseline query so
-  // the pills don't change when the user filters. Reuse the list endpoint with
-  // a large page to count states (cheap in pha 1 mock).
-  const baseline = useApplications({
-    tenantCode,
-    page: 1,
-    pageSize: 9999,
-  });
+  // Unfiltered counts for the quick-stat row come from the analytics endpoint
+  // so the pills don't change when the user filters and we don't hit the
+  // applications list pageSize cap (≤100 rows server-side).
+  const baseline = useApplicationAnalytics(tenantCode);
   const baselineCounts = useMemo(() => {
-    const items = baseline.data?.items ?? [];
+    const byState = baseline.data?.byState;
     return {
       total: baseline.data?.total ?? 0,
-      submitted: items.filter((a) => a.state === "SUBMITTED").length,
-      underReview: items.filter((a) => a.state === "UNDER_REVIEW").length,
-      needsInfo: items.filter((a) => a.state === "NEEDS_INFO").length,
-      approved: items.filter((a) => a.state === "APPROVED").length,
+      submitted: byState?.SUBMITTED ?? 0,
+      underReview: byState?.UNDER_REVIEW ?? 0,
+      needsInfo: byState?.NEEDS_INFO ?? 0,
+      approved: byState?.APPROVED ?? 0,
     };
   }, [baseline.data]);
 
