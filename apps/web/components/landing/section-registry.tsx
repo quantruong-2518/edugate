@@ -25,12 +25,16 @@ import { TestimonialsSection } from "./testimonials-section";
  */
 export function LandingSectionRenderer({
   section,
+  hrefPrefix = "",
 }: {
   section: LandingSection;
+  /** Prepended to internal CTA hrefs when the URL needs `/t/:code/` to be
+   * shareable (see `getTenantHrefPrefix`). Only sections with CTAs read it. */
+  hrefPrefix?: string;
 }) {
   switch (section.type) {
     case "hero":
-      return <HeroSection section={section} />;
+      return <HeroSection section={section} hrefPrefix={hrefPrefix} />;
     case "stats":
       return (
         <Reveal variant="up">

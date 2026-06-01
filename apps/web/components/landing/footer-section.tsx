@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import type { FooterSection } from "@shared/landing";
 
+import { tenantHref } from "@/lib/tenants/href";
+
 function isExternalHref(href: string) {
   return (
     href.startsWith("tel:") ||
@@ -11,7 +13,13 @@ function isExternalHref(href: string) {
   );
 }
 
-export async function FooterSection({ section }: { section: FooterSection }) {
+export async function FooterSection({
+  section,
+  hrefPrefix = "",
+}: {
+  section: FooterSection;
+  hrefPrefix?: string;
+}) {
   const year = new Date().getFullYear();
 
   return (
@@ -54,7 +62,7 @@ export async function FooterSection({ section }: { section: FooterSection }) {
                             </a>
                           ) : (
                             <Link
-                              href={link.href as Route}
+                              href={tenantHref(link.href, hrefPrefix) as Route}
                               className="break-words text-sm text-muted-foreground transition-colors hover:text-primary"
                             >
                               {link.label}

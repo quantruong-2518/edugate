@@ -2,6 +2,7 @@
 
 import type { Route } from 'next';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -11,6 +12,11 @@ import { useApplication } from '@/lib/api/queries';
 
 export function ConfirmationStep({ code }: { code: string }) {
   const t = useTranslations('apply.confirmation');
+  const pathname = usePathname();
+  // Keep `/t/:code/` if we landed here via the shared-host path so the track
+  // link the parent will share carries the tenant.
+  const tenantMatch = pathname.match(/^(\/t\/[^/]+)\//);
+  const trackPrefix = tenantMatch?.[1] ?? '';
   const { data: application } = useApplication(code);
   const applicant = application?.applicant;
   const parentName = applicant?.fullName;
@@ -55,7 +61,7 @@ export function ConfirmationStep({ code }: { code: string }) {
       </div>
 
       <Button size="lg" className="w-full max-w-xs" asChild>
-        <Link href={`/track/${code}` as Route}>{t('trackCta')}</Link>
+        <Link href={`${trackPrefix}/track/${code}` as Route}>{t('trackCta')}</Link>
       </Button>
     </div>
   );

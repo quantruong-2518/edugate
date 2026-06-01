@@ -3,6 +3,7 @@ import type { Route } from "next";
 import Link from "next/link";
 
 import { getTenantBranding, getTenantCode } from "@/lib/tenants/branding";
+import { getTenantHrefPrefix, tenantHref } from "@/lib/tenants/href";
 
 /**
  * Slim per-tenant header for the applicant journey (landing, register, track).
@@ -16,12 +17,13 @@ export async function PublicHeader() {
   if (!code) return null;
 
   const branding = await getTenantBranding(code);
+  const prefix = await getTenantHrefPrefix();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70 print:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center px-4 sm:px-6">
         <Link
-          href={"/" as Route}
+          href={tenantHref("/", prefix) as Route}
           className="flex min-w-0 items-center gap-2.5"
         >
           {branding.logoUrl ? (

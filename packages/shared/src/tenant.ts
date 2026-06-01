@@ -15,6 +15,17 @@
 export const TENANT_HEADER = "x-tenant-code";
 
 /**
+ * Which signal the middleware used to resolve the tenant. The applicant
+ * surfaces read this in RSC so internal links can re-prepend `/t/:code/` when
+ * the host alone doesn't carry the tenant (path or cookie fallback). Otherwise
+ * a parent who copies `/register` and shares it would land on a tenant-less
+ * URL after their cookie is missing.
+ */
+export const TENANT_SOURCE_HEADER = "x-tenant-source";
+
+export type TenantSource = "host" | "custom-domain" | "path" | "cookie";
+
+/**
  * Cookie that persists the active tenant across tenant-less URLs on a shared
  * host (e.g. reloading `/register` on dev localhost). The URL always wins over
  * it; it is only a fallback. Host-scoped (no Domain attr) so prod subdomains

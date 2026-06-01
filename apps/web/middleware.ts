@@ -3,11 +3,13 @@ import { NextResponse, type NextRequest } from "next/server";
 import {
   TENANT_COOKIE,
   TENANT_HEADER,
+  TENANT_SOURCE_HEADER,
   isValidTenantCode,
   parseTenantFromCustomDomain,
   parseTenantFromHost,
   parseTenantFromPath,
   resolveRootHosts,
+  type TenantSource,
 } from "@shared/tenant";
 
 import { CUSTOM_DOMAIN_TENANTS } from "@/lib/tenants/custom-domains";
@@ -24,8 +26,12 @@ export function middleware(req: NextRequest) {
   const host = req.headers.get("host");
 
   // Resolution order — these three are explicit (the tenant is named in the
-  // request), so they always win over the cookie fallback below.
+  // request), so they always win over the cookie fallback below. We also
+  // record *which* signal hit so RSC can decide whether internal links need
+  // to re-prepend `/t/:code/` (true on path + cookie; false on host paths
+  // because the host alone carries the tenant on every request).
   let tenantCode = parseTenantFromHost(host, ROOT_HOSTS);
+  let source: TenantSource | null = tenantCode ? "host" : null;
   let rewritten = false;
 
   // Custom domain a school owns (e.g. a-tuyen-sinh.vn) → its tenant code.
@@ -33,12 +39,14 @@ export function middleware(req: NextRequest) {
   // subdomain, the path is served as-is — no rewrite.
   if (!tenantCode) {
     tenantCode = parseTenantFromCustomDomain(host, CUSTOM_DOMAIN_TENANTS);
+    if (tenantCode) source = "custom-domain";
   }
 
   if (!tenantCode) {
     const fromPath = parseTenantFromPath(url.pathname);
     if (fromPath) {
       tenantCode = fromPath.code;
+      source = "path";
       url.pathname = fromPath.rest;
       rewritten = true;
     }
@@ -54,23 +62,27 @@ export function middleware(req: NextRequest) {
     const cookieCode = req.cookies.get(TENANT_COOKIE)?.value;
     if (cookieCode && isValidTenantCode(cookieCode)) {
       tenantCode = cookieCode;
+      source = "cookie";
     }
   }
 
   const requestHeaders = new Headers(req.headers);
-  if (tenantCode) {
+  if (tenantCode && source) {
     requestHeaders.set(TENANT_HEADER, tenantCode);
+    requestHeaders.set(TENANT_SOURCE_HEADER, source);
   } else {
     // Drop any inbound spoof attempt — the header is server-authoritative.
     requestHeaders.delete(TENANT_HEADER);
+    requestHeaders.delete(TENANT_SOURCE_HEADER);
   }
 
   const response = rewritten
     ? NextResponse.rewrite(url, { request: { headers: requestHeaders } })
     : NextResponse.next({ request: { headers: requestHeaders } });
 
-  if (tenantCode) {
+  if (tenantCode && source) {
     response.headers.set(TENANT_HEADER, tenantCode);
+    response.headers.set(TENANT_SOURCE_HEADER, source);
     // Persist / refresh the active tenant. Host-only (no Domain attr) keeps
     // prod subdomains isolated; httpOnly because the client never reads it —
     // theme + form schema are resolved server-side from the header.

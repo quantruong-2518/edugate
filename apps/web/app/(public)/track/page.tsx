@@ -1,7 +1,7 @@
 "use client";
 
 import type { Route } from "next";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -13,12 +13,19 @@ import { Label } from "@ui/components/label";
 export default function TrackIndexPage() {
   const t = useTranslations("track");
   const router = useRouter();
+  const pathname = usePathname();
   const [code, setCode] = useState("");
+
+  // Preserve `/t/:code/` when the tenant came from the path so the resulting
+  // URL stays shareable — otherwise this page is reached via `/t/:code/track`
+  // but pushes to a bare `/track/CODE`, dropping the prefix.
+  const tenantMatch = pathname.match(/^(\/t\/[^/]+)\//);
+  const prefix = tenantMatch?.[1] ?? "";
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = code.trim().toUpperCase();
-    if (trimmed) router.push(`/track/${trimmed}` as Route);
+    if (trimmed) router.push(`${prefix}/track/${trimmed}` as Route);
   };
 
   return (

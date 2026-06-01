@@ -2,6 +2,7 @@ import { LandingSectionRenderer } from "@/components/landing/section-registry";
 import { MarketingHome } from "@/components/marketing/marketing-home";
 import { getLandingConfig } from "@/lib/api";
 import { getTenantCode } from "@/lib/tenants/branding";
+import { getTenantHrefPrefix } from "@/lib/tenants/href";
 
 export default async function LandingPage() {
   const code = await getTenantCode();
@@ -10,7 +11,10 @@ export default async function LandingPage() {
   // tenant → that school's configurable admission landing.
   if (!code) return <MarketingHome />;
 
-  const config = await getLandingConfig(code);
+  const [config, hrefPrefix] = await Promise.all([
+    getLandingConfig(code),
+    getTenantHrefPrefix(),
+  ]);
 
   return (
     <main>
@@ -18,6 +22,7 @@ export default async function LandingPage() {
         <LandingSectionRenderer
           key={`${section.type}-${index}`}
           section={section}
+          hrefPrefix={hrefPrefix}
         />
       ))}
     </main>

@@ -4,6 +4,7 @@ import { FooterSection } from "@/components/landing/footer-section";
 import { PublicHeader } from "@/components/public/public-header";
 import { getLandingConfig } from "@/lib/api";
 import { getTenantCode } from "@/lib/tenants/branding";
+import { getTenantHrefPrefix } from "@/lib/tenants/href";
 
 export default async function PublicLayout({
   children,
@@ -11,7 +12,10 @@ export default async function PublicLayout({
   children: ReactNode;
 }) {
   const tenantCode = await getTenantCode();
-  const config = tenantCode ? await getLandingConfig(tenantCode) : null;
+  const [config, hrefPrefix] = await Promise.all([
+    tenantCode ? getLandingConfig(tenantCode) : Promise.resolve(null),
+    getTenantHrefPrefix(),
+  ]);
   const footerSection = config?.sections.find((s) => s.type === "footer");
 
   return (
@@ -25,7 +29,7 @@ export default async function PublicLayout({
       <PublicHeader />
       <div className="flex-1">{children}</div>
       {footerSection && footerSection.type === "footer" && (
-        <FooterSection section={footerSection} />
+        <FooterSection section={footerSection} hrefPrefix={hrefPrefix} />
       )}
     </div>
   );

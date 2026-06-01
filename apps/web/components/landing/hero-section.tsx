@@ -6,7 +6,15 @@ import Link from "next/link";
 import type { HeroSection } from "@shared/landing";
 import { Button } from "@ui/components/button";
 
-export function HeroSection({ section }: { section: HeroSection }) {
+import { tenantHref } from "@/lib/tenants/href";
+
+export function HeroSection({
+  section,
+  hrefPrefix = "",
+}: {
+  section: HeroSection;
+  hrefPrefix?: string;
+}) {
   return (
     <section data-section="hero" className="relative isolate overflow-hidden">
       {section.image && (
@@ -70,7 +78,7 @@ export function HeroSection({ section }: { section: HeroSection }) {
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             {section.ctaPrimary && (
               <Button asChild size="lg" className="group gap-2">
-                <Link href={section.ctaPrimary.href as Route}>
+                <Link href={tenantHref(section.ctaPrimary.href, hrefPrefix) as Route}>
                   {section.ctaPrimary.label}
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
@@ -78,7 +86,7 @@ export function HeroSection({ section }: { section: HeroSection }) {
             )}
             {section.ctaSecondary && (
               <Button asChild size="lg" variant="outline">
-                <Link href={section.ctaSecondary.href as Route}>
+                <Link href={tenantHref(section.ctaSecondary.href, hrefPrefix) as Route}>
                   {section.ctaSecondary.label}
                 </Link>
               </Button>
