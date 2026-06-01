@@ -10,7 +10,7 @@
  * intersect the permission matrix (task 9); SYSTEM is reserved for cron.
  */
 
-import type { ApplicationState } from "./states";
+import type { ApplicationState } from "./states.js";
 
 export const APPLICATION_ROLES = [
   "APPLICANT",

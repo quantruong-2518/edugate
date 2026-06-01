@@ -1,5 +1,6 @@
 export {
   DEFAULT_TENANT_THEME,
+  tenantThemeSchema,
   tenantThemeToCss,
   type TenantColorTokens,
   type TenantTheme,

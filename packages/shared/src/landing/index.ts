@@ -34,4 +34,4 @@ export {
   type StoryCardIcon,
   type StoryCardsSection,
   type TestimonialsSection,
-} from "./sections";
+} from "./sections.js";

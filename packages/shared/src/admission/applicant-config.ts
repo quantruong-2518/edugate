@@ -1,4 +1,4 @@
-import type { ApplicantRelationship } from "./application";
+import type { ApplicantRelationship } from "./application.js";
 
 /**
  * Per-tenant tweaks to the built-in applicant step of the register wizard

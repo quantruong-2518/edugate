@@ -5,7 +5,7 @@ export {
   type ApplicationState,
   type ApplicationStateMeta,
   type ApplicationStateTone,
-} from "./states";
+} from "./states.js";
 
 export {
   APPLICATION_ROLES,
@@ -14,7 +14,7 @@ export {
   getAllowedTransitions,
   type ApplicationRole,
   type Transition,
-} from "./transitions";
+} from "./transitions.js";
 
 export {
   generateApplicationCode,
@@ -23,9 +23,18 @@ export {
   type Application,
   type ApplicationCode,
   type ApplicationHistoryEntry,
-} from "./application";
+} from "./application.js";
 
 export {
   resolveApplicantConfig,
   type ApplicantConfig,
-} from "./applicant-config";
+} from "./applicant-config.js";
+
+export {
+  ANALYTICS_SERIES_DAYS,
+  emptyByState,
+  FUNNEL_ORDER,
+  type AnalyticsPoint,
+  type ApplicationAnalytics,
+  type FunnelStep,
+} from "./analytics.js";

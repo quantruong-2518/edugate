@@ -2,9 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FileX2, Search, X } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import {
   type Application,
@@ -15,10 +14,19 @@ import type { FormSchema } from "@shared/form";
 import { StateBadge } from "@ui/components/admission";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
+import { Card, CardContent } from "@ui/components/card";
 import { EmptyState } from "@ui/components/empty-state";
 import { ErrorState } from "@ui/components/error-state";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui/components/select";
+import { Skeleton } from "@ui/components/skeleton";
 import {
   Table,
   TableBody,
@@ -27,17 +35,13 @@ import {
   TableHeader,
   TableRow,
 } from "@ui/components/table";
-import { Skeleton } from "@ui/components/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@ui/components/select";
 
-import { studentNameOf } from "@/lib/api";
-import { admissionKeys, useApplications } from "@/lib/api/queries";
+import {
+  applicationScore,
+  studentNameOf,
+  type ApplicationSort,
+} from "@/lib/api";
+import { useApplications, useTransitionApplication } from "@/lib/api/queries";
 
 import { ApplicationDetailSheet } from "./application-detail-sheet";
 import { StateFilter } from "./state-filter";
@@ -49,18 +53,23 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
 });
 
 const PAGE_SIZES = [10, 20, 50] as const;
+const SORT_OPTIONS: readonly ApplicationSort[] = [
+  "createdAt:desc",
+  "createdAt:asc",
+  "score:desc",
+  "score:asc",
+];
 
-function studentDobOf(app: Application): string {
-  const dob = app.formData["dateOfBirth"];
-  if (typeof dob !== "string" || !dob) return "-";
-  const d = new Date(dob);
-  if (isNaN(d.getTime())) return dob;
-  return DATE_FORMATTER.format(d);
-}
+const SORT_KEY: Record<ApplicationSort, string> = {
+  "createdAt:desc": "createdAtDesc",
+  "createdAt:asc": "createdAtAsc",
+  "score:desc": "scoreDesc",
+  "score:asc": "scoreAsc",
+};
 
 function StatPill({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg bg-muted/50 px-3 py-2">
+    <div className="rounded-lg border bg-card px-3 py-2">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="text-xl font-semibold tabular-nums">{value}</p>
     </div>
@@ -77,25 +86,25 @@ export function ApplicationsView({
   const t = useTranslations("admin.applications");
   const tFilters = useTranslations("admin.applications.filters");
 
-  const searchParams = useSearchParams();
-  const urlQuery = searchParams.get("q") ?? "";
-
-  const [searchInput, setSearchInput] = useState(urlQuery);
-  const [search, setSearch] = useState(urlQuery);
+  // Filter / query state
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
   const [states, setStates] = useState<ApplicationState[]>([]);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [scoreMin, setScoreMin] = useState("");
+  const [scoreMax, setScoreMax] = useState("");
+  const [sort, setSort] = useState<ApplicationSort>("createdAt:desc");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<number>(10);
 
+  // Detail sheet
   const [selected, setSelected] = useState<Application | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const queryClient = useQueryClient();
+  const transitionMutation = useTransitionApplication();
+  const tCommon = useTranslations("common");
 
-  useEffect(() => {
-    setSearchInput(urlQuery);
-  }, [urlQuery]);
-
+  // Debounce search input → reset to page 1 on change.
   useEffect(() => {
     const id = setTimeout(() => {
       setSearch(searchInput);
@@ -104,9 +113,10 @@ export function ApplicationsView({
     return () => clearTimeout(id);
   }, [searchInput]);
 
+  // Reset to page 1 whenever any filter (other than page) changes.
   useEffect(() => {
     setPage(1);
-  }, [states, dateFrom, dateTo, pageSize]);
+  }, [states, dateFrom, dateTo, scoreMin, scoreMax, sort, pageSize]);
 
   const input = useMemo(
     () => ({
@@ -115,17 +125,37 @@ export function ApplicationsView({
       states: states.length > 0 ? states : undefined,
       dateFrom: dateFrom || undefined,
       dateTo: dateTo || undefined,
-      sort: "name:asc" as const,
+      scoreMin: scoreMin !== "" ? Number(scoreMin) : undefined,
+      scoreMax: scoreMax !== "" ? Number(scoreMax) : undefined,
+      sort,
       page,
       pageSize,
     }),
-    [tenantCode, search, states, dateFrom, dateTo, page, pageSize],
+    [
+      tenantCode,
+      search,
+      states,
+      dateFrom,
+      dateTo,
+      scoreMin,
+      scoreMax,
+      sort,
+      page,
+      pageSize,
+    ],
   );
 
   const { data, isPending, isError, refetch, isPlaceholderData } =
     useApplications(input);
 
-  const baseline = useApplications({ tenantCode, page: 1, pageSize: 9999 });
+  // Unfiltered analytics for the quick-stat row come from a baseline query so
+  // the pills don't change when the user filters. Reuse the list endpoint with
+  // a large page to count states (cheap in pha 1 mock).
+  const baseline = useApplications({
+    tenantCode,
+    page: 1,
+    pageSize: 9999,
+  });
   const baselineCounts = useMemo(() => {
     const items = baseline.data?.items ?? [];
     return {
@@ -146,7 +176,9 @@ export function ApplicationsView({
     search.trim() !== "" ||
     states.length > 0 ||
     dateFrom !== "" ||
-    dateTo !== "";
+    dateTo !== "" ||
+    scoreMin !== "" ||
+    scoreMax !== "";
 
   function clearAll() {
     setSearchInput("");
@@ -154,6 +186,8 @@ export function ApplicationsView({
     setStates([]);
     setDateFrom("");
     setDateTo("");
+    setScoreMin("");
+    setScoreMax("");
   }
 
   function openDetail(app: Application) {
@@ -161,124 +195,187 @@ export function ApplicationsView({
     setSheetOpen(true);
   }
 
-  function handleTransition(
+  // BE drives the transition (state machine + history + audit). On success
+  // the `useTransitionApplication` hook patches the query cache; we mirror
+  // the same update into the locally-selected app so the detail sheet's
+  // timeline + StateActions buttons refresh without a refetch.
+  async function handleTransition(
     app: Application,
     transition: Transition,
     reason: string | null,
   ) {
-    const now = new Date().toISOString();
-    const updated: Application = {
-      ...app,
-      state: transition.to,
-      updatedAt: now,
-      history: [
-        ...app.history,
-        { state: transition.to, at: now, ...(reason ? { note: reason } : {}) },
-      ],
-    };
-    setSelected(updated);
-    queryClient.setQueriesData<{ items: Application[] }>(
-      { queryKey: admissionKeys.all },
-      (prev) => {
-        if (!prev || !Array.isArray(prev.items)) return prev;
-        if (!prev.items.some((a) => a.code === app.code)) return prev;
-        return {
-          ...prev,
-          items: prev.items.map((a) => (a.code === app.code ? updated : a)),
-        };
-      },
-    );
+    try {
+      const updated = await transitionMutation.mutateAsync({
+        tenantCode,
+        code: app.code,
+        to: transition.to,
+        reason,
+      });
+      setSelected(updated);
+      toast.success(t("transitionSuccess"));
+    } catch (err) {
+      const message =
+        err instanceof Error && err.message ? err.message : tCommon("genericError");
+      toast.error(message);
+      throw err;
+    }
   }
 
   return (
     <div className="space-y-5">
       {/* Quick stats */}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         <StatPill label={t("stats.total")} value={baselineCounts.total} />
         <StatPill label={t("stats.submitted")} value={baselineCounts.submitted} />
-        <StatPill label={t("stats.underReview")} value={baselineCounts.underReview} />
+        <StatPill
+          label={t("stats.underReview")}
+          value={baselineCounts.underReview}
+        />
         <StatPill label={t("stats.needsInfo")} value={baselineCounts.needsInfo} />
         <StatPill label={t("stats.approved")} value={baselineCounts.approved} />
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden
-            />
-            <Input
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder={t("searchPlaceholder")}
-              aria-label={t("search")}
-              className="pl-9"
-            />
-          </div>
-          <StateFilter selected={states} onChange={setStates} />
-          <div className="flex items-center gap-1.5">
-            <Label htmlFor="date-from" className="shrink-0 text-xs text-muted-foreground">
-              {tFilters("dateFrom")}
-            </Label>
-            <Input
-              id="date-from"
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="w-36"
-            />
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Label htmlFor="date-to" className="shrink-0 text-xs text-muted-foreground">
-              {tFilters("dateTo")}
-            </Label>
-            <Input
-              id="date-to"
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="w-36"
-            />
-          </div>
-        </div>
-
-        {hasActiveFilters && (
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">
-              {tFilters("active")}:
-            </span>
-            {states.map((s) => (
-              <FilterChip
-                key={s}
-                label={<StateBadge state={s} className="ring-0" />}
-                onClear={() => setStates(states.filter((x) => x !== s))}
+      {/* Controls */}
+      <Card>
+        <CardContent className="space-y-3 p-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden
               />
-            ))}
-            {dateFrom && (
-              <FilterChip
-                label={`${tFilters("dateFrom")}: ${dateFrom}`}
-                onClear={() => setDateFrom("")}
+              <Input
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder={t("searchPlaceholder")}
+                aria-label={t("search")}
+                className="pl-9"
               />
-            )}
-            {dateTo && (
-              <FilterChip
-                label={`${tFilters("dateTo")}: ${dateTo}`}
-                onClear={() => setDateTo("")}
-              />
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              onClick={clearAll}
+            </div>
+            <StateFilter selected={states} onChange={setStates} />
+            <Select
+              value={sort}
+              onValueChange={(v) => setSort(v as ApplicationSort)}
             >
-              {tFilters("clearAll")}
-            </Button>
+              <SelectTrigger
+                className="w-full sm:w-44"
+                aria-label={t("sort.label")}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {t(`sort.${SORT_KEY[s]}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        )}
-      </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="space-y-1">
+              <Label htmlFor="date-from" className="text-xs text-muted-foreground">
+                {tFilters("dateFrom")}
+              </Label>
+              <Input
+                id="date-from"
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="date-to" className="text-xs text-muted-foreground">
+                {tFilters("dateTo")}
+              </Label>
+              <Input
+                id="date-to"
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="score-min" className="text-xs text-muted-foreground">
+                {tFilters("scoreMin")}
+              </Label>
+              <Input
+                id="score-min"
+                type="number"
+                min={0}
+                max={10}
+                step={0.1}
+                inputMode="decimal"
+                value={scoreMin}
+                onChange={(e) => setScoreMin(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="score-max" className="text-xs text-muted-foreground">
+                {tFilters("scoreMax")}
+              </Label>
+              <Input
+                id="score-max"
+                type="number"
+                min={0}
+                max={10}
+                step={0.1}
+                inputMode="decimal"
+                value={scoreMax}
+                onChange={(e) => setScoreMax(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {hasActiveFilters && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="text-xs text-muted-foreground">
+                {tFilters("active")}:
+              </span>
+              {states.map((s) => (
+                <FilterChip
+                  key={s}
+                  label={<StateBadge state={s} className="ring-0" />}
+                  onClear={() => setStates(states.filter((x) => x !== s))}
+                />
+              ))}
+              {dateFrom && (
+                <FilterChip
+                  label={`${tFilters("dateFrom")}: ${dateFrom}`}
+                  onClear={() => setDateFrom("")}
+                />
+              )}
+              {dateTo && (
+                <FilterChip
+                  label={`${tFilters("dateTo")}: ${dateTo}`}
+                  onClear={() => setDateTo("")}
+                />
+              )}
+              {scoreMin !== "" && (
+                <FilterChip
+                  label={`${tFilters("scoreMin")}: ${scoreMin}`}
+                  onClear={() => setScoreMin("")}
+                />
+              )}
+              {scoreMax !== "" && (
+                <FilterChip
+                  label={`${tFilters("scoreMax")}: ${scoreMax}`}
+                  onClear={() => setScoreMax("")}
+                />
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={clearAll}
+              >
+                {tFilters("clearAll")}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Results */}
       {isError ? (
@@ -304,19 +401,24 @@ export function ApplicationsView({
         />
       ) : (
         <>
+          {/* Desktop table */}
           <div
-            className={`overflow-x-auto rounded-lg border ${isPlaceholderData ? "opacity-60" : ""}`}
+            className={`hidden overflow-x-auto rounded-lg border md:block ${
+              isPlaceholderData ? "opacity-60" : ""
+            }`}
           >
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-32">{t("columns.code")}</TableHead>
-                  <TableHead>{t("columns.student")}</TableHead>
-                  <TableHead className="w-28">{t("columns.dob")}</TableHead>
-                  <TableHead className="w-36">{t("columns.state")}</TableHead>
+                  <TableHead>{t("columns.code")}</TableHead>
                   <TableHead>{t("columns.applicant")}</TableHead>
-                  <TableHead className="w-28 whitespace-nowrap">
+                  <TableHead>{t("columns.student")}</TableHead>
+                  <TableHead>{t("columns.state")}</TableHead>
+                  <TableHead className="whitespace-nowrap">
                     {t("columns.submittedAt")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("columns.score")}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -334,38 +436,92 @@ export function ApplicationsView({
                     ),
                   )}
                 {!isPending &&
-                  data?.items.map((app) => (
-                    <TableRow
-                      key={app.code}
-                      className="cursor-pointer"
-                      onClick={() => openDetail(app)}
-                    >
-                      <TableCell className="text-xs font-medium tabular-nums tracking-tight">
-                        {app.code}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {studentNameOf(app)}
-                      </TableCell>
-                      <TableCell className="tabular-nums text-muted-foreground">
-                        {studentDobOf(app)}
-                      </TableCell>
-                      <TableCell>
-                        <StateBadge state={app.state} />
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {app.applicant.fullName}
-                      </TableCell>
-                      <TableCell className="tabular-nums text-muted-foreground">
-                        {DATE_FORMATTER.format(new Date(app.createdAt))}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  data?.items.map((app) => {
+                    const score = applicationScore(app);
+                    return (
+                      <TableRow
+                        key={app.code}
+                        className="cursor-pointer"
+                        onClick={() => openDetail(app)}
+                      >
+                        <TableCell className="font-mono text-xs font-medium">
+                          {app.code}
+                        </TableCell>
+                        <TableCell>{app.applicant.fullName}</TableCell>
+                        <TableCell>{studentNameOf(app)}</TableCell>
+                        <TableCell>
+                          <StateBadge state={app.state} />
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-muted-foreground">
+                          {DATE_FORMATTER.format(new Date(app.createdAt))}
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {score ?? "—"}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
               </TableBody>
             </Table>
           </div>
 
+          {/* Mobile cards */}
+          <div
+            className={`space-y-2 md:hidden ${isPlaceholderData ? "opacity-60" : ""}`}
+          >
+            {isPending &&
+              Array.from({ length: 5 }).map((_, i) => (
+                <Card key={`card-skeleton-${i}`}>
+                  <CardContent className="space-y-2 p-4">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-5 w-20" />
+                  </CardContent>
+                </Card>
+              ))}
+            {!isPending &&
+              data?.items.map((app) => {
+                const score = applicationScore(app);
+                return (
+                  <button
+                    key={app.code}
+                    type="button"
+                    onClick={() => openDetail(app)}
+                    className="w-full text-left"
+                  >
+                    <Card className="transition-colors hover:bg-muted/40">
+                      <CardContent className="space-y-2 p-4">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-mono text-xs font-medium">
+                            {app.code}
+                          </span>
+                          <StateBadge state={app.state} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {studentNameOf(app)}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {app.applicant.fullName}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>
+                            {DATE_FORMATTER.format(new Date(app.createdAt))}
+                          </span>
+                          <span>
+                            {t("columns.score")}: {score ?? "—"}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </button>
+                );
+              })}
+          </div>
+
           {/* Pagination */}
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">
                 {t("pagination.pageSize")}
@@ -389,7 +545,11 @@ export function ApplicationsView({
 
             <div className="flex items-center gap-3 text-sm">
               <span className="text-muted-foreground">
-                {t("pagination.range", { from: rangeFrom, to: rangeTo, total })}
+                {t("pagination.range", {
+                  from: rangeFrom,
+                  to: rangeTo,
+                  total,
+                })}
               </span>
               <div className="flex gap-1">
                 <Button

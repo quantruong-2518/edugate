@@ -9,11 +9,15 @@ import {
 } from "@tanstack/react-query";
 
 import type { Application, ApplicationCode } from "@shared/admission";
+import type { AuditLogEntry, AuditLogFilters } from "@shared/audit";
+import type { LandingConfig } from "@shared/landing";
+import type { TenantTheme } from "@shared/theme";
 
 import {
   createApplication,
   getApplicationByCode,
   sendEmailOtp,
+  transitionApplication,
   verifyEmailOtp,
   listApplications,
   getApplicationAnalytics,
@@ -23,14 +27,21 @@ import {
   type CreateApplicationInput,
   type SendEmailOtpInput,
   type SendEmailOtpResult,
+  type TransitionApplicationInput,
   type VerifyEmailOtpInput,
   type VerifyEmailOtpResult,
   type ListApplicationsInput,
   type ListApplicationsResult,
   type ApplicationAnalytics,
-  type AnalyticsRange,
   type AppNotification,
 } from "./admission";
+import {
+  getTenantConfig,
+  updateTenantBranding,
+  updateTenantLanding,
+  type TenantConfigPayload,
+} from "./appearance";
+import { getAuditLog } from "./audit";
 
 /**
  * TanStack Query hooks for the admission seam. They wrap the data functions in
@@ -46,10 +57,22 @@ export const admissionKeys = {
     [...admissionKeys.all, "application", code] as const,
   list: (input: ListApplicationsInput) =>
     [...admissionKeys.all, "list", input] as const,
-  analytics: (tenantCode: string, range: AnalyticsRange = {}) =>
-    [...admissionKeys.all, "analytics", tenantCode, range] as const,
+  analytics: (tenantCode: string) =>
+    [...admissionKeys.all, "analytics", tenantCode] as const,
   notifications: (tenantCode: string) =>
     [...admissionKeys.all, "notifications", tenantCode] as const,
+};
+
+export const auditKeys = {
+  all: ["audit"] as const,
+  list: (tenantCode: string, filters: AuditLogFilters) =>
+    [...auditKeys.all, "list", tenantCode, filters] as const,
+};
+
+export const tenantConfigKeys = {
+  all: ["tenant-config"] as const,
+  byCode: (tenantCode: string) =>
+    [...tenantConfigKeys.all, tenantCode] as const,
 };
 
 export function useApplication(
@@ -81,6 +104,15 @@ export function useCreateApplication(): UseMutationResult<
   });
 }
 
+export function useAuditLog(
+  tenantCode: string,
+  filters: AuditLogFilters,
+): UseQueryResult<AuditLogEntry[]> {
+  return useQuery({
+    queryKey: auditKeys.list(tenantCode, filters),
+    queryFn: () => getAuditLog(tenantCode, filters),
+  });
+}
 
 export function useApplications(
   input: ListApplicationsInput,
@@ -94,12 +126,10 @@ export function useApplications(
 
 export function useApplicationAnalytics(
   tenantCode: string,
-  range: AnalyticsRange = {},
 ): UseQueryResult<ApplicationAnalytics> {
   return useQuery({
-    queryKey: admissionKeys.analytics(tenantCode, range),
-    queryFn: () => getApplicationAnalytics(tenantCode, range),
-    placeholderData: (prev) => prev,
+    queryKey: admissionKeys.analytics(tenantCode),
+    queryFn: () => getApplicationAnalytics(tenantCode),
   });
 }
 
@@ -150,4 +180,88 @@ export function useVerifyEmailOtp(): UseMutationResult<
   VerifyEmailOtpInput
 > {
   return useMutation({ mutationFn: verifyEmailOtp });
+}
+
+/**
+ * State transition mutation. On success, patch every cached list page that
+ * contains this application and seed the by-code cache so the detail sheet
+ * stays in sync without a refetch.
+ */
+export function useTransitionApplication(): UseMutationResult<
+  Application,
+  Error,
+  TransitionApplicationInput
+> {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: transitionApplication,
+    onSuccess: (updated) => {
+      queryClient.setQueryData(
+        admissionKeys.application(updated.code),
+        updated,
+      );
+      queryClient.setQueriesData<{ items: Application[] }>(
+        { queryKey: admissionKeys.all },
+        (prev) => {
+          if (!prev || !Array.isArray(prev.items)) return prev;
+          if (!prev.items.some((a) => a.code === updated.code)) return prev;
+          return {
+            ...prev,
+            items: prev.items.map((a) => (a.code === updated.code ? updated : a)),
+          };
+        },
+      );
+      // Analytics + audit log both reflect this change.
+      void queryClient.invalidateQueries({
+        queryKey: admissionKeys.analytics(updated.tenantCode),
+      });
+      void queryClient.invalidateQueries({ queryKey: auditKeys.all });
+    },
+  });
+}
+
+export function useTenantConfig(
+  tenantCode: string,
+): UseQueryResult<TenantConfigPayload> {
+  return useQuery({
+    queryKey: tenantConfigKeys.byCode(tenantCode),
+    queryFn: () => getTenantConfig(tenantCode),
+    enabled: tenantCode.length > 0,
+  });
+}
+
+export function useUpdateBranding(
+  tenantCode: string,
+): UseMutationResult<
+  TenantConfigPayload["branding"],
+  Error,
+  { logoUrl: string | null; theme: TenantTheme }
+> {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body) => updateTenantBranding(tenantCode, body),
+    onSuccess: (branding) => {
+      queryClient.setQueryData<TenantConfigPayload | undefined>(
+        tenantConfigKeys.byCode(tenantCode),
+        (prev) => (prev ? { ...prev, branding } : prev),
+      );
+      void queryClient.invalidateQueries({ queryKey: auditKeys.all });
+    },
+  });
+}
+
+export function useUpdateLanding(
+  tenantCode: string,
+): UseMutationResult<{ landing: LandingConfig }, Error, LandingConfig> {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (landing) => updateTenantLanding(tenantCode, landing),
+    onSuccess: ({ landing }) => {
+      queryClient.setQueryData<TenantConfigPayload | undefined>(
+        tenantConfigKeys.byCode(tenantCode),
+        (prev) => (prev ? { ...prev, landing } : prev),
+      );
+      void queryClient.invalidateQueries({ queryKey: auditKeys.all });
+    },
+  });
 }

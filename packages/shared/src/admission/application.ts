@@ -1,4 +1,4 @@
-import type { ApplicationState } from "./states";
+import type { ApplicationState } from "./states.js";
 
 /**
  * Admission application entity. Shared between FE (mock store + track page) and

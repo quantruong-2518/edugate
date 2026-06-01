@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 /**
  * Tenant theme contract.
  *
@@ -134,6 +136,46 @@ function colorBlock(tokens: TenantColorTokens): string {
  *
  * Idempotent and side-effect-free; safe to call from RSC.
  */
+/**
+ * Zod validator for TenantTheme. Used at the admin settings PATCH boundary
+ * so a malformed theme can't poison `tenants.theme` and crash future RSC
+ * renders. Token values are CSS color expressions — accept any non-empty
+ * string; the browser/PostCSS will reject invalid ones at render time.
+ */
+const cssColor = z.string().min(1).max(120);
+
+const colorTokensSchema = z.object({
+  background: cssColor,
+  foreground: cssColor,
+  card: cssColor,
+  cardForeground: cssColor,
+  popover: cssColor,
+  popoverForeground: cssColor,
+  primary: cssColor,
+  primaryForeground: cssColor,
+  secondary: cssColor,
+  secondaryForeground: cssColor,
+  muted: cssColor,
+  mutedForeground: cssColor,
+  accent: cssColor,
+  accentForeground: cssColor,
+  destructive: cssColor,
+  destructiveForeground: cssColor,
+  border: cssColor,
+  input: cssColor,
+  ring: cssColor,
+}) satisfies z.ZodType<TenantColorTokens>;
+
+export const tenantThemeSchema = z.object({
+  radius: z.string().min(1).max(40),
+  font: z.object({
+    sans: z.string().min(1).max(500),
+    mono: z.string().min(1).max(500).optional(),
+  }),
+  light: colorTokensSchema,
+  dark: colorTokensSchema,
+}) satisfies z.ZodType<TenantTheme>;
+
 export function tenantThemeToCss(theme: TenantTheme): string {
   const root = [
     `--radius: ${theme.radius};`,

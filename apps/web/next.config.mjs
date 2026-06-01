@@ -15,6 +15,17 @@ const nextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
+  // The shared + db packages live as TS sources resolved at build time, but
+  // their internal re-exports carry `.js` extensions so the API (NodeNext
+  // resolver) can import them. Tell webpack to fall back from `.js` to `.ts`
+  // so the same source tree builds under both resolvers.
+  webpack: (config) => {
+    config.resolve.extensionAlias = {
+      ...(config.resolve.extensionAlias ?? {}),
+      ".js": [".ts", ".tsx", ".js"],
+    };
+    return config;
+  },
 };
 
 export default withNextIntl(nextConfig);

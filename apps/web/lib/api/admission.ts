@@ -1,10 +1,17 @@
+import axios from "axios";
+
 import {
-  generateApplicationCode,
+  emptyByState,
   type Applicant,
+  type AnalyticsPoint,
   type Application,
+  type ApplicationAnalytics,
   type ApplicationCode,
   type ApplicationState,
+  type FunnelStep,
 } from "@shared/admission";
+
+export type { AnalyticsPoint, ApplicationAnalytics, FunnelStep };
 
 import {
   generateApplications,
@@ -13,19 +20,16 @@ import {
 import { http } from "./http";
 
 /**
- * Admission API seam.
+ * Admission API seam. The 4 public flows below talk to the NestJS API via
+ * `http` (axios) — base URL from `NEXT_PUBLIC_API_URL`, `x-tenant-code`
+ * header set by the request interceptor. The seam preserves signatures so
+ * the TanStack Query hooks in `queries.ts` and every call site stayed
+ * unchanged across the swap (the one exception is `otpToken`, which the
+ * wizard now threads from verify → submit per API_SPEC §3.3 + §3.1).
  *
- * Pha-1 mock: the public apply flow runs without a back-end. OTP is a fixed
- * dev code (`MOCK_OTP_CODE`) and submitted applications are stored in
- * localStorage so the confirmation + `/track/:code` pages work offline.
- * Signatures match the pha-2 API, so the TanStack Query hooks in `queries.ts`
- * and every call site are unchanged — pha 2 sets `NEXT_PUBLIC_API_URL` and
- * swaps each body back to an `http` call (threading `otpToken` from verify →
- * submit per API_SPEC §3.3 + §3.1).
- *
- * Only the public apply flow (OTP + submit + track-by-code) is mocked here.
- * The admin/management endpoints below are a mix of real `http` calls (e.g.
- * `listApplications`) and the deterministic seeded generator — left untouched.
+ * Management endpoints (`listApplications`, `getApplicationAnalytics`,
+ * notifications) are still mock-backed until the corresponding NestJS
+ * routes land in Day 6+.
  */
 
 export type CreateApplicationInput = {
@@ -60,93 +64,127 @@ export type VerifyEmailOtpResult = {
   expiresAt: string;
 };
 
-/** Fixed OTP for the pha-1 mock — no SMTP / back-end needed. */
-const MOCK_OTP_CODE = "123456";
+type CreateApplicationResponse = {
+  code: string;
+  state: ApplicationState;
+  createdAt: string;
+};
 
-/** localStorage key for mock-submitted applications (apply → track, offline). */
-const APPLICATION_STORE_KEY = "ghidanh:applications";
-
-function readApplicationStore(): Record<string, Application> {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = window.localStorage.getItem(APPLICATION_STORE_KEY);
-    return raw ? (JSON.parse(raw) as Record<string, Application>) : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeApplicationStore(store: Record<string, Application>): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(APPLICATION_STORE_KEY, JSON.stringify(store));
-  } catch {
-    // Ignore quota / private-mode failures.
-  }
-}
-
-/** ISO timestamp `minutes` from now (OTP expiry). */
-function isoIn(minutes: number): string {
-  return new Date(Date.now() + minutes * 60 * 1000).toISOString();
-}
+type GetApplicationResponse = {
+  code: string;
+  state: ApplicationState;
+  applicant: Applicant;
+  formData: Record<string, unknown>;
+  history: Array<{
+    state: ApplicationState;
+    at: string;
+    byRole: string | null;
+    note: string | null;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+  submittedAt: string | null;
+};
 
 /**
- * Submit a new application. Mock: generate a code, mark it SUBMITTED, and
- * persist to localStorage so the confirmation page + `/track/:code` resolve
- * offline. `otpToken` is accepted as-is (the mock verify issues it); pha 2 has
- * the API validate it and own canonical code generation.
+ * Submit a new application. The API returns a thin acknowledgement; we
+ * project it into the FE `Application` shape using the fields the caller
+ * already had so consumers (confirmation page, TanStack Query cache seed)
+ * don't need a second round-trip.
  */
 export async function createApplication(
   input: CreateApplicationInput,
 ): Promise<Application> {
-  const code = generateApplicationCode(input.tenantCode).toUpperCase();
-  const at = new Date().toISOString();
-  const application: Application = {
-    code,
-    tenantCode: input.tenantCode,
-    ...(input.campaignId ? { campaignId: input.campaignId } : {}),
-    state: "SUBMITTED",
+  const { data } = await http.post<CreateApplicationResponse>("/v1/applications", {
+    campaignId: input.campaignId,
     applicant: input.applicant,
     formData: input.formData,
-    history: [{ state: "SUBMITTED", at }],
-    createdAt: at,
-    updatedAt: at,
+    otpToken: input.otpToken,
+  });
+  return {
+    code: data.code,
+    tenantCode: input.tenantCode,
+    campaignId: input.campaignId,
+    state: data.state,
+    applicant: input.applicant,
+    formData: input.formData,
+    history: [{ state: data.state, at: data.createdAt }],
+    createdAt: data.createdAt,
+    updatedAt: data.createdAt,
   };
-  const store = readApplicationStore();
-  store[code] = application;
-  writeApplicationStore(store);
-  return delay(application);
 }
 
 export async function getApplicationByCode(
   code: ApplicationCode,
 ): Promise<Application | null> {
-  // Mock: read from the localStorage store this session's submit wrote to.
-  const store = readApplicationStore();
-  return delay(store[code.trim().toUpperCase()] ?? null);
+  try {
+    const { data } = await http.get<GetApplicationResponse>(
+      `/v1/applications/by-code/${encodeURIComponent(code.trim().toUpperCase())}`,
+    );
+    // Cross-tenant codes return 404 via RLS; non-404 errors fall through to
+    // the catch and bubble up so the caller's error UI fires.
+    const tenantCode = readTenantCodeFromUrl();
+    return {
+      code: data.code,
+      tenantCode,
+      state: data.state,
+      applicant: data.applicant,
+      formData: data.formData,
+      history: data.history.map((h) => ({
+        state: h.state,
+        at: h.at,
+        ...(h.note !== null ? { note: h.note } : {}),
+      })),
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 404) {
+      return null;
+    }
+    throw err;
+  }
 }
 
 export async function sendEmailOtp(
-  _input: SendEmailOtpInput,
+  input: SendEmailOtpInput,
 ): Promise<SendEmailOtpResult> {
-  // Mock: no SMTP. The code is always MOCK_OTP_CODE; `devCode` lets the UI
-  // toast it so a tester can self-serve without a back-end.
-  return delay({ sent: true, expiresAt: isoIn(10), devCode: MOCK_OTP_CODE });
+  const { data } = await http.post<SendEmailOtpResult>(
+    "/v1/applications/otp/send",
+    { email: input.email },
+  );
+  return data;
 }
 
 export async function verifyEmailOtp(
   input: VerifyEmailOtpInput,
 ): Promise<VerifyEmailOtpResult> {
-  // Mock: only MOCK_OTP_CODE verifies. A wrong code returns "not verified"
-  // (not a throw) so the form shows a normal validation message.
-  if (input.code.trim() !== MOCK_OTP_CODE) {
-    return delay({ verified: false, otpToken: "", expiresAt: "" });
+  try {
+    const { data } = await http.post<VerifyEmailOtpResult>(
+      "/v1/applications/otp/verify",
+      { email: input.email, code: input.code },
+    );
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 400) {
+      // Wrong code or expired — surface a "not verified" result rather than
+      // throwing so the form UI can show a normal validation message.
+      return { verified: false, otpToken: "", expiresAt: "" };
+    }
+    throw err;
   }
-  return delay({
-    verified: true,
-    otpToken: `mock-otp-${Date.now()}`,
-    expiresAt: isoIn(10),
-  });
+}
+
+function readTenantCodeFromUrl(): string {
+  if (typeof window === "undefined") return "";
+  // The seam runs client-side after the wizard renders, so the URL is real.
+  const host = window.location.host;
+  const subdomain = host.split(".")[0];
+  if (subdomain && subdomain !== "localhost" && subdomain !== "127") {
+    return subdomain;
+  }
+  const m = window.location.pathname.match(/^\/t\/([^/]+)/);
+  return m?.[1] ?? "";
 }
 
 /** Simulated network latency for the mock-backed management endpoints below. */
@@ -177,13 +215,6 @@ function datasetFor(tenantCode: string): Application[] {
     datasetCache.set(key, rows);
   }
   return rows;
-}
-
-function normalize(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "");
 }
 
 /** Numeric score used for the "score" column / range filter (the gpa field). */
@@ -221,8 +252,7 @@ export type ApplicationSort =
   | "createdAt:desc"
   | "createdAt:asc"
   | "score:desc"
-  | "score:asc"
-  | "name:asc";
+  | "score:asc";
 
 export type ListApplicationsInput = {
   tenantCode: string;
@@ -288,181 +318,46 @@ export async function listApplications(
   return data;
 }
 
-function sortApplications(
-  rows: Application[],
-  sort: ApplicationSort,
-): Application[] {
-  const sorted = [...rows];
-  switch (sort) {
-    case "createdAt:asc":
-      sorted.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
-      break;
-    case "score:desc":
-      sorted.sort(
-        (a, b) => (applicationScore(b) ?? -1) - (applicationScore(a) ?? -1),
-      );
-      break;
-    case "score:asc":
-      sorted.sort(
-        (a, b) => (applicationScore(a) ?? Infinity) - (applicationScore(b) ?? Infinity),
-      );
-      break;
-    case "name:asc":
-      sorted.sort((a, b) =>
-        studentNameOf(a).localeCompare(studentNameOf(b), "vi"),
-      );
-      break;
-    case "createdAt:desc":
-    default:
-      sorted.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-      break;
-  }
-  return sorted;
-}
-
-export type AnalyticsPoint = {
-  /** ISO date (yyyy-mm-dd). */
-  date: string;
-  count: number;
-};
-
-export type FunnelStep = {
-  state: ApplicationState;
-  count: number;
-};
-
-export type ApplicationAnalytics = {
-  total: number;
-  byState: Record<ApplicationState, number>;
-  todaySubmissions: number;
-  weekSubmissions: number;
-  /** Daily submission counts spanning the resolved range (oldest first). */
-  series: AnalyticsPoint[];
-  /** Effective range actually charted (resolved when caller passes none). */
-  range: { from: string; to: string };
-  /** Approval funnel (submitted → reviewed → approved → confirmed → enrolled). */
-  funnel: FunnelStep[];
-};
-
-/**
- * Date window for analytics. Both bounds optional ISO `yyyy-mm-dd`; when a bound
- * is omitted it resolves to all-time (earliest submission → REFERENCE_DATE).
- */
-export type AnalyticsRange = {
-  from?: string;
-  to?: string;
-};
-
-const DAY_MS = 86_400_000;
-
-const FUNNEL_ORDER: readonly ApplicationState[] = [
-  "SUBMITTED",
-  "UNDER_REVIEW",
-  "APPROVED",
-  "CONFIRMED",
-  "ENROLLED",
-];
-
-function emptyByState(): Record<ApplicationState, number> {
+export async function getApplicationAnalytics(
+  tenantCode: string,
+): Promise<ApplicationAnalytics> {
+  const { data } = await http.get<ApplicationAnalytics>(
+    "/v1/admin/applications/analytics",
+    { headers: { "x-tenant-code": tenantCode } },
+  );
+  // BE returns byState as a partial object — ensure every state is present so
+  // dashboard consumers can read `byState[s]` without an undefined check.
   return {
-    DRAFT: 0,
-    SUBMITTED: 0,
-    UNDER_REVIEW: 0,
-    NEEDS_INFO: 0,
-    APPROVED: 0,
-    REJECTED: 0,
-    CONFIRMED: 0,
-    ENROLLED: 0,
-    CANCELLED: 0,
-    EXPIRED: 0,
+    ...data,
+    byState: { ...emptyByState(), ...data.byState },
   };
 }
 
-function dateKey(ms: number): string {
-  return new Date(ms).toISOString().slice(0, 10);
-}
+export type TransitionApplicationInput = {
+  tenantCode: string;
+  code: string;
+  to: ApplicationState;
+  reason?: string | null;
+};
 
-/** Midnight UTC of an ISO `yyyy-mm-dd` day. */
-function startOfDayMs(key: string): number {
-  return Date.parse(`${key}T00:00:00.000Z`);
-}
-
-/** Last millisecond (UTC) of an ISO `yyyy-mm-dd` day. */
-function endOfDayMs(key: string): number {
-  return Date.parse(`${key}T23:59:59.999Z`);
-}
-
-export async function getApplicationAnalytics(
-  tenantCode: string,
-  range: AnalyticsRange = {},
-): Promise<ApplicationAnalytics> {
-  const all = datasetFor(tenantCode);
-
-  // Resolve the effective window. Omitted bounds expand to all-time: the
-  // earliest submission on record (lower) and REFERENCE "today" (upper).
-  const createdMsList = all.map((app) => new Date(app.createdAt).getTime());
-  const earliestMs = createdMsList.length
-    ? Math.min(...createdMsList)
-    : REFERENCE_DATE.getTime();
-  const fromMs = range.from ? startOfDayMs(range.from) : startOfDayMs(dateKey(earliestMs));
-  const toMs = range.to ? endOfDayMs(range.to) : endOfDayMs(dateKey(REFERENCE_DATE.getTime()));
-
-  const fromKey = dateKey(fromMs);
-  const toKey = dateKey(toMs);
-
-  const rows = all.filter((app) => {
-    const ms = new Date(app.createdAt).getTime();
-    return ms >= fromMs && ms <= toMs;
-  });
-
-  const byState = emptyByState();
-
-  // "Today" / "this week" stay anchored to REFERENCE regardless of range.
-  const startOfToday = new Date(REFERENCE_DATE);
-  startOfToday.setHours(0, 0, 0, 0);
-  const startOfWeek = startOfToday.getTime() - 6 * DAY_MS;
-  let todaySubmissions = 0;
-  let weekSubmissions = 0;
-  for (const app of all) {
-    const ms = new Date(app.createdAt).getTime();
-    if (ms >= startOfToday.getTime()) todaySubmissions += 1;
-    if (ms >= startOfWeek) weekSubmissions += 1;
-  }
-
-  // Seed one bucket per day in the window so empty days render as 0.
-  const buckets = new Map<string, number>();
-  for (let ms = startOfDayMs(fromKey); ms <= toMs; ms += DAY_MS) {
-    buckets.set(dateKey(ms), 0);
-  }
-  for (const app of rows) {
-    byState[app.state] += 1;
-    const key = dateKey(new Date(app.createdAt).getTime());
-    if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + 1);
-  }
-
-  const series: AnalyticsPoint[] = Array.from(buckets.entries()).map(
-    ([date, count]) => ({ date, count }),
+/**
+ * Move an application to a new state. The BE re-checks the transition against
+ * the shared state machine, writes the history entry, and emits the matching
+ * audit row — all inside the tenant tx. Returns the application in the same
+ * shape `listApplications`/`getApplicationByCode` produce.
+ */
+export async function transitionApplication(
+  input: TransitionApplicationInput,
+): Promise<Application> {
+  const { tenantCode, code, to, reason } = input;
+  const body: { to: ApplicationState; reason?: string } = { to };
+  if (reason?.trim()) body.reason = reason.trim();
+  const { data } = await http.patch<Application>(
+    `/v1/admin/applications/${encodeURIComponent(code.trim().toUpperCase())}/transition`,
+    body,
+    { headers: { "x-tenant-code": tenantCode } },
   );
-
-  // Funnel: each step counts applications (within range) that reached at least
-  // that state on their way to the current state.
-  const reachedAtLeast = (target: ApplicationState): number =>
-    rows.filter((app) => app.history.some((h) => h.state === target)).length;
-
-  const funnel: FunnelStep[] = FUNNEL_ORDER.map((state) => ({
-    state,
-    count: reachedAtLeast(state),
-  }));
-
-  return delay({
-    total: rows.length,
-    byState,
-    todaySubmissions,
-    weekSubmissions,
-    series,
-    range: { from: fromKey, to: toKey },
-    funnel,
-  });
+  return data;
 }
 
 export type NotificationKind =
