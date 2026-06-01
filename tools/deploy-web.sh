@@ -41,7 +41,7 @@ fi
 echo "→ Building apps/web (so we don't ship a broken commit)…"
 pnpm --filter web build
 
-echo "→ Pushing $BRANCH → repo-deploy/$BRANCH…"
+echo "→ Pushing ${BRANCH} → repo-deploy/${BRANCH}…"
 git push repo-deploy "$BRANCH":"$BRANCH"
 
-echo "✓ Pushed. Vercel will rebuild from repo-deploy/$BRANCH."
+echo "✓ Pushed. Vercel will rebuild from repo-deploy/${BRANCH}."
