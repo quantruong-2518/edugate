@@ -42,8 +42,22 @@ export async function generateMetadata(): Promise<Metadata> {
   const authedSlug = slug && isValidTenantCode(slug) ? slug : null;
   const branding = await getTenantBranding(authedSlug ?? (await getTenantCode()));
   // `absolute` ignores the root layout's host-driven "%s · Ghi Danh" template so
-  // the tab shows just the authenticated school.
-  return { title: { absolute: branding.name } };
+  // the tab shows just the authenticated school. Admin surfaces are gated and
+  // carry tenant-private state, so block all crawlers — overrides the public
+  // root layout's `index: true`.
+  return {
+    title: { absolute: branding.name },
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+        noimageindex: true,
+      },
+    },
+  };
 }
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {

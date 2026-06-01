@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro, Fraunces, Inter, Space_Grotesk } from "next/font/google";
+import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -44,14 +45,124 @@ const fontEditorialDisplay = Fraunces({
   variable: "--font-fraunces",
 });
 
+/**
+ * Build a 32×32 SVG favicon painted in the tenant's primary token, with the
+ * first letter of the short name centred on top. Kept inline (data URL) so we
+ * never need a per-tenant asset on disk and the icon updates the moment a
+ * tenant changes its theme. `style="fill: …"` (not the bare `fill=` attribute)
+ * lets modern browsers resolve `oklch(…)` values inside SVG.
+ */
+function tenantFaviconDataUrl(primary: string, shortName: string): string {
+  const letter = (shortName.trim().charAt(0) || "G").toUpperCase();
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">` +
+    `<rect width="32" height="32" rx="7" style="fill:${primary}"/>` +
+    `<text x="16" y="22" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" font-weight="700" fill="#fff">${letter}</text>` +
+    `</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+/**
+ * Resolve the canonical site origin for this request — used as `metadataBase`
+ * so Next can turn relative URLs in `openGraph.images` / `alternates` into
+ * absolute ones. Read from `x-forwarded-*` first (Caddy / Vercel terminate
+ * TLS upstream and forward the original scheme + host), then plain `host`,
+ * then the dev fallback. Falls back to a localhost URL rather than throwing
+ * so a misconfigured proxy never crashes the layout.
+ */
+async function getRequestOrigin(): Promise<URL> {
+  const h = await headers();
+  const protocol =
+    h.get("x-forwarded-proto") ??
+    (process.env.NODE_ENV === "production" ? "https" : "http");
+  const host =
+    h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+  try {
+    return new URL(`${protocol}://${host}`);
+  } catch {
+    return new URL("http://localhost:3000");
+  }
+}
+
 export async function generateMetadata(): Promise<Metadata> {
-  const branding = await getTenantBranding(await getTenantCode());
+  const [branding, origin, locale] = await Promise.all([
+    getTenantBranding(await getTenantCode()),
+    getRequestOrigin(),
+    getLocale(),
+  ]);
+  const favicon = tenantFaviconDataUrl(
+    branding.theme.light.primary,
+    branding.shortName,
+  );
+  const description = `${branding.name} — cổng tuyển sinh trực tuyến. Nộp hồ sơ và tra cứu kết quả nhanh chóng, minh bạch.`;
+
   return {
+    metadataBase: origin,
+    applicationName: branding.name,
     title: {
       default: branding.name,
       template: `%s · ${branding.shortName}`,
     },
-    description: "Nền tảng tuyển sinh đa tenant.",
+    description,
+    keywords: [
+      "tuyển sinh",
+      "nộp hồ sơ trực tuyến",
+      "tra cứu hồ sơ",
+      branding.name,
+      branding.shortName,
+    ],
+    authors: [{ name: branding.name }],
+    creator: branding.name,
+    publisher: branding.name,
+    formatDetection: {
+      telephone: false,
+      email: false,
+      address: false,
+    },
+    openGraph: {
+      type: "website",
+      siteName: branding.name,
+      title: branding.name,
+      description,
+      url: origin.toString(),
+      locale: locale === "vi" ? "vi_VN" : "en_US",
+      // TODO: dynamic og:image via app/opengraph-image.tsx once we have an
+      // OKLCH→RGB conversion (Satori in `next/og` doesn't parse oklch yet).
+    },
+    twitter: {
+      card: "summary",
+      title: branding.name,
+      description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    icons: {
+      icon: [{ url: favicon, type: "image/svg+xml" }],
+      shortcut: [{ url: favicon, type: "image/svg+xml" }],
+      apple: [{ url: favicon, type: "image/svg+xml" }],
+    },
+  };
+}
+
+/**
+ * Browser chrome tint (Android Chrome address bar, iOS status bar in PWA
+ * mode). Painted with the tenant's primary token so the OS chrome matches
+ * the in-app hero gradient. Next 14+ requires this in a separate `viewport`
+ * export rather than `metadata`.
+ */
+export async function generateViewport(): Promise<Viewport> {
+  const branding = await getTenantBranding(await getTenantCode());
+  return {
+    themeColor: branding.theme.light.primary,
+    colorScheme: "light",
   };
 }
 
