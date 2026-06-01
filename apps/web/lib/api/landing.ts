@@ -498,8 +498,8 @@ const NVH_CONFIG: LandingConfig = {
         {
           id: "eligibility",
           label: "Đối tượng",
-          highlight: "Sinh năm 2015 · Khu vực Sơn Đồng, Hà Nội",
-          body: "Học sinh sinh năm 2015 đã hoàn thành chương trình tiểu học, cư trú trên địa bàn xã Sơn Đồng và các khu vực theo phân tuyến tuyển sinh.",
+          highlight: "Sinh năm 2015 · Toàn thành phố Hà Nội",
+          body: "Học sinh sinh năm 2015 đã hoàn thành chương trình tiểu học, cư trú trên địa bàn toàn thành phố Hà Nội theo phân tuyến tuyển sinh.",
           icon: "users",
         },
         {
@@ -536,7 +536,7 @@ const NVH_CONFIG: LandingConfig = {
             "Tại đây, học tập không phải là áp lực thi cử đè nặng mà là một hành trình khám phá đầy hạnh phúc, để các con tự tin làm chủ tương lai và trở thành những công dân toàn cầu có ích.",
         },
         {
-          name: "Cô Bùi Hà Thị Thu",
+          name: "Cô Bùi Thị Hà Thu",
           role: "Phó Hiệu trưởng",
           photoUrl: "/tenants/nguyen-van-huyen/bui-thi-ha-thu-cutout.png",
           portrait: "cutout",

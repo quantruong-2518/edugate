@@ -45,9 +45,15 @@ const NHT_CONFIG: ApplicantConfig = {
     "Phụ huynh vui lòng cam kết và chịu trách nhiệm về tính chính xác của hồ sơ (học bạ và thông tin cư trú). Nếu phát hiện thông tin không hợp lệ hoặc sai lệch so với quy định, nhà trường có quyền từ chối tiếp nhận học sinh, kể cả khi đã có kết quả trúng tuyển.",
 };
 
+const NVH_CONFIG: ApplicantConfig = {
+  ...DEFAULT_CONFIG,
+  relationships: [...DEFAULT_RELATIONSHIPS, "other"],
+};
+
 const TENANT_CONFIGS: Readonly<Record<string, ApplicantConfig>> = {
   "nguyen-gia-thieu": NGT_CONFIG,
   "nguyen-huy-tuong": NHT_CONFIG,
+  "nguyen-van-huyen": NVH_CONFIG,
 };
 
 /** Sync lookup — both the RSC page (FE) and the Nest service (BE) call this. */

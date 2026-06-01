@@ -36,15 +36,18 @@ export const NVH_FORM_SCHEMA = {
           type: "text",
           name: "studentCode",
           label: "Mã học sinh",
-          required: true,
+          required: false,
           placeholder: "VD: 79012345678",
-          description: "Mã định danh do Bộ GD&ĐT cấp.",
+          description: "Mã định danh do Bộ GD&ĐT cấp (không bắt buộc).",
         },
         {
           type: "date",
           name: "dateOfBirth",
           label: "Ngày tháng năm sinh",
           required: true,
+          // Lớp 6 intake: học sinh phải sinh năm 2015 hoặc trước đó. Bound the
+          // upper edge so parents can't pick a future / sau-2015 date.
+          max: "2015-12-31",
         },
         {
           type: "select",

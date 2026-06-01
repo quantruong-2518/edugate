@@ -216,6 +216,8 @@
   white-space: nowrap;
   font-style: italic;
   font-size: clamp(0.62rem, 2.8vw, 1.45rem);
+  /* See nguyen-van-huyen rule below for why this padding exists. */
+  padding-right: 0.15em;
 }
 
 [data-tenant='nguyen-huy-tuong'] [data-section='enrollmentQuota'] {
@@ -334,6 +336,10 @@
   white-space: nowrap;
   font-style: italic;
   font-size: clamp(0.62rem, 2.8vw, 1.45rem);
+  /* Italic glyphs overhang their advance box; without padding-right the gradient
+     background (clipped to text) doesn't cover the last char's slant — making it
+     look like the trailing "i" gets sliced off. */
+  padding-right: 0.15em;
 }
 
 [data-tenant='nguyen-van-huyen'] [data-section='enrollmentQuota'] {
