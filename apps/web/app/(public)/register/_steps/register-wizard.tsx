@@ -64,6 +64,12 @@ function isEmpty(value: unknown): boolean {
   return value === undefined || value === null || value === "";
 }
 
+/** `2015-12-31` → `31/12/2015` for human-readable validation messages. */
+function isoToDmy(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : iso;
+}
+
 export function RegisterWizard({
   tenantCode,
   formSchema,
@@ -96,6 +102,8 @@ export function RegisterWizard({
       max: (max) => formT("max", { max }),
       email: formT("invalidEmail"),
       phone: t("applicant.invalidPhone"),
+      minDate: (min) => formT("minDate", { date: isoToDmy(min) }),
+      maxDate: (max) => formT("maxDate", { date: isoToDmy(max) }),
     };
     const studentNameShape: z.ZodRawShape = applicantConfig.showStudentName
       ? { studentFullName: z.string().min(1, formT("required")) }
@@ -259,12 +267,18 @@ export function RegisterWizard({
         : await form.trigger(fieldsForStep as never);
     if (!ok) return;
     // On form step with studentCode: require the parent to re-enter the code
-    // before advancing — catches transcription errors early.
+    // before advancing — catches transcription errors early. Skip the prompt
+    // when the field is optional and left blank; nothing to confirm.
     if (step === "form" && hasStudentCode) {
-      setConfirmInput("");
-      setConfirmError(null);
-      setConfirmOpen(true);
-      return;
+      const enteredCode = String(
+        (form.getValues() as Record<string, unknown>)["studentCode"] ?? "",
+      ).trim();
+      if (enteredCode) {
+        setConfirmInput("");
+        setConfirmError(null);
+        setConfirmOpen(true);
+        return;
+      }
     }
     goTo(STEPS[stepIndex + 1] as Step);
   };
@@ -273,7 +287,10 @@ export function RegisterWizard({
     const entered = confirmInput.trim();
     const allValues = form.getValues() as Record<string, unknown>;
     const stored = String(allValues["studentCode"] ?? "").trim();
-    if (!entered || entered !== stored) {
+    // Compare case-insensitively — student codes mix letters and digits and
+    // parents commonly retype them in a different case (e.g. CMND vs OS
+    // keyboard); a case-sensitive miss reads as a bug, not a safeguard.
+    if (!entered || entered.toLowerCase() !== stored.toLowerCase()) {
       setConfirmError(
         "Mã học sinh không khớp. Vui lòng kiểm tra lại và nhập đúng mã đã điền trong hồ sơ.",
       );

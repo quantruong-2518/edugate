@@ -123,7 +123,10 @@
       "await": "The school will review your application and respond as soon as possible. Please watch your email and use the code below to track its status.",
       "codeLabel": "Your application code",
       "trackHint": "Use this code to track your application status",
-      "trackCta": "Track application"
+      "trackCta": "Track application",
+      "copyCta": "Copy application code",
+      "copied": "Application code copied",
+      "copyFailed": "Could not copy. Please try again."
     },
     "draft": {
       "restored": "Restored your saved draft",
@@ -226,6 +229,8 @@
     "invalidNumber": "Invalid value",
     "min": "Minimum value is {min}",
     "max": "Maximum value is {max}",
+    "minDate": "Date must be on or after {date}",
+    "maxDate": "Date must be on or before {date}",
     "selectPlaceholder": "Select an option",
     "filePlaceholder": "Choose a file",
     "optional": "(optional)"

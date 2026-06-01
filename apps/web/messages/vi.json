@@ -123,7 +123,10 @@
       "await": "Nhà trường sẽ xem xét hồ sơ và phản hồi tới bạn trong thời gian sớm nhất. Vui lòng theo dõi email và dùng mã hồ sơ bên dưới để tra cứu trạng thái.",
       "codeLabel": "Mã hồ sơ của bạn",
       "trackHint": "Dùng mã này để tra cứu trạng thái hồ sơ",
-      "trackCta": "Tra cứu hồ sơ"
+      "trackCta": "Tra cứu hồ sơ",
+      "copyCta": "Sao chép mã hồ sơ",
+      "copied": "Đã sao chép mã hồ sơ",
+      "copyFailed": "Không thể sao chép. Vui lòng thử lại."
     },
     "draft": {
       "restored": "Đã khôi phục bản nháp đã lưu",
@@ -188,6 +191,8 @@
     "invalidNumber": "Giá trị không hợp lệ",
     "min": "Giá trị tối thiểu là {min}",
     "max": "Giá trị tối đa là {max}",
+    "minDate": "Ngày không được trước {date}",
+    "maxDate": "Ngày không được sau {date}",
     "selectPlaceholder": "Chọn một mục",
     "filePlaceholder": "Chọn tệp",
     "optional": "(không bắt buộc)"
