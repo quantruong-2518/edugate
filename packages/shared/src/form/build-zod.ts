@@ -25,7 +25,16 @@ export type FormValidationMessages = {
   phone?: string;
   minSelected?: (n: number) => string;
   maxSelected?: (n: number) => string;
+  /** ISO date bound — receivers typically format for display. */
+  minDate?: (min: string) => string;
+  maxDate?: (max: string) => string;
 };
+
+/** `2015-12-31` → `31/12/2015`. Returns the input unchanged if it isn't ISO. */
+function isoToDmy(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : iso;
+}
 
 export const DEFAULT_FORM_MESSAGES: Required<FormValidationMessages> = {
   required: "Trường này là bắt buộc",
@@ -35,6 +44,8 @@ export const DEFAULT_FORM_MESSAGES: Required<FormValidationMessages> = {
   phone: "Số điện thoại không hợp lệ",
   minSelected: (n) => `Chọn ít nhất ${n} mục`,
   maxSelected: (n) => `Chọn tối đa ${n} mục`,
+  minDate: (min) => `Ngày không được trước ${isoToDmy(min)}`,
+  maxDate: (max) => `Ngày không được sau ${isoToDmy(max)}`,
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -168,6 +179,30 @@ export function refineFields(
           });
         }
         break;
+      case "date": {
+        // Lexicographic compare works on ISO `YYYY-MM-DD` strings — same
+        // ordering as chronological. Skip silently if value isn't ISO; the
+        // renderer only writes ISO once parsing succeeds, so this guards
+        // against legacy / pre-fix drafts without surfacing a confusing
+        // error.
+        if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+          if (field.min && value < field.min) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [field.name],
+              message: msg.minDate(field.min),
+            });
+          }
+          if (field.max && value > field.max) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [field.name],
+              message: msg.maxDate(field.max),
+            });
+          }
+        }
+        break;
+      }
       case "checkbox": {
         const count = Array.isArray(value) ? value.length : 0;
         if (typeof field.minSelected === "number" && count < field.minSelected) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Loader2, UploadCloud, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -34,6 +34,16 @@ const COPY = {
   failedToast: "Tải tệp thất bại",
 } as const;
 
+/**
+ * Photo preview cache shared across remounts of `FileFieldRenderer`. The
+ * register wizard unmounts the form step when the user navigates away (e.g.
+ * to verify-email and back), which would otherwise drop the local object URL
+ * and force the field to render the generic "Đã tải lên" chip instead of the
+ * actual photo. Keying by field name is enough — there is at most one photo
+ * field per form, and a fresh upload overwrites the entry.
+ */
+const PHOTO_PREVIEW_CACHE = new Map<string, string>();
+
 /** True when `name`'s extension matches the comma-separated `accept` list. */
 function matchesAccept(name: string, accept?: string): boolean {
   if (!accept) return true;
@@ -55,15 +65,14 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(() =>
+    field.photoPreview ? (PHOTO_PREVIEW_CACHE.get(field.name) ?? null) : null,
+  );
   const { fileUploader } = useFormBuilderConfig();
 
-  // Revoke object URL when it changes or on unmount to avoid memory leaks.
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
+  // No revoke-on-unmount: the wizard unmounts this field when the user steps
+  // forward/back, and we need the preview URL to survive that. Revocation
+  // happens only when the user explicitly replaces or clears the photo.
 
   return (
     <FormField
@@ -77,17 +86,26 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
         const filename =
           typeof raw === "string" ? raw : (raw?.name ?? "");
 
+        const writePreview = (url: string | null) => {
+          const prev = PHOTO_PREVIEW_CACHE.get(field.name);
+          if (prev && prev !== url) URL.revokeObjectURL(prev);
+          if (url) PHOTO_PREVIEW_CACHE.set(field.name, url);
+          else PHOTO_PREVIEW_CACHE.delete(field.name);
+          setPreviewUrl(url);
+        };
+
         const accept = async (file: File): Promise<void> => {
           if (!matchesAccept(file.name, field.accept)) {
             toast.error(COPY.invalidToast, { description: field.accept });
             return;
           }
+          // Show a live local preview as soon as the user picks a file — works
+          // for both the mock (no uploader) path and the real presigned-PUT
+          // path, so the photo slot is always populated immediately.
+          if (field.photoPreview) {
+            writePreview(URL.createObjectURL(file));
+          }
           if (!fileUploader) {
-            if (field.photoPreview) {
-              // Show a live local preview without uploading.
-              const url = URL.createObjectURL(file);
-              setPreviewUrl(url);
-            }
             f.onChange({ key: "", name: file.name });
             toast.success(COPY.successToast, { description: file.name });
             return;
@@ -98,6 +116,7 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
             f.onChange({ key: result.key, name: result.name });
             toast.success(COPY.successToast, { description: result.name });
           } catch (err) {
+            if (field.photoPreview) writePreview(null);
             toast.error(COPY.failedToast, {
               description: (err as Error).message,
             });
@@ -159,7 +178,7 @@ export function FileFieldRenderer({ field, control }: FieldProps<FileFieldSchema
                     type="button"
                     aria-label="Xóa ảnh"
                     onClick={() => {
-                      setPreviewUrl(null);
+                      writePreview(null);
                       f.onChange("");
                     }}
                     className="rounded-full p-0.5 text-white/70 hover:text-white"
