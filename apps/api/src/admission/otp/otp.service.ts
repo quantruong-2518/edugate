@@ -17,13 +17,13 @@ import { MailService } from "../mail/mail.service.js";
  * One-time codes + verified submission tokens.
  *
  * Two artifacts share the otp_codes table (purpose column):
- *   • application       — the 6-digit code emailed to the parent (10-min TTL)
+ *   • application       — the 6-digit code emailed to the parent (15-min TTL)
  *   • application_submit — the 32-byte opaque token minted on verify
  *                          (30-min TTL, single-use, redeemed by POST
  *                          /v1/applications)
  *
  * Hashing: HMAC-SHA256(secret = AUTH_SECRET, message = code). This is fast
- * (no native deps) and sufficient given low entropy (6-digit) + 10-min TTL
+ * (no native deps) and sufficient given low entropy (6-digit) + 15-min TTL
  * + 5-attempt lockout. specs/THREAT_MODEL.md §6 marks argon2id as the
  * target — switching is a one-line change once @node-rs/argon2 lands in
  * Day 6+ auth work.
@@ -34,7 +34,7 @@ import { MailService } from "../mail/mail.service.js";
  * via Redis; deferred to rate-limit work.
  */
 
-const CODE_TTL_MIN = 10;
+const CODE_TTL_MIN = 15;
 const TOKEN_TTL_MIN = 30;
 const MAX_ATTEMPTS = 5;
 const RESEND_THROTTLE_SEC = 60;
