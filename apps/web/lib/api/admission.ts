@@ -105,12 +105,27 @@ type GetApplicationResponse = {
 export async function createApplication(
   input: CreateApplicationInput,
 ): Promise<Application> {
-  const { data } = await http.post<CreateApplicationResponse>("/v1/applications", {
-    campaignId: input.campaignId,
-    applicant: input.applicant,
-    formData: input.formData,
-    otpToken: input.otpToken,
-  });
+  let data: CreateApplicationResponse;
+  try {
+    ({ data } = await http.post<CreateApplicationResponse>("/v1/applications", {
+      campaignId: input.campaignId,
+      applicant: input.applicant,
+      formData: input.formData,
+      otpToken: input.otpToken,
+    }));
+  } catch (err) {
+    // Surface the API's friendly message (e.g. duplicate studentCode) instead
+    // of axios's default "Request failed with status code 409", which the
+    // toast at the verify-email step renders verbatim.
+    if (axios.isAxiosError(err)) {
+      const apiMessage = (err.response?.data as { message?: unknown } | undefined)
+        ?.message;
+      if (typeof apiMessage === "string" && apiMessage.trim()) {
+        throw new Error(apiMessage);
+      }
+    }
+    throw err;
+  }
   return {
     code: data.code,
     tenantCode: input.tenantCode,

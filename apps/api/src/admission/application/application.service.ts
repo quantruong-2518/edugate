@@ -190,6 +190,28 @@ export class ApplicationService {
     //     the unique-violation error to a friendly 409 below.
     const dedupeKey = computeDedupeKey(input.applicant, input.formData);
 
+    // 3c) Friendly pre-check for studentCode collisions. The DB has a partial
+    //     unique index (`applications_tenant_student_code_uniq`, migration
+    //     0024) that is the source of truth, but raising 409 here lets us
+    //     surface a clearer message before paying the INSERT roundtrip. The
+    //     DB index still catches the rare concurrent submission race.
+    const studentCode = extractStudentCode(input.formData);
+    if (studentCode) {
+      const dup = (await tx.execute(sql`
+        SELECT 1 FROM applications
+         WHERE upper(form_data->>'studentCode') = ${studentCode}
+           AND deleted_at IS NULL
+           AND state NOT IN ('REJECTED', 'CANCELLED')
+         LIMIT 1
+      `)) as { rows: Array<{ "?column?": number }> };
+      if (dup.rows.length > 0) {
+        throw new ConflictException({
+          code: "DUPLICATE_STUDENT_CODE",
+          message: "Học sinh này đã nộp hồ sơ.",
+        });
+      }
+    }
+
     // 4) Insert the application + its first history row inside the same tx
     //    so partial state is impossible (rollback on either failure).
     let insertedRows: {
@@ -211,10 +233,19 @@ export class ApplicationService {
         rows: Array<{ id: string; code: string; state: string; created_at: string }>;
       };
     } catch (err) {
-      // Postgres unique_violation = 23505. Surfaces when (tenant_id, dedupe_key)
-      // already has a live row that hasn't been rejected/cancelled.
+      // Postgres unique_violation = 23505. Two partial-unique indexes on
+      // `applications` can raise this — dedupe (name+DOB+addr) and
+      // studentCode — so we distinguish by the constraint name to keep the
+      // user-facing message accurate.
       const pgCode = (err as { code?: string }).code;
+      const constraint = (err as { constraint?: string }).constraint;
       if (pgCode === "23505") {
+        if (constraint === "applications_tenant_student_code_uniq") {
+          throw new ConflictException({
+            code: "DUPLICATE_STUDENT_CODE",
+            message: "Học sinh này đã nộp hồ sơ.",
+          });
+        }
         throw new ConflictException({
           code: "DUPLICATE_APPLICATION",
           message:
@@ -407,4 +438,17 @@ function computeDedupeKey(
   }
 
   return `${normalizeForDedupe(name)}|${dob.trim()}|${addrPart}`;
+}
+
+/**
+ * Pull the school-issued student code from the form payload, matching the
+ * DB index expression `upper(form_data->>'studentCode')`. Returns null when
+ * the tenant's form does not collect the field or the parent left it blank.
+ */
+function extractStudentCode(formData: Record<string, unknown>): string | null {
+  const raw = formData["studentCode"];
+  if (typeof raw !== "string") return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  return trimmed.toUpperCase();
 }
