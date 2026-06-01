@@ -19,6 +19,7 @@
     "docker:logs": "docker compose logs -f",
     "api:dev": "pnpm --filter api dev",
     "api:deploy": "bash tools/deploy-api.sh",
+    "web:deploy": "bash tools/deploy-web.sh",
     "db:generate": "pnpm --filter db db:generate",
     "db:migrate": "pnpm --filter db db:migrate"
   },
