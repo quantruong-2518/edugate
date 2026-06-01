@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 
+import { AdminAnalyticsService } from "./admin/admin-analytics.service.js";
 import { AdminApplicationsController } from "./admin/admin-applications.controller.js";
 import { AdminApplicationsService } from "./admin/admin-applications.service.js";
 import { ApplicationController } from "./application/application.controller.js";
@@ -10,7 +11,12 @@ import { OtpService } from "./otp/otp.service.js";
 @Module({
   imports: [MailModule],
   controllers: [ApplicationController, AdminApplicationsController],
-  providers: [ApplicationService, OtpService, AdminApplicationsService],
+  providers: [
+    ApplicationService,
+    OtpService,
+    AdminApplicationsService,
+    AdminAnalyticsService,
+  ],
   exports: [ApplicationService, OtpService],
 })
 export class AdmissionModule {}

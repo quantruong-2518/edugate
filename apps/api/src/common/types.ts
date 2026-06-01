@@ -8,6 +8,8 @@ import type { FastifyRequest } from "fastify";
 export type RequestTenant = {
   id: string;
   code: string;
+  /** Display name shown in user-facing copy (emails, page titles). */
+  name: string;
   /** Modules enabled for the tenant (see specs/PRD.md §6.4). */
   modules: readonly string[];
 };

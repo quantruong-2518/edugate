@@ -16,7 +16,7 @@ export type RenderedMail = {
   text: string;
 };
 
-const BRAND = "EduGate";
+const BRAND = "tuyensinhnhanh.vn";
 
 export function renderMail(
   kind: MailKind,
@@ -36,19 +36,21 @@ function renderOtp(vars: Record<string, unknown>): RenderedMail {
   const code = String(vars["code"] ?? "");
   const expiresAt = vars["expiresAt"] as string | undefined;
   const expiresMinutes = expiresAt ? minutesFromNow(expiresAt) : 10;
-  const subject = `[${BRAND}] Mã xác thực email: ${code}`;
+  const schoolName = String(vars["schoolName"] ?? BRAND);
+  const subject = `[${schoolName}] Mã xác thực email: ${code}`;
   const text = [
     `Mã xác thực email của bạn là: ${code}`,
     `Mã có hiệu lực trong ${expiresMinutes} phút.`,
     "",
     `Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email.`,
-    `— ${BRAND}`,
+    `— ${schoolName}`,
   ].join("\n");
   const html = baseLayout({
     title: "Mã xác thực email",
     body: `
       <p style="margin:0 0 16px;font-size:15px;color:#374151">
-        Đây là mã xác thực bạn cần để nộp hồ sơ tuyển sinh trực tuyến.
+        Đây là mã xác thực bạn cần để nộp hồ sơ tuyển sinh trực tuyến tại
+        <strong>${escapeHtml(schoolName)}</strong>.
       </p>
       <div style="margin:24px 0;text-align:center">
         <div style="display:inline-block;padding:14px 28px;border-radius:12px;

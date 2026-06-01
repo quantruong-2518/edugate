@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 
+import { TenantConfigModule } from "./admin/tenant-config/tenant-config.module.js";
 import { AdmissionModule } from "./admission/admission.module.js";
 import { AuditInterceptor } from "./common/audit/audit.interceptor.js";
 import { AuditModule } from "./common/audit/audit.module.js";
@@ -27,6 +28,7 @@ const isProd = process.env["NODE_ENV"] === "production";
     HealthModule,
     UploadsModule,
     AdmissionModule,
+    TenantConfigModule,
     // Debug controller is dev-only — its endpoints leak the active tenant id.
     ...(isProd ? [] : [DebugModule]),
   ],

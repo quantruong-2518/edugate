@@ -98,7 +98,11 @@ export class OtpService {
     await this.mail.send({
       to: normalizedEmail,
       kind: "application_otp",
-      vars: { code, expiresAt: expiresAt.toISOString() },
+      vars: {
+        code,
+        expiresAt: expiresAt.toISOString(),
+        schoolName: req.tenant!.name,
+      },
     });
 
     const isProd = this.config.get<string>("NODE_ENV") === "production";

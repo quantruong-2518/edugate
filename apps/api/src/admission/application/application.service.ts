@@ -243,7 +243,7 @@ export class ApplicationService {
         kind: "application_received",
         vars: {
           code: inserted.code,
-          schoolName: tenantCode,
+          schoolName: req.tenant!.name,
           applicantName: input.applicant.fullName,
         },
       });

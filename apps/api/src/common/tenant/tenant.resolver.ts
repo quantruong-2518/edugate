@@ -33,13 +33,15 @@ export class TenantResolverService {
 
     const db = this.pools.db("platform");
     const rows = (await db.execute(sql`
-      SELECT id, code, modules
+      SELECT id, code, name, modules
         FROM tenants
        WHERE code = ${normalized}
          AND deleted_at IS NULL
          AND status = 'active'
        LIMIT 1
-    `)) as unknown as { rows: Array<{ id: string; code: string; modules: string[] }> };
+    `)) as unknown as {
+      rows: Array<{ id: string; code: string; name: string; modules: string[] }>;
+    };
 
     const row = rows.rows[0];
     if (!row) {
@@ -50,6 +52,7 @@ export class TenantResolverService {
     const value: RequestTenant = {
       id: row.id,
       code: row.code,
+      name: row.name,
       modules: row.modules,
     };
     this.setCached(normalized, value);
