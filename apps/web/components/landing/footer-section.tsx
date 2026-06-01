@@ -70,8 +70,10 @@ export async function FooterSection({ section }: { section: FooterSection }) {
           )}
         </div>
 
-        {/* Bottom bar: copyright and product attribution on opposite ends. */}
-        <div className="mt-10 flex flex-col gap-2 border-t border-border/50 pt-6 sm:mt-12 sm:flex-row sm:items-center sm:justify-between">
+        {/* Bottom bar: desktop puts copyright + attribution on opposite ends;
+            mobile stacks them centred with the Senera attribution as the last
+            line of the footer. */}
+        <div className="mt-10 flex flex-col items-center gap-2 border-t border-border/50 pt-6 text-center sm:mt-12 sm:flex-row sm:items-center sm:justify-between sm:text-left">
           {section.copyright && (
             <p className="text-sm text-muted-foreground">
               © {year} {section.copyright}

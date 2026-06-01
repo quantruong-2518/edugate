@@ -100,14 +100,17 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
           </ul>
         ) : (
           <Tabs defaultValue={firstTab.id} className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-            <TabsList className="flex h-auto min-w-0 max-w-full flex-row gap-1 overflow-x-auto rounded-2xl bg-muted/60 p-1.5 sm:w-52 sm:shrink-0 sm:flex-col sm:overflow-visible">
+            {/* Mobile: an equal-width segmented control — each tab shares the row
+                (no overflow), icon stacked above a small wrapping label. Desktop:
+                a vertical sidebar with icon + label inline. */}
+            <TabsList className="flex h-auto w-full flex-row gap-1 rounded-2xl bg-muted/60 p-1.5 sm:w-52 sm:shrink-0 sm:flex-col">
               {section.tabs.map((tab) => {
                 const Icon = tab.icon ? ICONS[tab.icon] : Info;
                 return (
                   <TabsTrigger
                     key={tab.id}
                     value={tab.id}
-                    className="flex w-full min-w-max shrink-0 items-center justify-start gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium sm:min-w-0"
+                    className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 whitespace-normal rounded-xl px-1.5 py-2 text-center text-xs font-medium leading-tight data-[state=active]:text-primary sm:w-full sm:flex-none sm:flex-row sm:items-center sm:justify-start sm:gap-3 sm:whitespace-nowrap sm:px-4 sm:py-3 sm:text-left sm:text-sm"
                   >
                     <Icon className="size-4 shrink-0" aria-hidden />
                     {tab.label}

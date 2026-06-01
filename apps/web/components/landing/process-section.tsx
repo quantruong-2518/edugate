@@ -14,10 +14,11 @@ export function ProcessSection({ section }: { section: ProcessSection }) {
           {section.title}
         </h2>
       )}
-      {/* `data-reveal-item="x"` + a per-step `--reveal-index` makes the steps
-          cascade left→right when a <Reveal> ancestor scrolls into view (tenants
-          that opt in via CSS); inert otherwise. */}
-      <ol className="flex flex-col gap-8 sm:flex-row sm:items-start sm:gap-2">
+      {/* Mobile: a 2-up grid (steps read left→right, top→bottom); desktop: one
+          row with arrows between. `data-reveal-item="x"` + a per-step
+          `--reveal-index` makes the steps cascade left→right when a <Reveal>
+          ancestor scrolls into view (tenants that opt in via CSS); inert otherwise. */}
+      <ol className="grid grid-cols-2 gap-x-4 gap-y-10 sm:flex sm:flex-row sm:items-start sm:gap-2">
         {section.steps.map((step, index) => (
           <Fragment key={step.title}>
             <li
@@ -27,7 +28,7 @@ export function ProcessSection({ section }: { section: ProcessSection }) {
             >
               <span
                 data-step-num=""
-                className="font-display text-8xl font-bold leading-none text-primary/60"
+                className="font-display text-6xl font-bold leading-none text-primary/60 sm:text-8xl"
               >
                 {index + 1}
               </span>
