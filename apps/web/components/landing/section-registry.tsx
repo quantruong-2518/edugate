@@ -7,6 +7,7 @@ import { HeroSection } from "./hero-section";
 import { InfoTabsSection } from "./info-tabs-section";
 import { PledgeSection } from "./pledge-section";
 import { ProcessSection } from "./process-section";
+import { Reveal } from "./reveal";
 import { StatsSection } from "./stats-section";
 import { StoryCardsSection } from "./story-cards-section";
 import { TestimonialsSection } from "./testimonials-section";
@@ -15,6 +16,12 @@ import { TestimonialsSection } from "./testimonials-section";
  * Maps a section to its renderer. Unknown types (a pha 2 config may carry a
  * section type this FE build does not know yet) are skipped with a dev warning
  * rather than crashing the page.
+ *
+ * Each section (except the hero, which has its own load-in) is wrapped in
+ * <Reveal> so it animates as it scrolls into view. The reveal is only *visible*
+ * on tenants whose CSS opts in (see globals.css) — elsewhere it is an inert
+ * wrapper. `enrollmentQuota` / `process` use no wrapper variant because their
+ * inner cards/steps stagger themselves via `data-reveal-item`.
  */
 export function LandingSectionRenderer({
   section,
@@ -25,23 +32,59 @@ export function LandingSectionRenderer({
     case "hero":
       return <HeroSection section={section} />;
     case "stats":
-      return <StatsSection section={section} />;
+      return (
+        <Reveal variant="up">
+          <StatsSection section={section} />
+        </Reveal>
+      );
     case "enrollmentQuota":
-      return <EnrollmentQuotaSection section={section} />;
+      return (
+        <Reveal>
+          <EnrollmentQuotaSection section={section} />
+        </Reveal>
+      );
     case "process":
-      return <ProcessSection section={section} />;
+      return (
+        <Reveal>
+          <ProcessSection section={section} />
+        </Reveal>
+      );
     case "infoTabs":
-      return <InfoTabsSection section={section} />;
+      return (
+        <Reveal variant="up">
+          <InfoTabsSection section={section} />
+        </Reveal>
+      );
     case "about":
-      return <AboutSection section={section} />;
+      return (
+        <Reveal variant="up">
+          <AboutSection section={section} />
+        </Reveal>
+      );
     case "testimonials":
-      return <TestimonialsSection section={section} />;
+      return (
+        <Reveal variant="up">
+          <TestimonialsSection section={section} />
+        </Reveal>
+      );
     case "pledge":
-      return <PledgeSection section={section} />;
+      return (
+        <Reveal variant="up">
+          <PledgeSection section={section} />
+        </Reveal>
+      );
     case "storyCards":
-      return <StoryCardsSection section={section} />;
+      return (
+        <Reveal variant="up">
+          <StoryCardsSection section={section} />
+        </Reveal>
+      );
     case "faq":
-      return <FaqSection section={section} />;
+      return (
+        <Reveal variant="up">
+          <FaqSection section={section} />
+        </Reveal>
+      );
     case "footer":
       // Footer is rendered by (public)/layout.tsx so it appears on all public
       // pages (register, track, landing). Skip here to avoid double-render.

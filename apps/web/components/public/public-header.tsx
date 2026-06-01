@@ -24,18 +24,19 @@ export async function PublicHeader() {
           href={"/" as Route}
           className="flex min-w-0 items-center gap-2.5"
         >
-          <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary text-primary-foreground">
-            {branding.logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={branding.logoUrl}
-                alt=""
-                className="size-full object-cover"
-              />
-            ) : (
+          {branding.logoUrl ? (
+            // Bare logo image — no chip/border, sits straight on the header.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={branding.logoUrl}
+              alt=""
+              className="h-10 w-auto shrink-0 object-contain"
+            />
+          ) : (
+            <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary text-primary-foreground">
               <GraduationCap className="size-5" aria-hidden />
-            )}
-          </span>
+            </span>
+          )}
           <span className="min-w-0">
             <span className="block truncate text-xs text-muted-foreground leading-tight">
               Trang tuyển sinh chính thức của:

@@ -121,7 +121,7 @@ export const footerSectionSchema = z.object({
  * 17) can offer a picker; the renderer maps each name to a Lucide component
  * statically so the bundle does not pull in every icon.
  */
-export const ENROLLMENT_QUOTA_ICONS = ["graduationCap", "globe"] as const;
+export const ENROLLMENT_QUOTA_ICONS = ["graduationCap", "globe", "users", "award"] as const;
 export type EnrollmentQuotaIcon = (typeof ENROLLMENT_QUOTA_ICONS)[number];
 
 /**
@@ -164,6 +164,13 @@ export const enrollmentQuotaSectionSchema = z.object({
 export const pledgeSectionSchema = z.object({
   type: z.literal("pledge"),
   title: z.string().optional(),
+  /**
+   * How multiple speakers are shown: "carousel" (default — one auto-rotating
+   * slide) or "stacked" (all cards visible, stacked vertically with alternating
+   * left/right portraits + horizontal offset). A single speaker always renders
+   * as a feature card regardless.
+   */
+  layout: z.enum(["carousel", "stacked"]).optional(),
   items: z
     .array(
       z.object({

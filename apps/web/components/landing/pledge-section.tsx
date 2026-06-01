@@ -94,12 +94,93 @@ const CUTOUT_FILTER = (() => {
 })();
 
 /**
- * Single speaker → a "lời ngỏ" feature card. Mobile: a flex row — the cut-out
- * beside the quote. Desktop: the figure is pulled out to the far left, overlaps
- * the card and rises past its top border (sticker outline + lifted shadow). The
- * card reserves left space so the figure never sits on the text. Inherits the
- * section's tenant tint via `data-section="pledge"`.
+ * A "lời ngỏ" feature card: the cut-out figure overlaps the card and rises past
+ * its top border (sticker outline + lifted shadow); the card reserves space on
+ * the figure's side so it never sits on the text. `side` mirrors the whole card
+ * — figure + padding + text alignment + caption divider — so a stack of them can
+ * alternate left/right. Mobile keeps a single shared layout (figure left column).
  */
+function FeatureCard({ item, side = "left" }: { item: Pledge; side?: "left" | "right" }) {
+  const figureLeft = side === "left";
+  return (
+    <article
+      style={{
+        borderRadius: figureLeft
+          ? "2.25rem 1rem 2.25rem 1rem"
+          : "1rem 2.25rem 1rem 2.25rem",
+      }}
+      className={`relative grid grid-cols-[8rem_minmax(0,1fr)] items-end gap-4 bg-gradient-to-br from-card to-muted/30 px-4 py-7 shadow-[0_30px_60px_-28px_rgba(15,40,80,0.5)] sm:block sm:min-h-[19rem] sm:px-12 sm:py-12 ${
+        figureLeft ? "sm:pl-[22rem]" : "sm:pr-[22rem]"
+      }`}
+    >
+      {/* Figure: a grid column on mobile, pulled out to one side and rising above
+          the card on desktop. No `relative` here so the desktop `absolute` img
+          anchors to the card, not this wrapper. */}
+      <div className="self-end">
+        {item.photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={item.photoUrl}
+            alt={item.name}
+            draggable={false}
+            style={{ filter: CUTOUT_FILTER }}
+            className={`pointer-events-none block h-auto w-full max-w-[12rem] select-none sm:absolute sm:bottom-0 sm:h-[23rem] sm:w-auto sm:max-w-none ${
+              figureLeft ? "sm:-left-2" : "sm:-right-2"
+            }`}
+          />
+        ) : (
+          <div
+            aria-hidden
+            className={`mx-auto grid size-24 place-items-center rounded-full bg-primary/15 font-display text-3xl font-bold text-primary sm:absolute sm:bottom-10 sm:size-32 ${
+              figureLeft ? "sm:left-16" : "sm:right-16"
+            }`}
+          >
+            {initials(item.name)}
+          </div>
+        )}
+      </div>
+
+      {/* Message */}
+      <div className={`min-w-0 text-left ${figureLeft ? "" : "sm:text-right"}`}>
+        <span
+          aria-hidden
+          className="block select-none font-display text-6xl leading-[0.5] text-primary/20 sm:text-8xl"
+        >
+          &ldquo;
+        </span>
+        <blockquote className="mt-3 text-pretty text-base italic leading-relaxed text-foreground/85 sm:text-2xl sm:leading-relaxed">
+          {item.quote}
+        </blockquote>
+        <figcaption
+          className={`mt-6 flex items-center gap-3 sm:gap-4 ${
+            figureLeft ? "" : "sm:flex-row-reverse"
+          }`}
+        >
+          <span
+            aria-hidden
+            className={`h-px w-8 shrink-0 sm:w-10 ${
+              figureLeft
+                ? "bg-gradient-to-r from-primary to-transparent"
+                : "bg-gradient-to-l from-primary to-transparent"
+            }`}
+          />
+          <span>
+            <span className="block font-display text-lg font-bold text-foreground sm:text-2xl">
+              {item.name}
+            </span>
+            {item.role && (
+              <span className="mt-0.5 block text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary sm:text-xs">
+                {item.role}
+              </span>
+            )}
+          </span>
+        </figcaption>
+      </div>
+    </article>
+  );
+}
+
+/** A lone speaker → a single feature card (figure pulled to the left). */
 function FeatureMessage({ title, item }: { title?: string; item: Pledge }) {
   return (
     <section
@@ -112,63 +193,45 @@ function FeatureMessage({ title, item }: { title?: string; item: Pledge }) {
             {title}
           </h2>
         )}
+        <div className="mt-16 sm:mt-24">
+          <FeatureCard item={item} side="left" />
+        </div>
+      </div>
+    </section>
+  );
+}
 
-        <article
-          style={{ borderRadius: "2.25rem 1rem 2.25rem 1rem" }}
-          className="relative mt-16 grid grid-cols-[8rem_minmax(0,1fr)] items-end gap-4 bg-gradient-to-br from-card to-muted/30 px-4 py-7 shadow-[0_30px_60px_-28px_rgba(15,40,80,0.5)] sm:mt-24 sm:block sm:min-h-[19rem] sm:px-12 sm:py-12 sm:pl-[22rem]"
-        >
-          {/* Figure: a grid column on mobile, pulled out to the far left and
-              rising above the card on desktop. No `relative` here so the
-              desktop `absolute` img anchors to the card, not this wrapper. */}
-          <div className="self-end">
-            {item.photoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={item.photoUrl}
-                alt={item.name}
-                draggable={false}
-                style={{ filter: CUTOUT_FILTER }}
-                className="pointer-events-none block h-auto w-full max-w-[12rem] select-none sm:absolute sm:-left-2 sm:bottom-0 sm:h-[23rem] sm:w-auto sm:max-w-none"
-              />
-            ) : (
+/**
+ * Several speakers → feature cards stacked vertically, each mirrored to the
+ * opposite side of the one before (figure left, then right, …) and nudged the
+ * matching way for an off-axis, "phá cách" rhythm. Generous vertical spacing
+ * leaves room for each figure to rise above its card.
+ */
+function StackedFeatures({ section }: { section: PledgeSectionType }) {
+  return (
+    <section
+      data-section="pledge"
+      className="bg-muted/40 px-4 py-16 sm:px-6 sm:py-24"
+    >
+      <div className="mx-auto max-w-6xl">
+        {section.title && (
+          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+            {section.title}
+          </h2>
+        )}
+        <div className="mt-16 space-y-24 sm:mt-24 sm:space-y-32">
+          {section.items.map((item, i) => {
+            const left = i % 2 === 0;
+            return (
               <div
-                aria-hidden
-                className="mx-auto grid size-24 place-items-center rounded-full bg-primary/15 font-display text-3xl font-bold text-primary sm:absolute sm:bottom-10 sm:left-16 sm:size-32"
+                key={item.name}
+                className={`w-full sm:max-w-[52rem] ${left ? "sm:mr-auto" : "sm:ml-auto"}`}
               >
-                {initials(item.name)}
+                <FeatureCard item={item} side={left ? "left" : "right"} />
               </div>
-            )}
-          </div>
-
-          {/* Message */}
-          <div className="min-w-0 text-left">
-            <span
-              aria-hidden
-              className="block select-none font-display text-6xl leading-[0.5] text-primary/20 sm:text-8xl"
-            >
-              &ldquo;
-            </span>
-            <blockquote className="mt-3 text-pretty text-base italic leading-relaxed text-foreground/85 sm:text-2xl sm:leading-relaxed">
-              {item.quote}
-            </blockquote>
-            <figcaption className="mt-6 flex items-center gap-3 sm:gap-4">
-              <span
-                aria-hidden
-                className="h-px w-8 shrink-0 bg-gradient-to-r from-primary to-transparent sm:w-10"
-              />
-              <span>
-                <span className="block font-display text-lg font-bold text-foreground sm:text-2xl">
-                  {item.name}
-                </span>
-                {item.role && (
-                  <span className="mt-0.5 block text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary sm:text-xs">
-                    {item.role}
-                  </span>
-                )}
-              </span>
-            </figcaption>
-          </div>
-        </article>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
@@ -285,9 +348,14 @@ function PledgeCarousel({ section }: { section: PledgeSectionType }) {
 
 export function PledgeSection({ section }: { section: PledgeSectionType }) {
   if (section.items.length === 0) return null;
-  // A lone speaker reads as a "lời ngỏ" feature; several rotate in a carousel.
+  // A lone speaker reads as a "lời ngỏ" feature.
   if (section.items.length === 1) {
     return <FeatureMessage title={section.title} item={section.items[0]!} />;
+  }
+  // Several speakers: "stacked" shows all cards (alternating sides); the default
+  // rotates them in a carousel.
+  if (section.layout === "stacked") {
+    return <StackedFeatures section={section} />;
   }
   return <PledgeCarousel section={section} />;
 }

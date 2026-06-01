@@ -96,19 +96,20 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
   },
   "nguyen-van-huyen": {
     code: "nguyen-van-huyen",
-    name: "Trường THCS Nguyễn Văn Huyên, Hoài Đức, Hà Nội",
+    name: "Trường THCS Nguyễn Văn Huyên, Sơn Đồng, Hà Nội",
     shortName: "NVH",
-    logoUrl: null,
+    logoUrl: "/tenants/nguyen-van-huyen/nvh-logo-cutout.png",
     theme: tenantTheme({
-      // Deep ocean blue ("xanh biển đậm", hue ~245) — the NVH identity. Pairs
-      // with the deep-blue → blue-gray → white gradient + grain set in
-      // globals.css ([data-tenant="nguyen-van-huyen"]).
+      // Jade ("xanh ngọc bích", hue ~172 — a cool, slightly blue jade to set it
+      // apart from NHT's warmer bamboo green). Pairs with the polished-gem
+      // gradient + specular "ngọc sáng" sheen set in globals.css
+      // ([data-tenant="nguyen-van-huyen"]).
       light: {
-        primary: "oklch(0.48 0.143 245)",
+        primary: "oklch(0.52 0.13 172)",
         primaryForeground: "oklch(0.985 0 0)",
       },
       dark: {
-        primary: "oklch(0.7 0.13 240)",
+        primary: "oklch(0.74 0.13 174)",
         primaryForeground: "oklch(0.205 0 0)",
       },
       // Modern editorial serif (Fraunces) for prominent names — the "tài liệu

@@ -1,4 +1,5 @@
-import { Globe, GraduationCap, type LucideIcon } from "lucide-react";
+import { Award, Globe, GraduationCap, Users, type LucideIcon } from "lucide-react";
+import type { CSSProperties } from "react";
 
 import type {
   EnrollmentQuotaIcon,
@@ -12,6 +13,8 @@ import type {
 const ICON_MAP: Record<EnrollmentQuotaIcon, LucideIcon> = {
   graduationCap: GraduationCap,
   globe: Globe,
+  users: Users,
+  award: Award,
 };
 
 /**
@@ -47,11 +50,13 @@ export function EnrollmentQuotaSection({ section }: { section: EnrollmentQuotaSe
         )}
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-5">
-          {section.items.map((item) => {
+          {section.items.map((item, index) => {
             const Icon = item.icon ? ICON_MAP[item.icon] : null;
             return (
               <div
                 key={item.label}
+                data-reveal-item=""
+                style={{ "--reveal-index": index } as CSSProperties}
                 className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
               >
                 {Icon && (

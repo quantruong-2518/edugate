@@ -372,24 +372,36 @@ const NVH_CONFIG: LandingConfig = {
       headline: "Trường THCS",
       headlineHighlight: "Nguyễn Văn Huyên",
       subheadline: "Hành trình tri thức, đích đến tương lai",
-      // No NVH hero photo yet — Unsplash placeholder; the default overlay tints
-      // it with the tenant ocean blue. Swap for the school's real photo when sent.
-      image: unsplash("1580582932707-520aed937b7b"),
+      // No hero photo — a luminous jade ("ngọc sáng") gradient panel carries the
+      // hero so the jade name glows against it (see globals.css).
       ctaPrimary: { label: "Đăng ký ngay", href: "/register" },
       ctaSecondary: { label: "Tra cứu hồ sơ", href: "/track" },
     },
     {
-      // Real "Trường Chất lượng cao" output commitments (intro.docx, theo Điều 9
-      // QĐ 54/2026/QĐ-UBND) — shown in the quota band's big-number cards.
+      // Intake quota + "Trường Chất lượng cao" output commitments (intro.docx,
+      // theo Điều 9 QĐ 54/2026/QĐ-UBND) — a 2×2 band of big-number cards: the
+      // two intake facts on top, the two quality pledges below.
       type: "enrollmentQuota",
-      eyebrow: "Năm học",
+      eyebrow: "Tuyển sinh lớp 6",
       year: "2026 – 2027",
-      title: "Cam kết chất lượng đầu ra",
+      title: "Chỉ tiêu & cam kết chất lượng cao",
       items: [
         {
           icon: "graduationCap",
+          value: "07",
+          label: "Lớp Chất lượng cao",
+          note: "Tuyển sinh lớp 6 theo mô hình Trường chất lượng cao",
+        },
+        {
+          icon: "users",
+          value: "40",
+          label: "Học sinh / lớp",
+          note: "Sĩ số tối đa mỗi lớp Chất lượng cao",
+        },
+        {
+          icon: "award",
           value: "90%",
-          label: "Học lực Khá & Tốt",
+          label: "Học lực Tốt & Xuất Sắc",
           note: "Cam kết tối thiểu về chất lượng văn hóa",
         },
         {
@@ -429,7 +441,7 @@ const NVH_CONFIG: LandingConfig = {
             "16.505 m²",
             "30 phòng học",
             "12 phòng bộ môn",
-            "đạt chuẩn quốc gia",
+            "đạt chuẩn quốc gia mức độ 2",
           ],
         },
         {
@@ -479,8 +491,6 @@ const NVH_CONFIG: LandingConfig = {
       ],
     },
     {
-      // The 05/6 → 08/6/2026 schedule below is a PLACEHOLDER template — replace
-      // with NVH's official dates when published. The other tabs are real.
       type: "infoTabs",
       title: "Thông tin tuyển sinh",
       layout: "tabs",
@@ -488,15 +498,15 @@ const NVH_CONFIG: LandingConfig = {
         {
           id: "eligibility",
           label: "Đối tượng",
-          highlight: "Sinh năm 2015 · Khu vực Sơn Đồng, Hoài Đức",
-          body: "Học sinh sinh năm 2015 đã hoàn thành chương trình tiểu học, cư trú trên địa bàn xã Sơn Đồng và khu vực Hoài Đức theo phân tuyến tuyển sinh.",
+          highlight: "Sinh năm 2015 · Khu vực Sơn Đồng, Hà Nội",
+          body: "Học sinh sinh năm 2015 đã hoàn thành chương trình tiểu học, cư trú trên địa bàn xã Sơn Đồng và các khu vực theo phân tuyến tuyển sinh.",
           icon: "users",
         },
         {
           id: "schedule",
           label: "Lịch tuyển sinh",
-          highlight: "Nhận hồ sơ 05/6 → 08/6/2026",
-          body: "Nhận hồ sơ trực tuyến từ ngày 05/6/2026 đến hết ngày 08/6/2026. Hỗ trợ nộp hồ sơ online với những trường hợp không nộp được trực tuyến tại nhà, địa điểm hỗ trợ tại Văn phòng trường THCS Nguyễn Văn Huyên (từ 8h00 đến 17h00 ngày 08/6/2026).",
+          highlight: "Nhận hồ sơ 05/6 → 09/6/2026",
+          body: "Nhận hồ sơ trực tuyến từ ngày 05/6/2026 đến hết ngày 09/6/2026. Hỗ trợ nộp hồ sơ online với những trường hợp không nộp được trực tuyến tại nhà, địa điểm hỗ trợ tại Văn phòng trường THCS Nguyễn Văn Huyên (từ 8h00 đến 17h00 ngày 09/6/2026).",
           icon: "calendar",
         },
         {
@@ -511,8 +521,11 @@ const NVH_CONFIG: LandingConfig = {
     {
       // The principal's message (intro.docx). Her photo's background was removed
       // (macOS Vision) → a transparent cut-out that overlaps the message card.
+      // "stacked": the principal (figure left) above the vice-principal (figure
+      // right), each card nudged the opposite way for an off-axis rhythm.
       type: "pledge",
-      title: "Lời ngỏ của Hiệu trưởng",
+      title: "Lời ngỏ của Ban Giám hiệu",
+      layout: "stacked",
       items: [
         {
           name: "Cô Trần Thị Mai Hương",
@@ -522,6 +535,14 @@ const NVH_CONFIG: LandingConfig = {
           quote:
             "Tại đây, học tập không phải là áp lực thi cử đè nặng mà là một hành trình khám phá đầy hạnh phúc, để các con tự tin làm chủ tương lai và trở thành những công dân toàn cầu có ích.",
         },
+        {
+          name: "Cô Bùi Hà Thị Thu",
+          role: "Phó Hiệu trưởng",
+          photoUrl: "/tenants/nguyen-van-huyen/bui-thi-ha-thu-cutout.png",
+          portrait: "cutout",
+          quote:
+            "Nâng cao chất lượng chuyên môn, lấy học sinh làm trung tâm; giáo dục các con phát triển toàn diện Đức - Trí - Thể - Mỹ; xây dựng trường học hạnh phúc, an toàn.",
+        },
       ],
     },
     {
@@ -529,17 +550,16 @@ const NVH_CONFIG: LandingConfig = {
       columns: [
         {
           title: "Liên hệ",
-          // Hotline + email are not in intro.docx — confirm against the school.
           links: [
-            { label: "Địa chỉ: Xã Sơn Đồng, Hoài Đức, Hà Nội", href: "#" },
+            { label: "Địa chỉ: Đường Nguyễn Viết Thứ, Sơn Đồng, Hà Nội", href: "#" },
             {
-              label: "Hotline: 024 3386 0000",
-              href: "tel:02433860000",
+              label: "Hotline: 024 39997468",
+              href: "tel:02439997468",
               gradient: true,
             },
             {
-              label: "Email: c2nguyenvanhuyen@hanoi.edu.vn",
-              href: "mailto:c2nguyenvanhuyen@hanoi.edu.vn",
+              label: "Email: c2nguyenvanhuyen.sondong.hanoi@gmail.com",
+              href: "mailto:c2nguyenvanhuyen.sondong.hanoi@gmail.com",
             },
           ],
         },
@@ -551,7 +571,7 @@ const NVH_CONFIG: LandingConfig = {
           ],
         },
       ],
-      copyright: "Trường THCS Nguyễn Văn Huyên, Hoài Đức, Hà Nội",
+      copyright: "Trường THCS Nguyễn Văn Huyên, Sơn Đồng, Hà Nội",
     },
   ],
 };
