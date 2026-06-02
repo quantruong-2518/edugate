@@ -71,11 +71,20 @@ export const infoTabsSectionSchema = z.object({
     z.object({
       id: z.string(),
       label: z.string(),
-      body: z.string(),
+      /** Paragraph body. Omit when `steps` drives a timeline layout instead. */
+      body: z.string().optional(),
       /** Short key fact (date, place, count) surfaced in bold above the body. */
       highlight: z.string().optional(),
       /** Optional leading icon. */
       icon: z.enum(INFO_TABS_ICONS).optional(),
+      /**
+       * When present, the tab renders as a vertical timeline (lộ trình) of
+       * dated steps instead of a paragraph — for multi-date schedules that are
+       * hard to scan as prose. Each step pairs a bold `date` with `text`.
+       */
+      steps: z
+        .array(z.object({ date: z.string().optional(), text: z.string() }))
+        .optional(),
     }),
   ),
 });

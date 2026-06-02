@@ -401,7 +401,7 @@ const NVH_CONFIG: LandingConfig = {
         {
           icon: "award",
           value: "90%",
-          label: "Học lực Tốt & Xuất Sắc",
+          label: "Kết quả học tập xếp loại Tốt",
           note: "Cam kết tối thiểu về chất lượng văn hóa",
         },
         {
@@ -435,23 +435,23 @@ const NVH_CONFIG: LandingConfig = {
         {
           icon: "building",
           title: "Cơ sở vật chất",
-          body: "Từ năm 2020, trường chuyển về cơ sở mới khang trang rộng 16.505 m², gồm 30 phòng học và 12 phòng bộ môn hiện đại đạt chuẩn quốc gia.",
+          body: "Từ năm 2020, trường chuyển về cơ sở mới khang trang rộng 16.505 m², gồm 30 phòng học và 12 phòng bộ môn hiện đại đạt chuẩn quốc gia Mức độ 2.",
           emphasis: [
             "2020",
             "16.505 m²",
             "30 phòng học",
             "12 phòng bộ môn",
-            "đạt chuẩn quốc gia mức độ 2",
+            "đạt chuẩn quốc gia Mức độ 2",
           ],
         },
         {
           icon: "users",
           title: "Đội ngũ",
-          body: "Đội ngũ 51 cán bộ, giáo viên, nhân viên đạt 100% trình độ chuẩn và trên chuẩn, với 14 danh hiệu Giáo viên giỏi cấp Tỉnh, Thành phố cùng hàng trăm lượt cấp Huyện.",
+          body: "Đội ngũ 51 cán bộ, giáo viên, nhân viên đạt 100% trình độ chuẩn và trên chuẩn, trong đó 16 giáo viên đạt giải cấp Thành phố.",
           emphasis: [
             "51 cán bộ, giáo viên",
             "100%",
-            "14 danh hiệu Giáo viên giỏi",
+            "16 giáo viên đạt giải cấp Thành phố",
           ],
         },
         {
@@ -506,8 +506,17 @@ const NVH_CONFIG: LandingConfig = {
           id: "schedule",
           label: "Lịch tuyển sinh",
           highlight: "Nhận hồ sơ 05/6 → 09/6/2026",
-          body: "Nhận hồ sơ trực tuyến từ ngày 05/6/2026 đến hết ngày 09/6/2026. Hỗ trợ nộp hồ sơ online với những trường hợp không nộp được trực tuyến tại nhà, địa điểm hỗ trợ tại Văn phòng trường THCS Nguyễn Văn Huyên (từ 8h00 đến 17h00 ngày 09/6/2026).",
           icon: "calendar",
+          steps: [
+            {
+              date: "05/6 → 09/6/2026",
+              text: "Nhận hồ sơ trực tuyến — phụ huynh nộp online tại nhà.",
+            },
+            {
+              date: "06/6 → 09/6/2026 · 8h00 – 17h00",
+              text: "Hỗ trợ nộp hồ sơ tại Văn phòng trường THCS Nguyễn Văn Huyên cho các trường hợp không nộp trực tuyến được tại nhà.",
+            },
+          ],
         },
         {
           id: "documents",

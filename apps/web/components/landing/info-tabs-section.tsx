@@ -14,6 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import { HighlightedText } from "./highlight-text";
 import { PhotoIdPlaceholder } from "./photo-id-placeholder";
 
+type InfoTab = InfoTabsSection["tabs"][number];
+
 const ICONS: Record<InfoTabIcon, LucideIcon> = {
   users: Users,
   calendar: Calendar,
@@ -23,8 +25,56 @@ const ICONS: Record<InfoTabIcon, LucideIcon> = {
   info: Info,
 };
 
-function hasPhotoContent(body: string) {
-  return body.toLowerCase().includes("ảnh thẻ");
+function hasPhotoContent(body: string | undefined) {
+  return !!body && body.toLowerCase().includes("ảnh thẻ");
+}
+
+/** Vertical timeline (lộ trình) for tabs that supply dated `steps`. */
+function TabTimeline({ steps }: { steps: NonNullable<InfoTab["steps"]> }) {
+  return (
+    <ol className="relative mt-4 space-y-5 border-l border-border pl-6">
+      {steps.map((step) => (
+        <li key={`${step.date ?? ""}-${step.text}`} className="relative">
+          <span
+            aria-hidden
+            className="absolute -left-[33px] top-1.5 size-3 rounded-full bg-primary ring-4 ring-card"
+          />
+          {step.date && (
+            <p className="text-sm font-semibold text-primary">
+              <HighlightedText text={step.date} />
+            </p>
+          )}
+          <p className="text-[15px] leading-relaxed text-muted-foreground">
+            <HighlightedText text={step.text} />
+          </p>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/** A tab's content: a timeline when `steps` is set, else a body paragraph. */
+function TabContent({
+  tab,
+  bodyClassName,
+}: {
+  tab: InfoTab;
+  bodyClassName?: string;
+}) {
+  if (tab.steps?.length) return <TabTimeline steps={tab.steps} />;
+  if (!tab.body) return null;
+  return (
+    <>
+      <p
+        className={`text-[15px] leading-relaxed text-muted-foreground${
+          bodyClassName ? ` ${bodyClassName}` : ""
+        }`}
+      >
+        <HighlightedText text={tab.body} />
+      </p>
+      {hasPhotoContent(tab.body) && <PhotoIdPlaceholder />}
+    </>
+  );
 }
 
 export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
@@ -63,10 +113,7 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
                       <HighlightedText text={tab.highlight} />
                     </p>
                   )}
-                  <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
-                    <HighlightedText text={tab.body} />
-                  </p>
-                  {hasPhotoContent(tab.body) && <PhotoIdPlaceholder />}
+                  <TabContent tab={tab} bodyClassName="mt-2" />
                 </div>
               );
             })}
@@ -89,10 +136,7 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
                         <HighlightedText text={tab.highlight} />
                       </p>
                     )}
-                    <p className="text-[15px] leading-relaxed text-muted-foreground">
-                      <HighlightedText text={tab.body} />
-                    </p>
-                    {hasPhotoContent(tab.body) && <PhotoIdPlaceholder />}
+                    <TabContent tab={tab} />
                   </div>
                 </li>
               );
@@ -130,10 +174,10 @@ export function InfoTabsSection({ section }: { section: InfoTabsSection }) {
                       <HighlightedText text={tab.highlight} />
                     </p>
                   )}
-                  <p className={`text-[15px] leading-relaxed text-muted-foreground${tab.highlight ? " mt-2" : ""}`}>
-                    <HighlightedText text={tab.body} />
-                  </p>
-                  {hasPhotoContent(tab.body) && <PhotoIdPlaceholder />}
+                  <TabContent
+                    tab={tab}
+                    bodyClassName={tab.highlight ? "mt-2" : undefined}
+                  />
                 </TabsContent>
               ))}
             </div>
