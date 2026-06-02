@@ -123,6 +123,10 @@ export const TENANT_FIXTURES: Readonly<Record<string, TenantBranding>> = {
     name: "Trường THCS Nguyễn Gia Thiều, Phúc Lợi, Hà Nội",
     shortName: "NGT",
     logoUrl: null,
+    description:
+      "TUYỂN SINH TRỰC TUYẾN TRƯỜNG THCS NGUYỄN GIA THIỀU NĂM HỌC 2026 - 2027. " +
+      "Nộp trực tuyến: 7h00 ngày 03/6/2026 đến 24h00 ngày 08/6/2026. " +
+      "Kiểm tra đánh giá năng lực: Sáng 14/6/2026.",
     theme: tenantTheme({
       // Tailwind amber-700 / amber-400 in oklch, gold for a heritage school.
       light: {

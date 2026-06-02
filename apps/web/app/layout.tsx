@@ -94,7 +94,9 @@ export async function generateMetadata(): Promise<Metadata> {
     branding.theme.light.primary,
     branding.shortName,
   );
-  const description = `${branding.name} — cổng tuyển sinh trực tuyến. Nộp hồ sơ và tra cứu kết quả nhanh chóng, minh bạch.`;
+  const description =
+    branding.description?.trim() ||
+    `${branding.name} — cổng tuyển sinh trực tuyến. Nộp hồ sơ và tra cứu kết quả nhanh chóng, minh bạch.`;
 
   return {
     metadataBase: origin,

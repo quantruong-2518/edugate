@@ -648,8 +648,8 @@ const NGT_CONFIG: LandingConfig = {
         {
           id: "schedule",
           label: "Lịch tuyển sinh",
-          highlight: "Nhận hồ sơ 05/6 → 08/6/2026",
-          body: "Nhận hồ sơ trực tuyến từ ngày 05/6/2026 đến hết ngày 08/6/2026. Hỗ trợ nộp hồ sơ online với những trường hợp không nộp được trực tuyến tại nhà, địa điểm hỗ trợ tại Văn phòng trường THCS Nguyễn Gia Thiều (từ 8h00 đến 17h00 ngày 08/6/2026).",
+          highlight: "Nhận hồ sơ 03/6 → 08/6/2026 · KTĐGNL 14/6/2026",
+          body: "Nhận hồ sơ trực tuyến từ 7h00 ngày 03/6/2026 đến 24h00 ngày 08/6/2026. Hỗ trợ nộp hồ sơ online với những trường hợp không nộp được trực tuyến tại nhà, địa điểm hỗ trợ tại Văn phòng trường THCS Nguyễn Gia Thiều (từ 8h00 đến 17h00 ngày 08/6/2026). Kiểm tra đánh giá năng lực: Buổi sáng ngày 14/6/2026.",
           icon: "calendar",
         },
         {

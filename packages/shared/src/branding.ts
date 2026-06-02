@@ -20,4 +20,11 @@ export type TenantBranding = {
   logoUrl: string | null;
   /** Color tokens + radius + font stacks. Serialized via `tenantThemeToCss`. */
   theme: TenantTheme;
+  /**
+   * Meta / OG description shown alongside the URL in search results and
+   * link previews (Zalo, Facebook, iMessage). When unset the root layout
+   * falls back to a generic "{name} — cổng tuyển sinh trực tuyến…" line.
+   * Keep it concise — most crawlers truncate around 160 characters.
+   */
+  description?: string;
 };
