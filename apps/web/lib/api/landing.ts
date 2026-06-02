@@ -611,7 +611,7 @@ const NGT_CONFIG: LandingConfig = {
     },
     {
       type: "process",
-      title: "Các bước tuyển sinh online",
+      title: "Các bước nộp hồ sơ dự tuyển",
       // Mirrors the real registration wizard (applicant → form → verify → done);
       // tracking is a separate action afterwards, not a registration step.
       steps: [
